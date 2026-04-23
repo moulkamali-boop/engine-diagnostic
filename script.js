@@ -322,7 +322,7 @@ async function generatePDF() {
   doc.text(`نتيجة التشخيص: ${diagnosis}`, 20, 80);
   doc.text(`التوصية: ${hint}`, 20, 90);
   
-  if(freeDiagnostics >= MAX_FRE && !subscriptionActive) {
+  if(freeDiagnostics >= MAX_FREE && !subscriptionActive) {
     doc.setTextColor(255, 0, 0);
     doc.text("⚠️ هذا التقرير مجاني (المرة الثالثة). للتشخيصات القادمة، يلزم الاشتراك.", 20, 110);
     doc.setTextColor(0, 0, 0);
@@ -336,9 +336,8 @@ async function generatePDF() {
 
 // ==================== الاشتراك ====================
 function subscribe() {
-  alert("سيتم تحويلك إلى بوابة الدفع الآمنة (Lemon Squeezy / Patreon)\nالاشتراك الشهري: $20");
-  // هنا سنضيف رابط الدفع الحقيقي لاحقاً
-  // window.location.href = "https://patreon.com/c/Mouloud966/membership";
+    // رابط الاشتراك على Patreon
+    window.location.href = "https://www.patreon.com/c/Mouloud966/membership";
 }
 
 // ==================== الأحداث ====================
