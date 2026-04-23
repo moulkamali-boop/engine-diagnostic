@@ -343,8 +343,8 @@ async function generatePDF() {
 
 // ==================== الاشتراك ====================
 function subscribe() {
-    // رابط الاشتراك على Patreon
-    window.location.href = "https://www.patreon.com/c/Mouloud966/membership";
+    // رابط الدفع عبر Lemon Squeezy
+    window.location.href = "https://ai-moto-maintenance.lemonsqueezy.com/checkout/buy/c3abadc2-c6cc-459e-a106-de43d4f2d3f0";
 }
 
 // ==================== الأحداث ====================
