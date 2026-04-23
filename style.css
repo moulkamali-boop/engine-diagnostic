@@ -19,7 +19,7 @@ body {
 
 header {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
 header h1 {
@@ -30,14 +30,25 @@ header h1 {
 
 .subtitle {
   color: #aaa;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
+}
+
+.counter-card {
+  background: #1a1a1a;
+  border: 1px solid #ffd700;
+  border-radius: 16px;
+  padding: 10px;
+  text-align: center;
+  margin-bottom: 20px;
+  color: #ffd700;
+  font-weight: bold;
 }
 
 .lang-selector {
   display: flex;
   justify-content: center;
   gap: 10px;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
 .lang-btn {
@@ -131,7 +142,7 @@ header h1 {
 }
 
 .btn-secondary {
-  background: #444;
+  background: #333;
   color: #ffd700;
   border: 1px solid #ffd700;
   padding: 12px;
@@ -139,7 +150,20 @@ header h1 {
   font-size: 0.9rem;
   cursor: pointer;
   width: 100%;
-  margin-top: 15px;
+  margin-top: 10px;
+}
+
+.btn-subscribe {
+  background: #ff6600;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 30px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 10px;
 }
 
 .result-card {
@@ -165,6 +189,14 @@ header h1 {
 .result-hint {
   color: #aaa;
   font-size: 0.85rem;
+  margin-bottom: 10px;
+}
+
+.result-location {
+  color: #888;
+  font-size: 0.7rem;
+  margin-top: 10px;
+  font-family: monospace;
 }
 
 .status {

@@ -12,8 +12,12 @@
   <div class="container">
     <header>
       <h1>🔧 تشخيص المحرك</h1>
-      <p class="subtitle">Engine Diagnostic - أي محرك، أي مركبة</p>
+      <p class="subtitle">Engine Diagnostic - لأي محرك (سيارة، شاحنة، دراجة، قارب، مولد)</p>
     </header>
+
+    <div class="counter-card">
+      <span id="counter-display">التشخيصات المجانية المتبقية: 3</span>
+    </div>
 
     <div class="lang-selector">
       <button data-lang="ar" class="lang-btn active">🇸🇦 العربية</button>
@@ -21,6 +25,7 @@
       <button data-lang="fr" class="lang-btn">🇫🇷 Français</button>
     </div>
 
+    <!-- مرحلة 1: تصوير العادم -->
     <div class="step" id="step-camera">
       <div class="step-icon">📷</div>
       <div class="step-content">
@@ -34,6 +39,7 @@
       </div>
     </div>
 
+    <!-- مرحلة 2: تسجيل صوت المحرك -->
     <div class="step" id="step-microphone">
       <div class="step-icon">🎙️</div>
       <div class="step-content">
@@ -44,15 +50,19 @@
       </div>
     </div>
 
+    <!-- مرحلة 3: التشخيص -->
     <div class="step" id="step-diagnose">
       <button id="diagnose-btn" class="btn-diagnose">🔍 شخص الآن</button>
     </div>
 
+    <!-- نتيجة التشخيص -->
     <div id="result-card" class="result-card hidden">
       <h3 id="result-title">نتيجة التشخيص</h3>
       <div id="result-text" class="result-text"></div>
       <div id="result-hint" class="result-hint"></div>
-      <button id="deep-diagnose" class="btn-secondary hidden">📄 التقرير العميق (مدفوع)</button>
+      <div id="result-location" class="result-location"></div>
+      <button id="download-pdf" class="btn-secondary hidden">📄 تحميل التقرير (PDF)</button>
+      <button id="subscribe-btn" class="btn-subscribe hidden">🔒 الاشتراك ($20/شهر)</button>
     </div>
 
     <footer>
@@ -60,6 +70,8 @@
     </footer>
   </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
