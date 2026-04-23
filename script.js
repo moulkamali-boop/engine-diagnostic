@@ -135,15 +135,14 @@ function updateCounterDisplay() {
   const remaining = Math.max(0, MAX_FREE - freeDiagnostics);
   document.getElementById('counter-display').innerHTML = `🔓 التشخيصات المجانية المتبقية: ${remaining} / ${MAX_FREE}`;
   
+  // إظهار زر الاشتراك دائماً (لن يختفي أبداً)
+  const subscribeBtn = document.getElementById('subscribe-btn');
+  if(subscribeBtn) {
+    subscribeBtn.classList.remove('hidden');
+  }
+  
   if(subscriptionActive) {
     document.getElementById('counter-display').innerHTML = `✅ اشتراك نشط - تشخيص غير محدود (كل 72 ساعة)`;
-    document.getElementById('subscribe-btn').classList.add('hidden');
-  } else {
-    if(freeDiagnostics >= MAX_FREE) {
-      document.getElementById('subscribe-btn').classList.remove('hidden');
-    } else {
-      document.getElementById('subscribe-btn').classList.add('hidden');
-    }
   }
 }
 
@@ -231,7 +230,6 @@ function performDiagnosis() {
   // التحقق من إمكانية التشخيص (مجاني أم مدفوع)
   if(!subscriptionActive && freeDiagnostics >= MAX_FREE) {
     alert("لقد استنفذت التشخيصات المجانية الثلاثة. يرجى الاشتراك للمتابعة.");
-    document.getElementById('subscribe-btn').classList.remove('hidden');
     return;
   }
   
@@ -298,10 +296,6 @@ function performDiagnosis() {
     freeDiagnostics++;
     localStorage.setItem('engine_diag_free', freeDiagnostics);
     updateCounterDisplay();
-    
-    if(freeDiagnostics >= MAX_FREE) {
-      document.getElementById('subscribe-btn').classList.remove('hidden');
-    }
   }
 }
 
