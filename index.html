@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>تشخيص المحرك - Engine Diagnostic</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0a0a0a">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🔧 تشخيص المحرك</h1>
+      <p class="subtitle">Engine Diagnostic - أي محرك، أي مركبة</p>
+    </header>
+
+    <div class="lang-selector">
+      <button data-lang="ar" class="lang-btn active">🇸🇦 العربية</button>
+      <button data-lang="en" class="lang-btn">🇬🇧 English</button>
+      <button data-lang="fr" class="lang-btn">🇫🇷 Français</button>
+    </div>
+
+    <div class="step" id="step-camera">
+      <div class="step-icon">📷</div>
+      <div class="step-content">
+        <h3 id="cam-title">تصوير العادم</h3>
+        <p id="cam-desc">وجّه الكاميرا نحو مخرج العادم لتحليل لون الدخان</p>
+        <div class="camera-container">
+          <video id="camera-preview" autoplay playsinline muted></video>
+          <button id="capture-photo" class="btn-primary">📸 التقاط صورة</button>
+        </div>
+        <div id="photo-result" class="result-preview"></div>
+      </div>
+    </div>
+
+    <div class="step" id="step-microphone">
+      <div class="step-icon">🎙️</div>
+      <div class="step-content">
+        <h3 id="mic-title">تسجيل صوت المحرك</h3>
+        <p id="mic-desc">قرب الهاتف من المحرك وسجل الصوت لمدة 5 ثوانٍ</p>
+        <button id="record-sound" class="btn-primary">🎤 تسجيل</button>
+        <div id="recording-status" class="status"></div>
+      </div>
+    </div>
+
+    <div class="step" id="step-diagnose">
+      <button id="diagnose-btn" class="btn-diagnose">🔍 شخص الآن</button>
+    </div>
+
+    <div id="result-card" class="result-card hidden">
+      <h3 id="result-title">نتيجة التشخيص</h3>
+      <div id="result-text" class="result-text"></div>
+      <div id="result-hint" class="result-hint"></div>
+      <button id="deep-diagnose" class="btn-secondary hidden">📄 التقرير العميق (مدفوع)</button>
+    </div>
+
+    <footer>
+      <p>© منظومة تشخيص المحرك - تشخيص علمي دقيق</p>
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
