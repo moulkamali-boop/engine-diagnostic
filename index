@@ -2,81 +2,35 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>تشخيص المحرك - Engine Diagnostic</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#0a0a0a">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تشخيص المحرك - اشتراك</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0a0a0a;
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+    button {
+      background: #ffd700;
+      color: #1a1a1a;
+      border: none;
+      padding: 15px 30px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      border-radius: 50px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>🔧 تشخيص المحرك</h1>
-      <p class="subtitle">Engine Diagnostic - لأي محرك (سيارة، شاحنة، دراجة، قارب، مولد)</p>
-    </header>
-
-    <div class="counter-card">
-      <span id="counter-display">🔓 التشخيصات المجانية المتبقية: 3 / 3</span>
-    </div>
-
-    <div class="lang-selector">
-      <button data-lang="ar" class="lang-btn active">🇸🇦 العربية</button>
-      <button data-lang="en" class="lang-btn">🇬🇧 English</button>
-      <button data-lang="fr" class="lang-btn">🇫🇷 Français</button>
-    </div>
-
-    <!-- مرحلة 1: تصوير العادم -->
-    <div class="step" id="step-camera">
-      <div class="step-icon">📷</div>
-      <div class="step-content">
-        <h3 id="cam-title">تصوير العادم</h3>
-        <p id="cam-desc">وجّه الكاميرا نحو مخرج العادم لتحليل لون الدخان</p>
-        <div class="camera-container">
-          <video id="camera-preview" autoplay playsinline muted></video>
-          <button id="capture-photo" class="btn-primary">📸 التقاط صورة</button>
-        </div>
-        <div id="photo-result" class="result-preview"></div>
-      </div>
-    </div>
-
-    <!-- مرحلة 2: تسجيل صوت المحرك -->
-    <div class="step" id="step-microphone">
-      <div class="step-icon">🎙️</div>
-      <div class="step-content">
-        <h3 id="mic-title">تسجيل صوت المحرك</h3>
-        <p id="mic-desc">قرب الهاتف من المحرك وسجل الصوت لمدة 5 ثوانٍ</p>
-        <button id="record-sound" class="btn-primary">🎤 تسجيل</button>
-        <div id="recording-status" class="status"></div>
-      </div>
-    </div>
-
-    <!-- مرحلة 3: التشخيص -->
-    <div class="step" id="step-diagnose">
-      <button id="diagnose-btn" class="btn-diagnose">🔍 شخص الآن</button>
-    </div>
-
-    <!-- نتيجة التشخيص -->
-    <div id="result-card" class="result-card hidden">
-      <h3 id="result-title">نتيجة التشخيص</h3>
-      <div id="result-text" class="result-text"></div>
-      <div id="result-hint" class="result-hint"></div>
-      <div id="result-location" class="result-location"></div>
-      <button id="download-pdf" class="btn-secondary hidden">📄 تحميل التقرير (PDF)</button>
-    </div>
-
-    <!-- زر الاشتراك (ظاهر دائماً) -->
-    <div class="subscribe-section">
-      <button id="subscribe-btn" class="btn-subscribe">🔒 الاشتراك ($20/شهر)</button>
-      <p class="subscribe-note">اشترك الآن للحصول على تشخيصات غير محدودة (كل 72 ساعة)</p>
-    </div>
-
-    <footer>
-      <p>© منظومة تشخيص المحرك - تشخيص علمي دقيق</p>
-    </footer>
-  </div>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <script src="script.js"></script>
+  <h1>🔧 تشخيص المحرك</h1>
+  <p>اضغط الزر أدناه للاشتراك (20$/شهر)</p>
+  <button onclick="window.location.href='https://ai-moto-maintenance.lemonsqueezy.com/checkout/buy/c3abadc2-c6cc-459e-a106-de43d4f2d3f0'">
+    🔒 اشتراك الآن
+  </button>
+  <p><a href="https://moulkamali-boop.github.io/engine-diagnostic/" style="color:#aaa">العودة إلى التطبيق الرئيسي</a></p>
 </body>
 </html>
