@@ -133,10 +133,17 @@ function loadLanguage(lang) {
 
 function updateCounterDisplay() {
   const remaining = Math.max(0, MAX_FREE - freeDiagnostics);
-  const t = translations[currentLang];
   document.getElementById('counter-display').innerHTML = `🔓 التشخيصات المجانية المتبقية: ${remaining} / ${MAX_FREE}`;
+  
   if(subscriptionActive) {
     document.getElementById('counter-display').innerHTML = `✅ اشتراك نشط - تشخيص غير محدود (كل 72 ساعة)`;
+    document.getElementById('subscribe-btn').classList.add('hidden');
+  } else {
+    if(freeDiagnostics >= MAX_FREE) {
+      document.getElementById('subscribe-btn').classList.remove('hidden');
+    } else {
+      document.getElementById('subscribe-btn').classList.add('hidden');
+    }
   }
 }
 
