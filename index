@@ -2,62 +2,34 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>تشخيص المحرك - التشخيص الذكي</title>
+  <title>تشخيص المحرك - نسخة مبسطة</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#0a0a0a">
 </head>
 <body>
   <div class="container">
-    <header>
-      <h1>🔧 تشخيص المحرك</h1>
-      <p class="subtitle">Engine Diagnostic - ثورة في تشخيص الأعطال</p>
-    </header>
-
-    <div class="counter-card">
-      <span id="counter-display">🔓 التشخيصات المجانية المتبقية: 3 / 3</span>
+    <h1>🔧 تشخيص المحرك</h1>
+    <div class="counter" id="counter">🔓 المجانية: 3/3</div>
+    
+    <div class="lang">
+      <button data-lang="ar">🇸🇦 عربي</button>
+      <button data-lang="en">🇬🇧 English</button>
     </div>
 
-    <div class="lang-selector">
-      <button data-lang="ar" class="lang-btn active">🇸🇦 العربية</button>
-      <button data-lang="en" class="lang-btn">🇬🇧 English</button>
-      <button data-lang="fr" class="lang-btn">🇫🇷 Français</button>
+    <button id="start-diagnose" class="btn">🔍 ابدأ التشخيص</button>
+
+    <div id="step1" class="hidden steps">
+      <button id="mic-btn" class="btn">🎤 تسجيل الصوت (10 ثوانٍ)</button>
+      <button id="photo-btn" class="btn">📸 تصوير العادم</button>
+      <button id="diagnose-btn" class="btn">🔍 شخص الآن</button>
     </div>
 
-    <!-- زر التشخيص الرئيسي -->
-    <div class="step" id="step-diagnose">
-      <button id="start-diagnose" class="btn-diagnose">🔍 ابدأ التشخيص الآن</button>
-      <p class="step-hint">سيتم توجيهك خطوة بخطوة (المحرك ← العادم)</p>
+    <div id="result-card" class="result hidden">
+      <h3 id="result-title">النتيجة</h3>
+      <div id="result-text"></div>
+      <button id="download-pdf" class="btn">📄 تحميل PDF</button>
+      <button id="subscribe-btn" class="btn subscribe hidden">🔒 الاشتراك ($20/شهر)</button>
     </div>
-
-    <!-- حالة التقدم (تظهر أثناء التشخيص) -->
-    <div id="progress-panel" class="progress-panel hidden">
-      <div id="progress-status" class="progress-status">⚙️ جاري التحضير...</div>
-      <div class="progress-bar-container">
-        <div id="progress-bar" class="progress-bar"></div>
-      </div>
-    </div>
-
-    <!-- نتيجة التشخيص -->
-    <div id="result-card" class="result-card hidden">
-      <h3 id="result-title">نتيجة التشخيص</h3>
-      <div id="result-icon" class="result-icon">🟢</div>
-      <div id="result-text" class="result-text"></div>
-      <div id="result-hint" class="result-hint"></div>
-      <div id="result-location" class="result-location"></div>
-      <div class="result-actions">
-        <button id="download-pdf" class="btn-secondary">📄 تحميل التقرير (PDF)</button>
-        <button id="subscribe-btn" class="btn-subscribe" onclick="window.location.href='https://ai-moto-maintenance.lemonsqueezy.com/checkout/buy/c3abadc2-c6cc-459e-a106-de43d4f2d3f0'">🔒 الاشتراك ($20/شهر)</button>
-      </div>
-    </div>
-
-    <footer>
-      <p>© منظومة تشخيص المحرك - للاشتراك والدعم الفني</p>
-    </footer>
   </div>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
