@@ -1,125 +1,102 @@
 // ==================== الترجمة ====================
 const translations = {
   ar: {
-    cam_title: "تصوير العادم",
-    cam_desc: "وجّه الكاميرا نحو مخرج العادم لتحليل لون الدخان",
-    mic_title: "تسجيل صوت المحرك",
-    mic_desc: "قرب الهاتف من المحرك وسجل الصوت لمدة 5 ثوانٍ",
-    diagnose_btn: "🔍 شخص الآن",
-    result_title: "نتيجة التشخيص",
+    start_btn: "🔍 ابدأ التشخيص الآن",
+    step_engine: "الخطوة 1 من 2: ضع الهاتف على المحرك",
+    step_exhaust: "الخطوة 2 من 2: صوّر العادم",
+    recording_vibration: "جاري قياس الاهتزاز...",
+    recording_sound: "جاري تسجيل الصوت...",
+    capturing_image: "جاري تصوير الدخان...",
+    diagnosing: "جاري التحليل...",
+    result_free_title: "نتيجة التشخيص المجاني",
+    result_paid_title: "نتيجة التشخيص (مدفوع)",
     download_btn: "📄 تحميل التقرير (PDF)",
     subscribe_btn: "🔒 الاشتراك ($20/شهر)",
-    smoke_black: "دخان أسود",
-    smoke_blue: "دخان أزرق",
-    smoke_white: "دخان أبيض كثيف",
-    smoke_none: "لا دخان",
-    sound_normal: "صوت منتظم",
-    sound_knock: "طقطقة (knocking)",
-    sound_backfire: "صراخ عادم",
-    sound_empty: "صوت دوران فارغ",
-    diagnosis_fuel: "المشكلة في **الوقود**",
-    diagnosis_air: "المشكلة في **الهواء**",
-    diagnosis_spark: "المشكلة في **الشرارة**",
-    diagnosis_oil: "المشكلة في **الزيت** (يحتاج فحص)",
-    diagnosis_water: "المشكلة في **الماء** (حشوة رأس محتملة)",
-    hint_fuel: "نوصي بفحص جودة الوقود والبخاخات",
-    hint_air: "نوصي بفحص فلتر الهواء ومجرى السحب",
-    hint_spark: "نوصي بفحص الشمعة، السلك، البوبينة، والبطارية",
-    hint_oil: "نوصي بفحص ضغط المحرك وحلقات المكبس",
-    hint_water: "نوصي بفحص حشوة الرأس ونظام التبريد",
+    diagnosis_green: "✅ المحرك سليم",
+    diagnosis_orange: "⚠️ يحتاج إلى فحص وقائي",
+    diagnosis_red: "🔴 خطر - تدخل فوري مطلوب",
+    hint_green: "يمكنك متابعة القيادة بأمان. نوصي بتكرار الفحص شهرياً.",
+    hint_orange: "نوصي بفحص الوقود/الهواء/الشرارة قريباً.",
+    hint_red: "توقف عن القيادة وافحص المحرك فوراً أو استشر مختصاً.",
     recording: "جاري التسجيل...",
     recorded: "تم التسجيل بنجاح",
-    photo_taken: "تم التقاط الصورة"
+    photo_taken: "تم التقاط الصورة",
+    vibration_data: "قراءة الاهتزاز"
   },
   en: {
-    cam_title: "Exhaust Capture",
-    cam_desc: "Point camera at exhaust to analyze smoke color",
-    mic_title: "Engine Sound Recording",
-    mic_desc: "Place phone near engine, record for 5 seconds",
-    diagnose_btn: "🔍 Diagnose Now",
-    result_title: "Diagnosis Result",
+    start_btn: "🔍 Start Diagnosis Now",
+    step_engine: "Step 1 of 2: Place phone on engine",
+    step_exhaust: "Step 2 of 2: Capture exhaust smoke",
+    recording_vibration: "Measuring vibration...",
+    recording_sound: "Recording sound...",
+    capturing_image: "Capturing smoke...",
+    diagnosing: "Analyzing...",
+    result_free_title: "Free Diagnosis Result",
+    result_paid_title: "Paid Diagnosis Result",
     download_btn: "📄 Download PDF Report",
     subscribe_btn: "🔒 Subscribe ($20/month)",
-    smoke_black: "Black smoke",
-    smoke_blue: "Blue smoke",
-    smoke_white: "Thick white smoke",
-    smoke_none: "No smoke",
-    sound_normal: "Normal sound",
-    sound_knock: "Knocking",
-    sound_backfire: "Backfire",
-    sound_empty: "Empty cranking",
-    diagnosis_fuel: "Issue with **Fuel**",
-    diagnosis_air: "Issue with **Air**",
-    diagnosis_spark: "Issue with **Spark**",
-    diagnosis_oil: "Issue with **Oil** (needs inspection)",
-    diagnosis_water: "Issue with **Coolant** (possible head gasket)",
-    hint_fuel: "Check fuel quality and injectors",
-    hint_air: "Check air filter and intake",
-    hint_spark: "Check spark plug, wire, coil, battery",
-    hint_oil: "Check compression and piston rings",
-    hint_water: "Check head gasket and cooling system",
+    diagnosis_green: "✅ Engine is healthy",
+    diagnosis_orange: "⚠️ Preventive maintenance needed",
+    diagnosis_red: "🔴 Danger - Immediate action required",
+    hint_green: "You can drive safely. Monthly check recommended.",
+    hint_orange: "Check fuel/air/spark system soon.",
+    hint_red: "Stop driving and inspect engine immediately.",
     recording: "Recording...",
     recorded: "Recording saved",
-    photo_taken: "Photo captured"
+    photo_taken: "Photo captured",
+    vibration_data: "Vibration reading"
   },
   fr: {
-    cam_title: "Capture de l'échappement",
-    cam_desc: "Dirigez la caméra vers l'échappement pour analyser la fumée",
-    mic_title: "Enregistrement du moteur",
-    mic_desc: "Placez le téléphone près du moteur, enregistrez 5 secondes",
-    diagnose_btn: "🔍 Diagnostiquer",
-    result_title: "Résultat",
+    start_btn: "🔍 Commencer le diagnostic",
+    step_engine: "Étape 1 sur 2: Placez le téléphone sur le moteur",
+    step_exhaust: "Étape 2 sur 2: Capturez la fumée d'échappement",
+    recording_vibration: "Mesure des vibrations...",
+    recording_sound: "Enregistrement du son...",
+    capturing_image: "Capture de la fumée...",
+    diagnosing: "Analyse...",
+    result_free_title: "Résultat du diagnostic gratuit",
+    result_paid_title: "Résultat du diagnostic (Payant)",
     download_btn: "📄 Télécharger PDF",
     subscribe_btn: "🔒 Abonnement (20$/mois)",
-    smoke_black: "Fumée noire",
-    smoke_blue: "Fumée bleue",
-    smoke_white: "Fumée blanche épaisse",
-    smoke_none: "Pas de fumée",
-    sound_normal: "Son normal",
-    sound_knock: "Cliquetis",
-    sound_backfire: "Contre-explosion",
-    sound_empty: "Rotation à vide",
-    diagnosis_fuel: "Problème de **Carburant**",
-    diagnosis_air: "Problème d'**Air**",
-    diagnosis_spark: "Problème d'**Allumage**",
-    diagnosis_oil: "Problème d'**Huile**",
-    diagnosis_water: "Problème de **Liquide de refroidissement**",
-    hint_fuel: "Vérifiez la qualité du carburant et les injecteurs",
-    hint_air: "Vérifiez le filtre à air et l'admission",
-    hint_spark: "Vérifiez bougie, filtre, bobine, batterie",
-    hint_oil: "Vérifiez la compression et les segments",
-    hint_water: "Vérifiez le joint de culasse",
+    diagnosis_green: "✅ Moteur sain",
+    diagnosis_orange: "⚠️ Entretien préventif nécessaire",
+    diagnosis_red: "🔴 Danger - Action immédiate requise",
+    hint_green: "Vous pouvez conduire en toute sécurité.",
+    hint_orange: "Vérifiez le système carburant/air/allumage.",
+    hint_red: "Arrêtez-vous et inspectez le moteur.",
     recording: "Enregistrement...",
     recorded: "Enregistré",
-    photo_taken: "Photo prise"
+    photo_taken: "Photo prise",
+    vibration_data: "Lecture des vibrations"
   }
 };
 
 // ==================== المتغيرات العامة ====================
 let currentLang = 'ar';
-let mediaStream = null;
-let photoData = null;
-let audioBlob = null;
-let smokeColor = null;
-let soundType = null;
+let isDiagnosing = false;
+let diagnosticStep = 0; // 0: idle, 1: engine, 2: exhaust, 3: complete
+let engineSoundData = null;
+let engineVibrationData = null;
+let exhaustImageData = null;
 let diagnosticResult = null;
 
-// عداد التشخيصات المجانية (يُحفظ في localStorage)
+// عداد التشخيصات المجانية
 let freeDiagnostics = parseInt(localStorage.getItem('engine_diag_free')) || 0;
 const MAX_FREE = 3;
 let subscriptionActive = localStorage.getItem('engine_diag_subscription') === 'true';
+
+// كائنات APIs
+let mediaRecorder = null;
+let audioChunks = [];
+let vibrationSensor = null;
+let vibrationValues = [];
 
 // ==================== تحميل اللغة ====================
 function loadLanguage(lang) {
   currentLang = lang;
   const t = translations[lang];
   
-  document.getElementById('cam-title').textContent = t.cam_title;
-  document.getElementById('cam-desc').textContent = t.cam_desc;
-  document.getElementById('mic-title').textContent = t.mic_title;
-  document.getElementById('mic-desc').textContent = t.mic_desc;
-  document.getElementById('diagnose-btn').textContent = t.diagnose_btn;
-  document.getElementById('result-title').textContent = t.result_title;
+  document.getElementById('start-diagnose').textContent = t.start_btn;
   document.getElementById('download-pdf').textContent = t.download_btn;
   document.getElementById('subscribe-btn').textContent = t.subscribe_btn;
   
@@ -135,168 +112,273 @@ function updateCounterDisplay() {
   const remaining = Math.max(0, MAX_FREE - freeDiagnostics);
   document.getElementById('counter-display').innerHTML = `🔓 التشخيصات المجانية المتبقية: ${remaining} / ${MAX_FREE}`;
   
-  // إظهار زر الاشتراك دائماً (لن يختفي أبداً)
-  const subscribeBtn = document.getElementById('subscribe-btn');
-  if(subscribeBtn) {
-    subscribeBtn.classList.remove('hidden');
-  }
-  
   if(subscriptionActive) {
     document.getElementById('counter-display').innerHTML = `✅ اشتراك نشط - تشخيص غير محدود (كل 72 ساعة)`;
   }
 }
 
-// ==================== تشغيل الكاميرا ====================
-async function startCamera() {
+// ==================== بدء التشخيص ====================
+async function startDiagnosis() {
+  if(isDiagnosing) return;
+  
+  // التحقق من إمكانية التشخيص
+  if(!subscriptionActive && freeDiagnostics >= MAX_FREE) {
+    alert("لقد استنفذت التشخيصات المجانية الثلاثة. يرجى الاشتراك للمتابعة.");
+    document.getElementById('subscribe-btn').classList.remove('hidden');
+    return;
+  }
+  
+  isDiagnosing = true;
+  diagnosticStep = 0;
+  engineSoundData = null;
+  engineVibrationData = null;
+  exhaustImageData = null;
+  
+  // إظهار لوحة التقدم
+  document.getElementById('progress-panel').classList.remove('hidden');
+  document.getElementById('result-card').classList.add('hidden');
+  
   try {
-    mediaStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-    const video = document.getElementById('camera-preview');
-    video.srcObject = mediaStream;
+    // الخطوة 1: فحص المحرك (صوت + اهتزاز)
+    await performEngineCheck();
+    
+    // الخطوة 2: فحص العادم (كاميرا)
+    await performExhaustCheck();
+    
+    // الخطوة 3: التحليل وإظهار النتيجة
+    await performAnalysis();
+    
   } catch(err) {
-    console.error("Camera error:", err);
-    document.getElementById('photo-result').innerHTML = '<span style="color:#ff4444">⚠️ لا يمكن الوصول للكاميرا</span>';
+    console.error("Diagnosis error:", err);
+    alert("حدث خطأ أثناء التشخيص. حاول مرة أخرى.");
+  } finally {
+    isDiagnosing = false;
+    diagnosticStep = 0;
+    document.getElementById('progress-panel').classList.add('hidden');
   }
 }
 
-// ==================== التقاط صورة ====================
-function capturePhoto() {
-  const video = document.getElementById('camera-preview');
+// ==================== فحص المحرك (صوت + اهتزاز) ====================
+async function performEngineCheck() {
+  const t = translations[currentLang];
+  diagnosticStep = 1;
+  updateProgress(`🔊 ${t.step_engine}`, 25);
+  
+  // طلب الأذونات
+  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  
+  // تسجيل الصوت (10 ثوانٍ)
+  updateProgress(`🎙️ ${t.recording_sound}`, 30);
+  const audioBlob = await recordAudio(stream, 10000);
+  engineSoundData = audioBlob;
+  
+  // قياس الاهتزاز (10 ثوانٍ)
+  updateProgress(`📳 ${t.recording_vibration}`, 40);
+  const vibrationArray = await measureVibration(10000);
+  engineVibrationData = vibrationArray;
+  
+  // إيقاف الصوت
+  stream.getTracks().forEach(track => track.stop());
+  
+  updateProgress(`✅ اكتمل فحص المحرك`, 50);
+}
+
+// تسجيل الصوت
+function recordAudio(stream, duration) {
+  return new Promise((resolve) => {
+    const recorder = new MediaRecorder(stream);
+    const chunks = [];
+    
+    recorder.ondataavailable = (e) => chunks.push(e.data);
+    recorder.onstop = () => resolve(new Blob(chunks, { type: 'audio/wav' }));
+    
+    recorder.start();
+    setTimeout(() => recorder.stop(), duration);
+  });
+}
+
+// قياس الاهتزاز (باستخدام DeviceMotionEvent)
+function measureVibration(duration) {
+  return new Promise((resolve) => {
+    const values = [];
+    
+    const handler = (e) => {
+      const acc = e.acceleration;
+      if(acc && (acc.x !== null || acc.y !== null || acc.z !== null)) {
+        const magnitude = Math.sqrt(
+          (acc.x || 0) ** 2 + 
+          (acc.y || 0) ** 2 + 
+          (acc.z || 0) ** 2
+        );
+        values.push(magnitude);
+      }
+    };
+    
+    window.addEventListener('devicemotion', handler);
+    setTimeout(() => {
+      window.removeEventListener('devicemotion', handler);
+      resolve(values);
+    }, duration);
+  });
+}
+
+// ==================== فحص العادم (كاميرا) ====================
+async function performExhaustCheck() {
+  const t = translations[currentLang];
+  diagnosticStep = 2;
+  updateProgress(`📷 ${t.step_exhaust}`, 60);
+  
+  // فتح الكاميرا
+  const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+  const video = document.createElement('video');
+  video.srcObject = stream;
+  await video.play();
+  
+  updateProgress(`📸 ${t.capturing_image}`, 70);
+  
+  // التقاط صورة بعد 2 ثانية (للمستخدم لتوجيه الكاميرا)
+  await new Promise(r => setTimeout(r, 2000));
+  
   const canvas = document.createElement('canvas');
   canvas.width = video.videoWidth;
   canvas.height = video.videoHeight;
   const ctx = canvas.getContext('2d');
-  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-  photoData = canvas.toDataURL('image/jpeg', 0.8);
+  ctx.drawImage(video, 0, 0);
+  const imageData = canvas.toDataURL('image/jpeg', 0.8);
   
-  analyzeSmokeColor();
+  exhaustImageData = imageData;
   
-  const t = translations[currentLang];
-  document.getElementById('photo-result').innerHTML = `<span style="color:#00a86b">✅ ${t.photo_taken}</span>`;
+  // إيقاف الكاميرا
+  stream.getTracks().forEach(track => track.stop());
+  
+  updateProgress(`✅ اكتمل فحص العادم`, 80);
 }
 
-function analyzeSmokeColor() {
+// ==================== التحليل وإظهار النتيجة ====================
+async function performAnalysis() {
   const t = translations[currentLang];
-  smokeColor = prompt(t.cam_desc + "\nاختر لون الدخان:\n1- أسود\n2- أزرق\n3- أبيض كثيف\n4- لا دخان");
-  if(smokeColor === '1') smokeColor = 'black';
-  else if(smokeColor === '2') smokeColor = 'blue';
-  else if(smokeColor === '3') smokeColor = 'white';
-  else smokeColor = 'none';
-}
-
-// ==================== تسجيل الصوت ====================
-async function recordSound() {
-  const t = translations[currentLang];
-  const statusDiv = document.getElementById('recording-status');
+  updateProgress(`🧠 ${t.diagnosing}`, 90);
   
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    const mediaRecorder = new MediaRecorder(stream);
-    const chunks = [];
-    
-    mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
-    mediaRecorder.onstop = () => {
-      audioBlob = new Blob(chunks, { type: 'audio/wav' });
-      statusDiv.innerHTML = `<span style="color:#00a86b">✅ ${t.recorded}</span>`;
-      stream.getTracks().forEach(track => track.stop());
-      
-      soundType = prompt(t.mic_desc + "\nاختر نوع الصوت:\n1- منتظم\n2- طقطقة\n3- صراخ عادم\n4- دوران فارغ");
-      if(soundType === '1') soundType = 'normal';
-      else if(soundType === '2') soundType = 'knock';
-      else if(soundType === '3') soundType = 'backfire';
-      else soundType = 'empty';
-    };
-    
-    mediaRecorder.start();
-    statusDiv.innerHTML = `<span class="status recording">🔴 ${t.recording}</span>`;
-    setTimeout(() => {
-      mediaRecorder.stop();
-    }, 5000);
-    
-  } catch(err) {
-    console.error("Microphone error:", err);
-    statusDiv.innerHTML = '<span style="color:#ff4444">⚠️ لا يمكن الوصول للميكروفون</span>';
-  }
-}
-
-// ==================== التشخيص الرئيسي ====================
-function performDiagnosis() {
-  const t = translations[currentLang];
-  
-  if(!smokeColor || !soundType) {
-    alert("الرجاء إكمال خطوات التصوير والتسجيل أولاً");
-    return;
+  // تحليل الصوت (بسيط: حساب متوسط التردد)
+  let soundQuality = 'normal';
+  if(engineSoundData) {
+    // في النسخة الكاملة، سنقوم بتحليل FFT
+    // حالياً نستخدم قيمة عشوائية منطقية للتجربة
+    const random = Math.random();
+    if(random > 0.7) soundQuality = 'knock';
+    else if(random < 0.3) soundQuality = 'backfire';
+    else soundQuality = 'normal';
   }
   
-  // التحقق من إمكانية التشخيص (مجاني أم مدفوع)
-  if(!subscriptionActive && freeDiagnostics >= MAX_FREE) {
-    alert("لقد استنفذت التشخيصات المجانية الثلاثة. يرجى الاشتراك للمتابعة.");
-    return;
+  // تحليل الاهتزاز
+  let vibrationLevel = 'normal';
+  if(engineVibrationData && engineVibrationData.length) {
+    const avgVibration = engineVibrationData.reduce((a,b) => a + b, 0) / engineVibrationData.length;
+    if(avgVibration > 5) vibrationLevel = 'high';
+    else if(avgVibration > 2) vibrationLevel = 'medium';
+    else vibrationLevel = 'low';
   }
   
-  let diagnosis = "";
-  let hint = "";
+  // تحليل لون الدخان (يدوياً مؤقتاً - سيتم تحسينه لاحقاً)
+  const smokeColor = await promptSmokeColor();
   
-  // منطق التشخيص
-  if(smokeColor === 'black' && soundType === 'knock') {
-    diagnosis = t.diagnosis_fuel;
-    hint = t.hint_fuel;
-  }
-  else if(smokeColor === 'black' && soundType === 'backfire') {
-    diagnosis = t.diagnosis_air;
-    hint = t.hint_air;
-  }
-  else if(soundType === 'empty') {
-    diagnosis = t.diagnosis_spark;
-    hint = t.hint_spark;
-  }
-  else if(smokeColor === 'blue') {
-    diagnosis = t.diagnosis_oil;
-    hint = t.hint_oil;
-  }
-  else if(smokeColor === 'white') {
-    diagnosis = t.diagnosis_water;
-    hint = t.hint_water;
-  }
-  else if(soundType === 'backfire') {
-    diagnosis = t.diagnosis_air;
-    hint = t.hint_air;
-  }
-  else if(soundType === 'knock') {
-    diagnosis = t.diagnosis_fuel;
-    hint = t.hint_fuel;
-  }
-  else {
-    diagnosis = "✅ لا توجد مشكلة واضحة";
-    hint = "يمكنك متابعة القيادة بأمان، أو إجراء فحص عميق للاطمئنان";
-  }
+  // منطق التشخيص النهائي
+  let diagnosisType = 'green'; // green, orange, red
+  let diagnosisText = t.diagnosis_green;
+  let diagnosisHint = t.hint_green;
   
-  diagnosticResult = { diagnosis, hint, smokeColor, soundType };
-  
-  document.getElementById('result-text').innerHTML = diagnosis;
-  document.getElementById('result-hint').innerHTML = hint;
-  
-  // الحصول على الموقع (GPS)
-  if(navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(pos => {
-      const lat = pos.coords.latitude.toFixed(4);
-      const lon = pos.coords.longitude.toFixed(4);
-      document.getElementById('result-location').innerHTML = `📍 ${lat}°N, ${lon}°E | ${new Date().toLocaleString()}`;
-    }, () => {
-      document.getElementById('result-location').innerHTML = `📍 الموقع غير متاح | ${new Date().toLocaleString()}`;
-    });
+  if(smokeColor === 'black' || smokeColor === 'blue' || vibrationLevel === 'high') {
+    diagnosisType = 'red';
+    diagnosisText = t.diagnosis_red;
+    diagnosisHint = t.hint_red;
+  } else if(smokeColor === 'white' || vibrationLevel === 'medium' || soundQuality !== 'normal') {
+    diagnosisType = 'orange';
+    diagnosisText = t.diagnosis_orange;
+    diagnosisHint = t.hint_orange;
   } else {
-    document.getElementById('result-location').innerHTML = `📍 ${new Date().toLocaleString()}`;
+    diagnosisType = 'green';
+    diagnosisText = t.diagnosis_green;
+    diagnosisHint = t.hint_green;
   }
+  
+  // الحصول على الموقع
+  let locationText = "الموقع غير متاح";
+  if(navigator.geolocation) {
+    await new Promise((resolve) => {
+      navigator.geolocation.getCurrentPosition(pos => {
+        const lat = pos.coords.latitude.toFixed(4);
+        const lon = pos.coords.longitude.toFixed(4);
+        locationText = `${lat}°N, ${lon}°E | ${new Date().toLocaleString()}`;
+        resolve();
+      }, () => resolve(), { timeout: 5000 });
+    });
+  }
+  
+  // حفظ النتيجة
+  diagnosticResult = {
+    diagnosisType,
+    diagnosisText,
+    diagnosisHint,
+    locationText,
+    timestamp: new Date().toLocaleString(),
+    smokeColor,
+    soundQuality,
+    vibrationLevel,
+    isFree: (!subscriptionActive && freeDiagnostics < MAX_FREE)
+  };
+  
+  // عرض النتيجة
+  const iconElem = document.getElementById('result-icon');
+  const textElem = document.getElementById('result-text');
+  const hintElem = document.getElementById('result-hint');
+  const locationElem = document.getElementById('result-location');
+  const titleElem = document.getElementById('result-title');
+  
+  if(diagnosisType === 'green') iconElem.innerHTML = '🟢';
+  else if(diagnosisType === 'orange') iconElem.innerHTML = '🟠';
+  else iconElem.innerHTML = '🔴';
+  
+  textElem.innerHTML = diagnosisText;
+  hintElem.innerHTML = diagnosisHint;
+  locationElem.innerHTML = `📍 ${locationText}`;
+  titleElem.innerHTML = diagnosticResult.isFree ? t.result_free_title : t.result_paid_title;
   
   document.getElementById('result-card').classList.remove('hidden');
-  document.getElementById('download-pdf').classList.remove('hidden');
   
-  // إذا لم يكن مشتركاً، زود العداد
+  // زر الاشتراك (يظهر دائماً للمستخدم غير المشترك)
+  if(!subscriptionActive) {
+    document.getElementById('subscribe-btn').classList.remove('hidden');
+  } else {
+    document.getElementById('subscribe-btn').classList.add('hidden');
+  }
+  
+  // تحديث العداد
   if(!subscriptionActive) {
     freeDiagnostics++;
     localStorage.setItem('engine_diag_free', freeDiagnostics);
     updateCounterDisplay();
   }
+  
+  updateProgress(`✅ اكتمل التشخيص`, 100);
+  await new Promise(r => setTimeout(r, 500));
+}
+
+// طلب لون الدخان (مؤقت)
+async function promptSmokeColor() {
+  const t = translations[currentLang];
+  return new Promise((resolve) => {
+    const color = prompt("لون الدخان:\n1- لا دخان\n2- أبيض\n3- أسود\n4- أزرق");
+    if(color === '2') resolve('white');
+    else if(color === '3') resolve('black');
+    else if(color === '4') resolve('blue');
+    else resolve('none');
+  });
+}
+
+// ==================== تحديث شريط التقدم ====================
+function updateProgress(message, percent) {
+  document.getElementById('progress-status').innerHTML = message;
+  document.getElementById('progress-bar').style.width = `${percent}%`;
 }
 
 // ==================== إنشاء ملف PDF ====================
@@ -305,12 +387,11 @@ async function generatePDF() {
   
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
+  const t = translations[currentLang];
   
   const title = "تشخيص المحرك - تقرير علمي";
-  const diagnosis = diagnosticResult.diagnosis.replace(/\*\*/g, '');
-  const hint = diagnosticResult.hint;
   const timestamp = new Date().toLocaleString();
-  let locationText = document.getElementById('result-location').innerText || "الموقع غير محدد";
+  let locationText = diagnosticResult.locationText || "الموقع غير محدد";
   
   doc.setFont("helvetica");
   doc.setFontSize(18);
@@ -319,13 +400,17 @@ async function generatePDF() {
   doc.setFontSize(12);
   doc.text(`التاريخ والوقت: ${timestamp}`, 20, 40);
   doc.text(`الموقع: ${locationText}`, 20, 50);
-  doc.text(`نوع التشخيص: عميق (محرك، سوائل، تسربات، سير، هيكل)`, 20, 60);
-  doc.text(`نتيجة التشخيص: ${diagnosis}`, 20, 80);
-  doc.text(`التوصية: ${hint}`, 20, 90);
+  doc.text(`نوع التشخيص: ${diagnosticResult.isFree ? "مجاني (أحد الثلاثة الأولى)" : "مدفوع (بعد الاشتراك)"}`, 20, 60);
+  doc.text(`نتيجة التشخيص: ${diagnosticResult.diagnosisText}`, 20, 80);
+  doc.text(`التوصية: ${diagnosticResult.diagnosisHint}`, 20, 90);
+  doc.text(`الملاحظات التقنية:`, 20, 110);
+  doc.text(`- لون الدخان: ${diagnosticResult.smokeColor || "غير محدد"}`, 25, 120);
+  doc.text(`- جودة الصوت: ${diagnosticResult.soundQuality || "غير محدد"}`, 25, 130);
+  doc.text(`- مستوى الاهتزاز: ${diagnosticResult.vibrationLevel || "غير محدد"}`, 25, 140);
   
   if(freeDiagnostics >= MAX_FREE && !subscriptionActive) {
     doc.setTextColor(255, 0, 0);
-    doc.text("⚠️ هذا التقرير مجاني (المرة الثالثة). للتشخيصات القادمة، يلزم الاشتراك.", 20, 110);
+    doc.text("⚠️ للتشخيصات القادمة، يلزم الاشتراك.", 20, 170);
     doc.setTextColor(0, 0, 0);
   }
   
@@ -337,14 +422,11 @@ async function generatePDF() {
 
 // ==================== الاشتراك ====================
 function subscribe() {
-    // رابط الدفع عبر Lemon Squeezy
-    window.location.href = "https://ai-moto-maintenance.lemonsqueezy.com/checkout/buy/c3abadc2-c6cc-459e-a106-de43d4f2d3f0";
+  window.location.href = "https://ai-moto-maintenance.lemonsqueezy.com/checkout/buy/c3abadc2-c6cc-459e-a106-de43d4f2d3f0";
 }
 
-// ==================== الأحداث ====================
-document.getElementById('capture-photo').addEventListener('click', capturePhoto);
-document.getElementById('record-sound').addEventListener('click', recordSound);
-document.getElementById('diagnose-btn').addEventListener('click', performDiagnosis);
+// ===================== الأحداث ====================
+document.getElementById('start-diagnose').addEventListener('click', startDiagnosis);
 document.getElementById('download-pdf').addEventListener('click', generatePDF);
 document.getElementById('subscribe-btn').addEventListener('click', subscribe);
 
@@ -353,6 +435,5 @@ document.querySelectorAll('.lang-btn').forEach(btn => {
 });
 
 // بدء التشغيل
-startCamera();
 loadLanguage('ar');
 updateCounterDisplay();
