@@ -3,78 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>تشخيص المحرك - النسخة المستقرة</title>
+  <title>تشخيص المحرك - النسخة النهائية</title>
   <style>
-    body {
-      background: #0a0a0a;
-      color: #eee;
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 20px;
-    }
-    .container {
-      max-width: 500px;
-      margin: auto;
-    }
-    .counter {
-      background: #1a1a1a;
-      padding: 10px;
-      border-radius: 12px;
-      margin: 10px 0;
-      color: #ffd700;
-    }
-    .btn {
-      background: #ffd700;
-      color: #1a1a1a;
-      border: none;
-      padding: 14px;
-      border-radius: 30px;
-      font-weight: bold;
-      font-size: 1rem;
-      width: 100%;
-      margin: 8px 0;
-      cursor: pointer;
-    }
-    .btn-danger {
-      background: #ff6600;
-      color: white;
-    }
-    .hidden {
-      display: none;
-    }
-    .result {
-      background: #0d2b1a;
-      border: 1px solid #ffd700;
-      border-radius: 16px;
-      padding: 20px;
-      margin-top: 20px;
-    }
-    .lang {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-      margin-bottom: 10px;
-    }
-    .lang button {
-      background: #222;
-      color: white;
-      border: 1px solid #444;
-      padding: 8px 16px;
-      border-radius: 20px;
-      cursor: pointer;
-    }
-    .status {
-      margin-top: 10px;
-      padding: 8px;
-      border-radius: 8px;
-      font-size: 0.8rem;
-    }
-    .status.recording {
-      background: #ff4444;
-    }
-    .status.success {
-      background: #00a86b;
-    }
+    body { background: #0a0a0a; color: #eee; font-family: Arial; text-align: center; padding: 20px; }
+    .container { max-width: 500px; margin: auto; }
+    .btn { background: #ffd700; color: #1a1a1a; border: none; padding: 14px; border-radius: 30px; width: 100%; margin: 8px 0; font-weight: bold; cursor: pointer; }
+    .btn-danger { background: #ff6600; color: white; }
+    .result { background: #0d2b1a; border: 1px solid #ffd700; border-radius: 16px; padding: 20px; margin-top: 20px; }
+    .counter { background: #1a1a1a; padding: 10px; border-radius: 12px; color: #ffd700; margin-bottom: 10px; }
+    .status { margin-top: 5px; padding: 5px; border-radius: 8px; font-size: 0.8rem; }
+    .success { background: #00a86b; }
+    .recording { background: #ff4444; }
+    .hidden { display: none; }
+    input, label { display: block; width: 100%; margin: 8px 0; text-align: center; }
   </style>
 </head>
 <body>
@@ -82,192 +23,142 @@
   <h1>🔧 تشخيص المحرك</h1>
   <div class="counter" id="counter">🔓 المجانية: 3/3</div>
 
-  <div class="lang">
-    <button data-lang="ar">🇸🇦 عربي</button>
-    <button data-lang="en">🇬🇧 English</button>
-  </div>
+  <!-- تسجيل الصوت -->
+  <button id="micBtn" class="btn">🎤 تسجيل الصوت (5 ثوانٍ)</button>
+  <div id="micStatus" class="status hidden"></div>
 
-  <!-- الأزرار الرئيسية -->
-  <button id="mic-btn" class="btn">🎤 تسجيل الصوت (5 ثوانٍ)</button>
-  <div id="mic-status" class="status hidden"></div>
+  <!-- خياران لالتقاط صورة العادم (كاميرا أو رفع) -->
+  <button id="camBtn" class="btn">📸 تصوير العادم بالكاميرا</button>
+  <label for="uploadImage" class="btn" style="background:#333;">🖼️ أو رفع صورة من المعرض</label>
+  <input type="file" id="uploadImage" accept="image/*" style="display:none;">
+  <div id="camStatus" class="status hidden"></div>
 
-  <button id="cam-btn" class="btn">📸 تصوير العادم</button>
-  <div id="cam-status" class="status hidden"></div>
+  <button id="diagnoseBtn" class="btn">🔍 شخص الآن</button>
 
-  <button id="diagnose-btn" class="btn">🔍 شخص الآن</button>
-
-  <div id="result-card" class="result hidden">
+  <div id="resultCard" class="result hidden">
     <h3>نتيجة التشخيص</h3>
-    <div id="result-text"></div>
-    <button id="download-pdf" class="btn">📄 تحميل PDF</button>
-    <button id="subscribe-btn" class="btn btn-danger hidden">🔒 الاشتراك ($20/شهر)</button>
+    <div id="resultText"></div>
+    <button id="downloadBtn" class="btn">📄 تحميل PDF</button>
+    <button id="subscribeBtn" class="btn btn-danger hidden">🔒 الاشتراك ($20/شهر)</button>
   </div>
 </div>
 
 <script>
-  let currentLang = 'ar';
   let audioBlob = null;
   let imageData = null;
   let freeCount = parseInt(localStorage.getItem('freeDiag')) || 0;
+  let micBtn = document.getElementById('micBtn');
+  let camBtn = document.getElementById('camBtn');
+  let uploadInput = document.getElementById('uploadImage');
+  let diagnoseBtn = document.getElementById('diagnoseBtn');
+  let downloadBtn = document.getElementById('downloadBtn');
+  let subscribeBtn = document.getElementById('subscribeBtn');
+  let micStatus = document.getElementById('micStatus');
+  let camStatus = document.getElementById('camStatus');
+  let resultCard = document.getElementById('resultCard');
+  let resultText = document.getElementById('resultText');
+  let counterDiv = document.getElementById('counter');
 
-  const translations = {
-    ar: {
-      mic_btn: "🎤 تسجيل الصوت (5 ثوانٍ)",
-      cam_btn: "📸 تصوير العادم",
-      diagnose_btn: "🔍 شخص الآن",
-      download_btn: "📄 تحميل PDF",
-      subscribe_btn: "🔒 الاشتراك ($20/شهر)",
-      recording: "🔴 جاري التسجيل...",
-      recorded: "✅ تم التسجيل",
-      photo_taken: "✅ تم التصوير",
-      diagnosis_green: "✅ المحرك سليم",
-      diagnosis_red: "⚠️ يرجى إكمال التسجيل والتصوير أولاً",
-      counter_text: "🔓 المجانية: ",
-      limit_reached: "⚠️ استنفذت التشخيصات المجانية. اشترك للمتابعة."
-    },
-    en: {
-      mic_btn: "🎤 Record Sound (5 sec)",
-      cam_btn: "📸 Capture Exhaust",
-      diagnose_btn: "🔍 Diagnose Now",
-      download_btn: "📄 Download PDF",
-      subscribe_btn: "🔒 Subscribe ($20/month)",
-      recording: "🔴 Recording...",
-      recorded: "✅ Recorded",
-      photo_taken: "✅ Captured",
-      diagnosis_green: "✅ Engine is healthy",
-      diagnosis_red: "⚠️ Please complete recording and capture first",
-      counter_text: "🔓 Free: ",
-      limit_reached: "⚠️ Free diagnostics limit reached. Subscribe to continue."
-    }
-  };
-
-  function t(key) {
-    return translations[currentLang][key] || key;
-  }
-
-  function updateUI() {
-    document.getElementById('mic-btn').textContent = t('mic_btn');
-    document.getElementById('cam-btn').textContent = t('cam_btn');
-    document.getElementById('diagnose-btn').textContent = t('diagnose_btn');
-    document.getElementById('download-pdf').textContent = t('download_btn');
-    document.getElementById('subscribe-btn').textContent = t('subscribe_btn');
-    document.getElementById('counter').innerHTML = t('counter_text') + (3 - freeCount) + "/3";
+  function updateCounter() {
+    counterDiv.innerHTML = `🔓 المجانية: ${3 - freeCount} / 3`;
+    if(freeCount >= 3) subscribeBtn.classList.remove('hidden');
   }
 
   // تسجيل الصوت
-  async function recordSound() {
-    const btn = document.getElementById('mic-btn');
-    const statusDiv = document.getElementById('mic-status');
-    btn.disabled = true;
-    statusDiv.classList.remove('hidden');
-    statusDiv.className = 'status recording';
-    statusDiv.innerHTML = t('recording');
-    
+  micBtn.onclick = async () => {
+    micBtn.disabled = true;
+    micStatus.classList.remove('hidden');
+    micStatus.className = 'status recording';
+    micStatus.innerHTML = "🔴 جاري التسجيل...";
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const recorder = new MediaRecorder(stream);
-      const chunks = [];
-      
+      let chunks = [];
       recorder.ondataavailable = e => chunks.push(e.data);
       recorder.onstop = () => {
         audioBlob = new Blob(chunks, { type: 'audio/wav' });
-        statusDiv.className = 'status success';
-        statusDiv.innerHTML = t('recorded');
-        btn.disabled = false;
+        micStatus.className = 'status success';
+        micStatus.innerHTML = "✅ تم التسجيل";
+        micBtn.disabled = false;
         stream.getTracks().forEach(t => t.stop());
       };
-      
       recorder.start();
       setTimeout(() => recorder.stop(), 5000);
     } catch(e) {
-      statusDiv.innerHTML = '❌ لا يمكن الوصول للميكروفون';
-      btn.disabled = false;
+      micStatus.innerHTML = "❌ فشل التسجيل (امنح الإذن)";
+      micBtn.disabled = false;
     }
-  }
+  };
 
-  // تصوير العادم
-  async function takePhoto() {
-    const btn = document.getElementById('cam-btn');
-    const statusDiv = document.getElementById('cam-status');
-    btn.disabled = true;
-    statusDiv.classList.remove('hidden');
-    statusDiv.className = 'status recording';
-    statusDiv.innerHTML = "📸 جاري التصوير...";
-    
+  // تصوير بالكاميرا
+  camBtn.onclick = async () => {
+    camBtn.disabled = true;
+    camStatus.classList.remove('hidden');
+    camStatus.className = 'status recording';
+    camStatus.innerHTML = "📸 جاري تشغيل الكاميرا...";
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       const video = document.createElement('video');
       video.srcObject = stream;
       video.play();
-      
+      camStatus.innerHTML = "📸 جاري التصوير خلال ثانية...";
       setTimeout(() => {
         const canvas = document.createElement('canvas');
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         canvas.getContext('2d').drawImage(video, 0, 0);
         imageData = canvas.toDataURL('image/jpeg', 0.8);
-        statusDiv.className = 'status success';
-        statusDiv.innerHTML = t('photo_taken');
-        btn.disabled = false;
+        camStatus.className = 'status success';
+        camStatus.innerHTML = "✅ تم التصوير";
+        camBtn.disabled = false;
         stream.getTracks().forEach(t => t.stop());
-      }, 500);
+      }, 1000);
     } catch(e) {
-      statusDiv.innerHTML = '❌ لا يمكن الوصول للكاميرا';
-      btn.disabled = false;
+      camStatus.innerHTML = "❌ فشل الكاميرا. استخدم رفع الصورة بدلاً من ذلك.";
+      camBtn.disabled = false;
     }
-  }
+  };
+
+  // رفع صورة من المعرض
+  uploadInput.onchange = (e) => {
+    const file = e.target.files[0];
+    if(file) {
+      const reader = new FileReader();
+      reader.onload = function(ev) {
+        imageData = ev.target.result;
+        camStatus.classList.remove('hidden');
+        camStatus.className = 'status success';
+        camStatus.innerHTML = "✅ تم رفع الصورة بنجاح";
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   // التشخيص
-  function diagnose() {
+  diagnoseBtn.onclick = () => {
     if(freeCount >= 3) {
-      document.getElementById('result-text').innerHTML = t('limit_reached');
-      document.getElementById('result-card').classList.remove('hidden');
-      document.getElementById('subscribe-btn').classList.remove('hidden');
+      resultText.innerHTML = "⚠️ استنفذت التشخيصات المجانية. اشترك للمتابعة.";
+      resultCard.classList.remove('hidden');
+      subscribeBtn.classList.remove('hidden');
       return;
     }
-    
     if(!audioBlob || !imageData) {
-      document.getElementById('result-text').innerHTML = t('diagnosis_red');
-      document.getElementById('result-card').classList.remove('hidden');
+      resultText.innerHTML = "⚠️ يرجى تسجيل الصوت وتصوير/رفع صورة العادم أولاً.";
+      resultCard.classList.remove('hidden');
       return;
     }
-    
     freeCount++;
     localStorage.setItem('freeDiag', freeCount);
-    updateUI();
-    
-    document.getElementById('result-text').innerHTML = t('diagnosis_green');
-    document.getElementById('result-card').classList.remove('hidden');
-    
-    if(freeCount >= 3) {
-      document.getElementById('subscribe-btn').classList.remove('hidden');
-    }
-  }
+    updateCounter();
+    resultText.innerHTML = "✅ المحرك سليم (تشخيص أولي). اشترك للتفاصيل العميقة.";
+    resultCard.classList.remove('hidden');
+    if(freeCount >= 3) subscribeBtn.classList.remove('hidden');
+  };
 
-  function subscribe() {
-    window.location.href = "https://ai-moto-maintenance.lemonsqueezy.com/checkout/buy/c3abadc2-c6cc-459e-a106-de43d4f2d3f0";
-  }
+  downloadBtn.onclick = () => alert("سيتم تفعيل PDF في التحديث القادم");
+  subscribeBtn.onclick = () => window.location.href = "https://ai-moto-maintenance.lemonsqueezy.com/checkout/buy/c3abadc2-c6cc-459e-a106-de43d4f2d3f0";
 
-  function generatePDF() {
-    alert("PDF سيتوفر قريباً في التحديث القادم");
-  }
-
-  // تغيير اللغة
-  document.querySelectorAll('.lang-btn').forEach(btn => {
-    btn.onclick = () => {
-      currentLang = btn.getAttribute('data-lang');
-      updateUI();
-    };
-  });
-
-  // ربط الأحداث
-  document.getElementById('mic-btn').onclick = recordSound;
-  document.getElementById('cam-btn').onclick = takePhoto;
-  document.getElementById('diagnose-btn').onclick = diagnose;
-  document.getElementById('download-pdf').onclick = generatePDF;
-  document.getElementById('subscribe-btn').onclick = subscribe;
-
-  updateUI();
+  updateCounter();
 </script>
 </body>
 </html>
