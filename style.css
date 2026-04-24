@@ -67,103 +67,56 @@ header h1 {
   border-color: #ffd700;
 }
 
-.step {
-  background: #1a1a1a;
-  border-radius: 16px;
-  padding: 20px;
-  margin-bottom: 20px;
-  border: 1px solid #333;
-}
-
-.step-icon {
-  font-size: 2rem;
-  margin-bottom: 10px;
-}
-
-.step-content h3 {
-  color: #ffd700;
-  margin-bottom: 8px;
-}
-
-.step-content p {
-  color: #aaa;
-  font-size: 0.85rem;
-  margin-bottom: 15px;
-}
-
-.camera-container {
-  position: relative;
-  width: 100%;
-  border-radius: 12px;
-  overflow: hidden;
-  background: #000;
-  margin-bottom: 10px;
-}
-
-#camera-preview {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-.btn-primary {
-  background: #ffd700;
-  color: #1a1a1a;
-  border: none;
-  padding: 12px 20px;
-  border-radius: 30px;
-  font-size: 1rem;
-  font-weight: bold;
-  cursor: pointer;
-  transition: 0.3s;
-  width: 100%;
-  margin-top: 10px;
-}
-
-.btn-primary:hover {
-  background: #ffed4a;
-}
-
 .btn-diagnose {
   background: #00a86b;
   color: white;
   border: none;
-  padding: 16px;
+  padding: 18px;
   border-radius: 50px;
   font-size: 1.2rem;
   font-weight: bold;
   cursor: pointer;
   width: 100%;
   transition: 0.3s;
+  margin-bottom: 10px;
 }
 
 .btn-diagnose:hover {
   background: #00c48a;
 }
 
-.btn-secondary {
-  background: #333;
-  color: #ffd700;
-  border: 1px solid #ffd700;
-  padding: 12px;
-  border-radius: 30px;
-  font-size: 0.9rem;
-  cursor: pointer;
-  width: 100%;
-  margin-top: 10px;
+.step-hint {
+  text-align: center;
+  font-size: 0.8rem;
+  color: #888;
 }
 
-.btn-subscribe {
-  background: #ff6600;
-  color: white;
-  border: none;
-  padding: 12px;
-  border-radius: 30px;
-  font-size: 0.9rem;
-  font-weight: bold;
-  cursor: pointer;
-  width: 100%;
-  margin-top: 10px;
+.progress-panel {
+  background: #1a1a1a;
+  border-radius: 16px;
+  padding: 20px;
+  margin: 20px 0;
+  text-align: center;
+}
+
+.progress-status {
+  font-size: 1rem;
+  margin-bottom: 15px;
+  color: #ffd700;
+}
+
+.progress-bar-container {
+  background: #333;
+  border-radius: 10px;
+  height: 10px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  background: #ffd700;
+  width: 0%;
+  height: 100%;
+  transition: width 0.3s;
 }
 
 .result-card {
@@ -175,13 +128,18 @@ header h1 {
   text-align: center;
 }
 
+.result-icon {
+  font-size: 3rem;
+  margin-bottom: 10px;
+}
+
 .result-card h3 {
   color: #ffd700;
   margin-bottom: 10px;
 }
 
 .result-text {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   font-weight: bold;
   margin-bottom: 10px;
 }
@@ -199,29 +157,33 @@ header h1 {
   font-family: monospace;
 }
 
-.status {
-  margin-top: 10px;
-  font-size: 0.85rem;
-  padding: 8px;
-  border-radius: 8px;
-  text-align: center;
+.result-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
 }
 
-.status.recording {
-  background: #ff4444;
-  color: white;
-}
-
-.status.success {
-  background: #00a86b;
-  color: white;
-}
-
-.result-preview {
-  margin-top: 10px;
+.btn-secondary {
+  background: #333;
+  color: #ffd700;
+  border: 1px solid #ffd700;
+  padding: 10px;
+  border-radius: 30px;
   font-size: 0.8rem;
-  color: #aaa;
-  text-align: center;
+  cursor: pointer;
+  flex: 1;
+}
+
+.btn-subscribe {
+  background: #ff6600;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 30px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  cursor: pointer;
+  flex: 1;
 }
 
 .hidden {
@@ -233,4 +195,10 @@ footer {
   margin-top: 40px;
   font-size: 0.7rem;
   color: #555;
+}
+
+@media (max-width: 480px) {
+  .result-actions {
+    flex-direction: column;
+  }
 }
