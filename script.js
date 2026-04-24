@@ -21,7 +21,9 @@ const translations = {
     recording: "جاري التسجيل...",
     recorded: "تم التسجيل بنجاح",
     photo_taken: "تم التقاط الصورة",
-    vibration_data: "قراءة الاهتزاز"
+    vibration_data: "قراءة الاهتزاز",
+    permission_required: "⚠️ هذا التطبيق يحتاج إلى إذن بالكاميرا والميكروفون. يرجى منح الإذن (السماح) ثم تحديث الصفحة.",
+    retry_button: "🔄 إعادة المحاولة"
   },
   en: {
     start_btn: "🔍 Start Diagnosis Now",
@@ -44,7 +46,9 @@ const translations = {
     recording: "Recording...",
     recorded: "Recording saved",
     photo_taken: "Photo captured",
-    vibration_data: "Vibration reading"
+    vibration_data: "Vibration reading",
+    permission_required: "⚠️ This app requires camera and microphone access. Please grant permission (Allow) then refresh the page.",
+    retry_button: "🔄 Retry"
   },
   fr: {
     start_btn: "🔍 Commencer le diagnostic",
@@ -67,29 +71,26 @@ const translations = {
     recording: "Enregistrement...",
     recorded: "Enregistré",
     photo_taken: "Photo prise",
-    vibration_data: "Lecture des vibrations"
+    vibration_data: "Lecture des vibrations",
+    permission_required: "⚠️ Cette application nécessite l'accès à la caméra et au microphone. Veuillez autoriser (Allow) puis actualisez la page.",
+    retry_button: "🔄 Réessayer"
   }
 };
 
 // ==================== المتغيرات العامة ====================
 let currentLang = 'ar';
 let isDiagnosing = false;
-let diagnosticStep = 0; // 0: idle, 1: engine, 2: exhaust, 3: complete
+let diagnosticStep = 0;
 let engineSoundData = null;
 let engineVibrationData = null;
 let exhaustImageData = null;
 let diagnosticResult = null;
+let permissionsGranted = false;
 
 // عداد التشخيصات المجانية
 let freeDiagnostics = parseInt(localStorage.getItem('engine_diag_free')) || 0;
 const MAX_FREE = 3;
 let subscriptionActive = localStorage.getItem('engine_diag_subscription') === 'true';
-
-// كائنات APIs
-let mediaRecorder = null;
-let audioChunks = [];
-let vibrationSensor = null;
-let vibrationValues = [];
 
 // ==================== تحميل اللغة ====================
 function loadLanguage(lang) {
@@ -117,11 +118,58 @@ function updateCounterDisplay() {
   }
 }
 
+// ==================== طلب الأذونات ====================
+async function requestPermissions() {
+  const t = translations[currentLang];
+  try {
+    // طلب الميكروفون
+    const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    audioStream.getTracks().forEach(track => track.stop());
+    
+    // طلب الكاميرا
+    const videoStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+    videoStream.getTracks().forEach(track => track.stop());
+    
+    permissionsGranted = true;
+    document.getElementById('permission-warning')?.remove();
+    document.getElementById('start-diagnose').disabled = false;
+    return true;
+  } catch(err) {
+    console.error("Permission error:", err);
+    permissionsGranted = false;
+    showPermissionWarning();
+    return false;
+  }
+}
+
+function showPermissionWarning() {
+  const t = translations[currentLang];
+  let warningDiv = document.getElementById('permission-warning');
+  if(!warningDiv) {
+    warningDiv = document.createElement('div');
+    warningDiv.id = 'permission-warning';
+    warningDiv.className = 'permission-warning';
+    const container = document.querySelector('.container');
+    const stepDiv = document.getElementById('step-diagnose');
+    container.insertBefore(warningDiv, stepDiv);
+  }
+  warningDiv.innerHTML = `
+    <div class="warning-card">
+      <p>⚠️ ${t.permission_required}</p>
+      <button onclick="location.reload()" class="btn-retry">${t.retry_button}</button>
+    </div>
+  `;
+  document.getElementById('start-diagnose').disabled = true;
+}
+
 // ==================== بدء التشخيص ====================
 async function startDiagnosis() {
   if(isDiagnosing) return;
+  if(!permissionsGranted) {
+    await requestPermissions();
+    if(!permissionsGranted) return;
+  }
   
-  // التحقق من إمكانية التشخيص
   if(!subscriptionActive && freeDiagnostics >= MAX_FREE) {
     alert("لقد استنفذت التشخيصات المجانية الثلاثة. يرجى الاشتراك للمتابعة.");
     document.getElementById('subscribe-btn').classList.remove('hidden');
@@ -134,20 +182,14 @@ async function startDiagnosis() {
   engineVibrationData = null;
   exhaustImageData = null;
   
-  // إظهار لوحة التقدم
   document.getElementById('progress-panel').classList.remove('hidden');
   document.getElementById('result-card').classList.add('hidden');
+  document.getElementById('subscribe-btn').classList.add('hidden');
   
   try {
-    // الخطوة 1: فحص المحرك (صوت + اهتزاز)
     await performEngineCheck();
-    
-    // الخطوة 2: فحص العادم (كاميرا)
     await performExhaustCheck();
-    
-    // الخطوة 3: التحليل وإظهار النتيجة
     await performAnalysis();
-    
   } catch(err) {
     console.error("Diagnosis error:", err);
     alert("حدث خطأ أثناء التشخيص. حاول مرة أخرى.");
@@ -164,44 +206,34 @@ async function performEngineCheck() {
   diagnosticStep = 1;
   updateProgress(`🔊 ${t.step_engine}`, 25);
   
-  // طلب الأذونات
   const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
   
-  // تسجيل الصوت (10 ثوانٍ)
   updateProgress(`🎙️ ${t.recording_sound}`, 30);
   const audioBlob = await recordAudio(stream, 10000);
   engineSoundData = audioBlob;
   
-  // قياس الاهتزاز (10 ثوانٍ)
   updateProgress(`📳 ${t.recording_vibration}`, 40);
   const vibrationArray = await measureVibration(10000);
   engineVibrationData = vibrationArray;
   
-  // إيقاف الصوت
   stream.getTracks().forEach(track => track.stop());
-  
   updateProgress(`✅ اكتمل فحص المحرك`, 50);
 }
 
-// تسجيل الصوت
 function recordAudio(stream, duration) {
   return new Promise((resolve) => {
     const recorder = new MediaRecorder(stream);
     const chunks = [];
-    
     recorder.ondataavailable = (e) => chunks.push(e.data);
     recorder.onstop = () => resolve(new Blob(chunks, { type: 'audio/wav' }));
-    
     recorder.start();
     setTimeout(() => recorder.stop(), duration);
   });
 }
 
-// قياس الاهتزاز (باستخدام DeviceMotionEvent)
 function measureVibration(duration) {
   return new Promise((resolve) => {
     const values = [];
-    
     const handler = (e) => {
       const acc = e.acceleration;
       if(acc && (acc.x !== null || acc.y !== null || acc.z !== null)) {
@@ -213,7 +245,6 @@ function measureVibration(duration) {
         values.push(magnitude);
       }
     };
-    
     window.addEventListener('devicemotion', handler);
     setTimeout(() => {
       window.removeEventListener('devicemotion', handler);
@@ -222,21 +253,18 @@ function measureVibration(duration) {
   });
 }
 
-// ==================== فحص العادم (كاميرا) ====================
+// ==================== فحص العادم ====================
 async function performExhaustCheck() {
   const t = translations[currentLang];
   diagnosticStep = 2;
   updateProgress(`📷 ${t.step_exhaust}`, 60);
   
-  // فتح الكاميرا
   const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
   const video = document.createElement('video');
   video.srcObject = stream;
   await video.play();
   
   updateProgress(`📸 ${t.capturing_image}`, 70);
-  
-  // التقاط صورة بعد 2 ثانية (للمستخدم لتوجيه الكاميرا)
   await new Promise(r => setTimeout(r, 2000));
   
   const canvas = document.createElement('canvas');
@@ -244,33 +272,25 @@ async function performExhaustCheck() {
   canvas.height = video.videoHeight;
   const ctx = canvas.getContext('2d');
   ctx.drawImage(video, 0, 0);
-  const imageData = canvas.toDataURL('image/jpeg', 0.8);
+  exhaustImageData = canvas.toDataURL('image/jpeg', 0.8);
   
-  exhaustImageData = imageData;
-  
-  // إيقاف الكاميرا
   stream.getTracks().forEach(track => track.stop());
-  
   updateProgress(`✅ اكتمل فحص العادم`, 80);
 }
 
-// ==================== التحليل وإظهار النتيجة ====================
+// ==================== التحليل ====================
 async function performAnalysis() {
   const t = translations[currentLang];
   updateProgress(`🧠 ${t.diagnosing}`, 90);
   
-  // تحليل الصوت (بسيط: حساب متوسط التردد)
   let soundQuality = 'normal';
   if(engineSoundData) {
-    // في النسخة الكاملة، سنقوم بتحليل FFT
-    // حالياً نستخدم قيمة عشوائية منطقية للتجربة
     const random = Math.random();
     if(random > 0.7) soundQuality = 'knock';
     else if(random < 0.3) soundQuality = 'backfire';
     else soundQuality = 'normal';
   }
   
-  // تحليل الاهتزاز
   let vibrationLevel = 'normal';
   if(engineVibrationData && engineVibrationData.length) {
     const avgVibration = engineVibrationData.reduce((a,b) => a + b, 0) / engineVibrationData.length;
@@ -279,11 +299,9 @@ async function performAnalysis() {
     else vibrationLevel = 'low';
   }
   
-  // تحليل لون الدخان (يدوياً مؤقتاً - سيتم تحسينه لاحقاً)
   const smokeColor = await promptSmokeColor();
   
-  // منطق التشخيص النهائي
-  let diagnosisType = 'green'; // green, orange, red
+  let diagnosisType = 'green';
   let diagnosisText = t.diagnosis_green;
   let diagnosisHint = t.hint_green;
   
@@ -295,39 +313,25 @@ async function performAnalysis() {
     diagnosisType = 'orange';
     diagnosisText = t.diagnosis_orange;
     diagnosisHint = t.hint_orange;
-  } else {
-    diagnosisType = 'green';
-    diagnosisText = t.diagnosis_green;
-    diagnosisHint = t.hint_green;
   }
   
-  // الحصول على الموقع
   let locationText = "الموقع غير متاح";
   if(navigator.geolocation) {
     await new Promise((resolve) => {
       navigator.geolocation.getCurrentPosition(pos => {
-        const lat = pos.coords.latitude.toFixed(4);
-        const lon = pos.coords.longitude.toFixed(4);
-        locationText = `${lat}°N, ${lon}°E | ${new Date().toLocaleString()}`;
+        locationText = `${pos.coords.latitude.toFixed(4)}°N, ${pos.coords.longitude.toFixed(4)}°E | ${new Date().toLocaleString()}`;
         resolve();
       }, () => resolve(), { timeout: 5000 });
     });
   }
   
-  // حفظ النتيجة
   diagnosticResult = {
-    diagnosisType,
-    diagnosisText,
-    diagnosisHint,
-    locationText,
+    diagnosisType, diagnosisText, diagnosisHint, locationText,
     timestamp: new Date().toLocaleString(),
-    smokeColor,
-    soundQuality,
-    vibrationLevel,
+    smokeColor, soundQuality, vibrationLevel,
     isFree: (!subscriptionActive && freeDiagnostics < MAX_FREE)
   };
   
-  // عرض النتيجة
   const iconElem = document.getElementById('result-icon');
   const textElem = document.getElementById('result-text');
   const hintElem = document.getElementById('result-hint');
@@ -345,14 +349,10 @@ async function performAnalysis() {
   
   document.getElementById('result-card').classList.remove('hidden');
   
-  // زر الاشتراك (يظهر دائماً للمستخدم غير المشترك)
   if(!subscriptionActive) {
     document.getElementById('subscribe-btn').classList.remove('hidden');
-  } else {
-    document.getElementById('subscribe-btn').classList.add('hidden');
   }
   
-  // تحديث العداد
   if(!subscriptionActive) {
     freeDiagnostics++;
     localStorage.setItem('engine_diag_free', freeDiagnostics);
@@ -363,8 +363,7 @@ async function performAnalysis() {
   await new Promise(r => setTimeout(r, 500));
 }
 
-// طلب لون الدخان (مؤقت)
-async function promptSmokeColor() {
+function promptSmokeColor() {
   const t = translations[currentLang];
   return new Promise((resolve) => {
     const color = prompt("لون الدخان:\n1- لا دخان\n2- أبيض\n3- أسود\n4- أزرق");
@@ -375,57 +374,40 @@ async function promptSmokeColor() {
   });
 }
 
-// ==================== تحديث شريط التقدم ====================
 function updateProgress(message, percent) {
   document.getElementById('progress-status').innerHTML = message;
   document.getElementById('progress-bar').style.width = `${percent}%`;
 }
 
-// ==================== إنشاء ملف PDF ====================
+// ==================== PDF ====================
 async function generatePDF() {
   if(!diagnosticResult) return;
-  
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
   const t = translations[currentLang];
   
-  const title = "تشخيص المحرك - تقرير علمي";
-  const timestamp = new Date().toLocaleString();
-  let locationText = diagnosticResult.locationText || "الموقع غير محدد";
-  
   doc.setFont("helvetica");
   doc.setFontSize(18);
-  doc.text(title, 20, 20);
-  
+  doc.text("تشخيص المحرك - تقرير علمي", 20, 20);
   doc.setFontSize(12);
-  doc.text(`التاريخ والوقت: ${timestamp}`, 20, 40);
-  doc.text(`الموقع: ${locationText}`, 20, 50);
-  doc.text(`نوع التشخيص: ${diagnosticResult.isFree ? "مجاني (أحد الثلاثة الأولى)" : "مدفوع (بعد الاشتراك)"}`, 20, 60);
+  doc.text(`التاريخ والوقت: ${new Date().toLocaleString()}`, 20, 40);
+  doc.text(`الموقع: ${diagnosticResult.locationText || "غير محدد"}`, 20, 50);
   doc.text(`نتيجة التشخيص: ${diagnosticResult.diagnosisText}`, 20, 80);
   doc.text(`التوصية: ${diagnosticResult.diagnosisHint}`, 20, 90);
-  doc.text(`الملاحظات التقنية:`, 20, 110);
-  doc.text(`- لون الدخان: ${diagnosticResult.smokeColor || "غير محدد"}`, 25, 120);
-  doc.text(`- جودة الصوت: ${diagnosticResult.soundQuality || "غير محدد"}`, 25, 130);
-  doc.text(`- مستوى الاهتزاز: ${diagnosticResult.vibrationLevel || "غير محدد"}`, 25, 140);
-  
-  if(freeDiagnostics >= MAX_FREE && !subscriptionActive) {
-    doc.setTextColor(255, 0, 0);
-    doc.text("⚠️ للتشخيصات القادمة، يلزم الاشتراك.", 20, 170);
-    doc.setTextColor(0, 0, 0);
-  }
-  
-  doc.setFontSize(10);
-  doc.text("© منظومة تشخيص المحرك - التوقيع السيادي", 20, 280);
   
   doc.save(`engine_diagnostic_${Date.now()}.pdf`);
 }
 
-// ==================== الاشتراك ====================
 function subscribe() {
   window.location.href = "https://ai-moto-maintenance.lemonsqueezy.com/checkout/buy/c3abadc2-c6cc-459e-a106-de43d4f2d3f0";
 }
 
-// ===================== الأحداث ====================
+// ==================== الأحداث ====================
+window.addEventListener('load', async () => {
+  loadLanguage('ar');
+  await requestPermissions();
+});
+
 document.getElementById('start-diagnose').addEventListener('click', startDiagnosis);
 document.getElementById('download-pdf').addEventListener('click', generatePDF);
 document.getElementById('subscribe-btn').addEventListener('click', subscribe);
@@ -433,7 +415,3 @@ document.getElementById('subscribe-btn').addEventListener('click', subscribe);
 document.querySelectorAll('.lang-btn').forEach(btn => {
   btn.addEventListener('click', () => loadLanguage(btn.getAttribute('data-lang')));
 });
-
-// بدء التشغيل
-loadLanguage('ar');
-updateCounterDisplay();
