@@ -2,117 +2,272 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <title>تشخيص المحرك - اختبار الأذونات</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تشخيص المحرك - النسخة المستقرة</title>
   <style>
-    body { background: #0a0a0a; color: #eee; font-family: Arial; text-align: center; padding: 20px; }
-    .btn { background: #ffd700; color: #1a1a1a; border: none; padding: 12px; border-radius: 30px; margin: 5px; width: 80%; cursor: pointer; }
-    .status { background: #1a1a1a; padding: 10px; border-radius: 12px; margin: 10px; }
+    body {
+      background: #0a0a0a;
+      color: #eee;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    .container {
+      max-width: 500px;
+      margin: auto;
+    }
+    .counter {
+      background: #1a1a1a;
+      padding: 10px;
+      border-radius: 12px;
+      margin: 10px 0;
+      color: #ffd700;
+    }
+    .btn {
+      background: #ffd700;
+      color: #1a1a1a;
+      border: none;
+      padding: 14px;
+      border-radius: 30px;
+      font-weight: bold;
+      font-size: 1rem;
+      width: 100%;
+      margin: 8px 0;
+      cursor: pointer;
+    }
+    .btn-danger {
+      background: #ff6600;
+      color: white;
+    }
+    .hidden {
+      display: none;
+    }
+    .result {
+      background: #0d2b1a;
+      border: 1px solid #ffd700;
+      border-radius: 16px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+    .lang {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
+    .lang button {
+      background: #222;
+      color: white;
+      border: 1px solid #444;
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+    .status {
+      margin-top: 10px;
+      padding: 8px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+    }
+    .status.recording {
+      background: #ff4444;
+    }
+    .status.success {
+      background: #00a86b;
+    }
   </style>
 </head>
 <body>
+<div class="container">
   <h1>🔧 تشخيص المحرك</h1>
-  <div id="status" class="status">⏳ جاري طلب الأذونات...</div>
-  <div id="controls" style="display:none;">
-    <button id="micBtn" class="btn">🎤 تسجيل الصوت (10 ثوانٍ)</button>
-    <button id="camBtn" class="btn">📸 تصوير العادم</button>
-    <button id="diagBtn" class="btn">🔍 شخص الآن</button>
-    <button id="subBtn" class="btn" style="background:#ff6600;">🔒 الاشتراك ($20/شهر)</button>
+  <div class="counter" id="counter">🔓 المجانية: 3/3</div>
+
+  <div class="lang">
+    <button data-lang="ar">🇸🇦 عربي</button>
+    <button data-lang="en">🇬🇧 English</button>
   </div>
-  <div id="result" style="margin-top:20px;"></div>
 
-  <script>
-    let audioBlob = null;
-    let imageData = null;
-    let freeCount = parseInt(localStorage.getItem('freeDiag')) || 0;
+  <!-- الأزرار الرئيسية -->
+  <button id="mic-btn" class="btn">🎤 تسجيل الصوت (5 ثوانٍ)</button>
+  <div id="mic-status" class="status hidden"></div>
 
-    async function requestPermissions() {
-      try {
-        // طلب الميكروفون
-        const audio = await navigator.mediaDevices.getUserMedia({ audio: true });
-        audio.getTracks().forEach(t => t.stop());
-        
-        // طلب الكاميرا
-        const video = await navigator.mediaDevices.getUserMedia({ video: true });
-        video.getTracks().forEach(t => t.stop());
-        
-        document.getElementById('status').innerHTML = '✅ الأذونات ممنوحة. يمكنك بدء التشخيص.';
-        document.getElementById('controls').style.display = 'block';
-      } catch(err) {
-        document.getElementById('status').innerHTML = '❌ لم يتم منح الأذونات. يرجى السماح للكاميرا والميكروفون ثم تحديث الصفحة.';
-      }
+  <button id="cam-btn" class="btn">📸 تصوير العادم</button>
+  <div id="cam-status" class="status hidden"></div>
+
+  <button id="diagnose-btn" class="btn">🔍 شخص الآن</button>
+
+  <div id="result-card" class="result hidden">
+    <h3>نتيجة التشخيص</h3>
+    <div id="result-text"></div>
+    <button id="download-pdf" class="btn">📄 تحميل PDF</button>
+    <button id="subscribe-btn" class="btn btn-danger hidden">🔒 الاشتراك ($20/شهر)</button>
+  </div>
+</div>
+
+<script>
+  let currentLang = 'ar';
+  let audioBlob = null;
+  let imageData = null;
+  let freeCount = parseInt(localStorage.getItem('freeDiag')) || 0;
+
+  const translations = {
+    ar: {
+      mic_btn: "🎤 تسجيل الصوت (5 ثوانٍ)",
+      cam_btn: "📸 تصوير العادم",
+      diagnose_btn: "🔍 شخص الآن",
+      download_btn: "📄 تحميل PDF",
+      subscribe_btn: "🔒 الاشتراك ($20/شهر)",
+      recording: "🔴 جاري التسجيل...",
+      recorded: "✅ تم التسجيل",
+      photo_taken: "✅ تم التصوير",
+      diagnosis_green: "✅ المحرك سليم",
+      diagnosis_red: "⚠️ يرجى إكمال التسجيل والتصوير أولاً",
+      counter_text: "🔓 المجانية: ",
+      limit_reached: "⚠️ استنفذت التشخيصات المجانية. اشترك للمتابعة."
+    },
+    en: {
+      mic_btn: "🎤 Record Sound (5 sec)",
+      cam_btn: "📸 Capture Exhaust",
+      diagnose_btn: "🔍 Diagnose Now",
+      download_btn: "📄 Download PDF",
+      subscribe_btn: "🔒 Subscribe ($20/month)",
+      recording: "🔴 Recording...",
+      recorded: "✅ Recorded",
+      photo_taken: "✅ Captured",
+      diagnosis_green: "✅ Engine is healthy",
+      diagnosis_red: "⚠️ Please complete recording and capture first",
+      counter_text: "🔓 Free: ",
+      limit_reached: "⚠️ Free diagnostics limit reached. Subscribe to continue."
     }
+  };
 
-    async function recordSound() {
-      const btn = document.getElementById('micBtn');
-      btn.disabled = true;
-      btn.textContent = '🎤 جاري التسجيل...';
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        const recorder = new MediaRecorder(stream);
-        const chunks = [];
-        recorder.ondataavailable = e => chunks.push(e.data);
-        recorder.onstop = () => {
-          audioBlob = new Blob(chunks, { type: 'audio/wav' });
-          btn.textContent = '✅ تم التسجيل';
-          stream.getTracks().forEach(t => t.stop());
-        };
-        recorder.start();
-        setTimeout(() => recorder.stop(), 10000);
-      } catch(e) {
-        btn.textContent = '❌ فشل التسجيل';
-        setTimeout(() => btn.textContent = '🎤 تسجيل الصوت', 2000);
-      }
+  function t(key) {
+    return translations[currentLang][key] || key;
+  }
+
+  function updateUI() {
+    document.getElementById('mic-btn').textContent = t('mic_btn');
+    document.getElementById('cam-btn').textContent = t('cam_btn');
+    document.getElementById('diagnose-btn').textContent = t('diagnose_btn');
+    document.getElementById('download-pdf').textContent = t('download_btn');
+    document.getElementById('subscribe-btn').textContent = t('subscribe_btn');
+    document.getElementById('counter').innerHTML = t('counter_text') + (3 - freeCount) + "/3";
+  }
+
+  // تسجيل الصوت
+  async function recordSound() {
+    const btn = document.getElementById('mic-btn');
+    const statusDiv = document.getElementById('mic-status');
+    btn.disabled = true;
+    statusDiv.classList.remove('hidden');
+    statusDiv.className = 'status recording';
+    statusDiv.innerHTML = t('recording');
+    
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream);
+      const chunks = [];
+      
+      recorder.ondataavailable = e => chunks.push(e.data);
+      recorder.onstop = () => {
+        audioBlob = new Blob(chunks, { type: 'audio/wav' });
+        statusDiv.className = 'status success';
+        statusDiv.innerHTML = t('recorded');
+        btn.disabled = false;
+        stream.getTracks().forEach(t => t.stop());
+      };
+      
+      recorder.start();
+      setTimeout(() => recorder.stop(), 5000);
+    } catch(e) {
+      statusDiv.innerHTML = '❌ لا يمكن الوصول للميكروفون';
+      btn.disabled = false;
     }
+  }
 
-    async function takePhoto() {
-      const btn = document.getElementById('camBtn');
-      btn.disabled = true;
-      btn.textContent = '📸 جاري التصوير...';
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        const video = document.createElement('video');
-        video.srcObject = stream;
-        await video.play();
-        setTimeout(() => {
-          const canvas = document.createElement('canvas');
-          canvas.width = video.videoWidth;
-          canvas.height = video.videoHeight;
-          canvas.getContext('2d').drawImage(video, 0, 0);
-          imageData = canvas.toDataURL('image/jpeg', 0.8);
-          btn.textContent = '✅ تم التصوير';
-          stream.getTracks().forEach(t => t.stop());
-        }, 1000);
-      } catch(e) {
-        btn.textContent = '❌ فشل التصوير';
-        setTimeout(() => btn.textContent = '📸 تصوير العادم', 2000);
-      }
+  // تصوير العادم
+  async function takePhoto() {
+    const btn = document.getElementById('cam-btn');
+    const statusDiv = document.getElementById('cam-status');
+    btn.disabled = true;
+    statusDiv.classList.remove('hidden');
+    statusDiv.className = 'status recording';
+    statusDiv.innerHTML = "📸 جاري التصوير...";
+    
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      const video = document.createElement('video');
+      video.srcObject = stream;
+      video.play();
+      
+      setTimeout(() => {
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+        imageData = canvas.toDataURL('image/jpeg', 0.8);
+        statusDiv.className = 'status success';
+        statusDiv.innerHTML = t('photo_taken');
+        btn.disabled = false;
+        stream.getTracks().forEach(t => t.stop());
+      }, 500);
+    } catch(e) {
+      statusDiv.innerHTML = '❌ لا يمكن الوصول للكاميرا';
+      btn.disabled = false;
     }
+  }
 
-    function diagnose() {
-      if(freeCount >= 3) {
-        document.getElementById('result').innerHTML = '⚠️ استنفذت التشخيصات المجانية. اشترك للمتابعة.';
-        return;
-      }
-      if(!audioBlob || !imageData) {
-        document.getElementById('result').innerHTML = '⚠️ يرجى تسجيل الصوت وتصوير العادم أولاً.';
-        return;
-      }
-      freeCount++;
-      localStorage.setItem('freeDiag', freeCount);
-      document.getElementById('result').innerHTML = '✅ المحرك سليم (تشخيص أولي). يرجى الاشتراك للتفاصيل الدقيقة.';
-      if(freeCount >= 3) document.getElementById('subBtn').style.display = 'block';
+  // التشخيص
+  function diagnose() {
+    if(freeCount >= 3) {
+      document.getElementById('result-text').innerHTML = t('limit_reached');
+      document.getElementById('result-card').classList.remove('hidden');
+      document.getElementById('subscribe-btn').classList.remove('hidden');
+      return;
     }
-
-    function subscribe() {
-      window.location.href = "https://ai-moto-maintenance.lemonsqueezy.com/checkout/buy/c3abadc2-c6cc-459e-a106-de43d4f2d3f0";
+    
+    if(!audioBlob || !imageData) {
+      document.getElementById('result-text').innerHTML = t('diagnosis_red');
+      document.getElementById('result-card').classList.remove('hidden');
+      return;
     }
+    
+    freeCount++;
+    localStorage.setItem('freeDiag', freeCount);
+    updateUI();
+    
+    document.getElementById('result-text').innerHTML = t('diagnosis_green');
+    document.getElementById('result-card').classList.remove('hidden');
+    
+    if(freeCount >= 3) {
+      document.getElementById('subscribe-btn').classList.remove('hidden');
+    }
+  }
 
-    document.getElementById('micBtn').onclick = recordSound;
-    document.getElementById('camBtn').onclick = takePhoto;
-    document.getElementById('diagBtn').onclick = diagnose;
-    document.getElementById('subBtn').onclick = subscribe;
+  function subscribe() {
+    window.location.href = "https://ai-moto-maintenance.lemonsqueezy.com/checkout/buy/c3abadc2-c6cc-459e-a106-de43d4f2d3f0";
+  }
 
-    requestPermissions();
-  </script>
+  function generatePDF() {
+    alert("PDF سيتوفر قريباً في التحديث القادم");
+  }
+
+  // تغيير اللغة
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.onclick = () => {
+      currentLang = btn.getAttribute('data-lang');
+      updateUI();
+    };
+  });
+
+  // ربط الأحداث
+  document.getElementById('mic-btn').onclick = recordSound;
+  document.getElementById('cam-btn').onclick = takePhoto;
+  document.getElementById('diagnose-btn').onclick = diagnose;
+  document.getElementById('download-pdf').onclick = generatePDF;
+  document.getElementById('subscribe-btn').onclick = subscribe;
+
+  updateUI();
+</script>
 </body>
 </html>
