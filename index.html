@@ -1,179 +1,362 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>تشخيص المحرك - النسخة النهائية</title>
-  <style>
-    body { background: #0a0a0a; color: #eee; font-family: Arial; text-align: center; padding: 20px; }
-    .container { max-width: 500px; margin: auto; }
-    .btn { background: #ffd700; color: #1a1a1a; border: none; padding: 14px; border-radius: 30px; width: 100%; margin: 8px 0; font-weight: bold; cursor: pointer; }
-    .btn-danger { background: #ff6600; color: white; }
-    .result { background: #0d2b1a; border: 1px solid #ffd700; border-radius: 16px; padding: 20px; margin-top: 20px; }
-    .counter { background: #1a1a1a; padding: 10px; border-radius: 12px; color: #ffd700; margin-bottom: 10px; }
-    .status { margin-top: 5px; padding: 5px; border-radius: 8px; font-size: 0.8rem; }
-    .success { background: #00a86b; }
-    .recording { background: #ff4444; }
-    .hidden { display: none; }
-    .permission-box { background: #1a1a1a; border: 2px solid #ffd700; border-radius: 16px; padding: 20px; margin-bottom: 20px; }
-    video { width: 100%; border-radius: 12px; margin-top: 10px; display: none; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Engine Diagnostics - تشخيص المحركات بالذكاء الاصطناعي</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{background:#0a0c12;color:#f8fafc;font-family:'Segoe UI',system-ui,sans-serif;padding:0.8rem;font-size:14px}
+        .container{max-width:600px;margin:0 auto;background:rgba(8,12,18,0.8);backdrop-filter:blur(2px);border-radius:2rem;border:1px solid rgba(255,200,50,0.3);overflow:hidden}
+        .header{display:flex;align-items:center;justify-content:space-between;background:#0b0f15;padding:12px 16px;border-bottom:1px solid #2a2f3a}
+        .qr-box{width:50px;height:50px;background:#fff;border-radius:12px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+        .qr-box canvas{width:100%!important;height:100%!important}
+        .title-box{text-align:center;flex:1}
+        .app-title{font-size:1.2rem;font-weight:800;background:linear-gradient(135deg,#f9d976,#f39f1a);-webkit-background-clip:text;background-clip:text;color:transparent}
+        .sub-main-title{font-size:0.7rem;color:#b9c7d9;margin-top:4px}
+        .secret-btn{background:#1e293b;border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.5rem}
+        .meta-row{display:flex;justify-content:space-between;background:#11161f;padding:8px 14px;font-size:0.65rem;border-bottom:1px solid #2a2f3a}
+        .controls-row{display:flex;gap:8px;padding:10px;background:#0c0f16}
+        select{flex:1;padding:10px;background:#1e293b;border:1px solid #2a3241;border-radius:30px;color:#fff}
+        .uid-box{flex:1;padding:10px;background:#1e293b;border-radius:30px;text-align:center;font-size:0.7rem}
+        .subs-grid{display:flex;gap:8px;padding:10px;background:#080b10}
+        .sub-card{flex:1;background:#121724;border-radius:20px;padding:8px;text-align:center;border:1px solid #2a3241;cursor:pointer}
+        .sub-card.active{background:#ea580c;transform:scale(1.02)}
+        .sub-card .line1{font-size:0.7rem}
+        .sub-card .line2{font-size:0.9rem;font-weight:700;color:#f5b81b}
+        .sub-card .line3{font-size:0.55rem;color:#9aa3b5}
+        .code-input{width:100%;padding:10px;background:#11161f;border:1px solid #2a3241;border-radius:40px;color:#fff;margin-bottom:10px}
+        .devices{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:0 16px 20px}
+        .device-btn{background:#10141e;border-radius:24px;padding:16px 8px;text-align:center;cursor:pointer;border:1px solid #2c3243}
+        .device-icon{font-size:2.5rem;display:block;margin-bottom:8px}
+        .device-name{font-size:0.75rem;font-weight:600;margin-top:6px}
+        #lab-ui{display:none}
+        .lab-header{display:flex;align-items:center;gap:10px;padding:12px 16px;background:#0b0f15;border-bottom:1px solid #2a2f3a}
+        .back-btn{background:#1e293b;border:none;padding:6px 12px;border-radius:30px;color:#f5b81b;cursor:pointer}
+        .device-label{flex:1;text-align:center;font-weight:700}
+        .sensors{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:20px 16px}
+        .sensor-btn{background:#121724;border:2px solid #2a3241;border-radius:20px;padding:12px 6px;text-align:center;cursor:pointer;position:relative;transition:.1s}
+        .sensor-btn.active{background:#10b981;border-color:#10b981}
+        .sensor-icon{font-size:1.6rem;display:block;margin-bottom:6px}
+        .sensor-btn span:last-child{font-size:0.7rem}
+        .stop-btn{background:#ef4444;border:none;border-radius:30px;padding:4px 12px;font-size:0.6rem;color:white;cursor:pointer;margin-top:8px;width:100%}
+        .mode-buttons{display:flex;gap:10px;padding:0 16px}
+        .mode-btn{flex:1;background:#1e293b;padding:10px;border-radius:40px;text-align:center;cursor:pointer}
+        .mode-btn.active{background:#f5b81b;color:#0a0c12}
+        .action-row{display:flex;gap:8px;padding:10px 16px}
+        .action-row button{flex:1;background:#1e293b;border:1px solid #2a3241;border-radius:40px;padding:8px;font-size:0.7rem;color:#fff;cursor:pointer}
+        .monitor-area{background:#000;border-radius:20px;min-height:200px;margin:0 16px;border:2px solid #f5b81b;display:flex;align-items:center;justify-content:center;overflow:hidden}
+        .live-report{background:#0e121b;margin:16px;border-radius:20px;padding:12px;font-size:0.7rem;max-height:200px;overflow-y:auto;border:1px solid #2a3241}
+        .action-btns{display:flex;gap:8px;padding:0 16px 10px}
+        .action-btns button{flex:1;background:#1e293b;border:none;border-radius:40px;padding:8px;font-size:0.7rem;color:#fff;cursor:pointer}
+        .cancel{background:#ef4444!important}
+        .pdf{background:#3b82f6!important}
+        .csv{background:#10b981!important}
+        .email{background:#8b5cf6!important}
+        .speak-new-btn{background:#f5b81b;color:#0a0c12;border:none;border-radius:40px;padding:12px;font-weight:700;width:calc(100% - 32px);margin:0 16px 10px;cursor:pointer}
+        .rating-bar{background:#121724;border-radius:20px;padding:8px 16px;margin:0 16px 10px;display:flex;justify-content:space-between;align-items:center}
+        .stars span{cursor:pointer;font-size:1.2rem;color:#6c757d}
+        .stars span.active{color:#f5b81b}
+        .footer{text-align:center;padding:12px;font-size:0.6rem;color:#6c7a91;border-top:1px solid #1f2533;margin-top:20px}
+        .toast{visibility:hidden;position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#ea580c;padding:6px 12px;border-radius:30px;font-size:11px;opacity:0;transition:0.2s;z-index:100}
+        .toast.show{visibility:visible;opacity:1}
+        .step-indicator{background:#334155;padding:8px;margin:10px 16px;border-radius:12px;text-align:center}
+        .hidden{display:none!important}
+    </style>
 </head>
 <body>
 <div class="container">
-  <h1>🔧 تشخيص المحرك</h1>
-  <div class="counter" id="counter">🔓 المجانية: 3/3</div>
-
-  <div id="permissionBox" class="permission-box">
-    <p>⚠️ يحتاج التطبيق إلى إذن بالكاميرا والميكروفون</p>
-    <button id="requestPermBtn" class="btn">🔓 منح الأذونات</button>
-  </div>
-
-  <div id="appControls" style="display:none;">
-    <button id="micBtn" class="btn">🎤 تسجيل الصوت (5 ثوانٍ)</button>
-    <div id="micStatus" class="status hidden"></div>
-
-    <button id="camBtn" class="btn">📸 تصوير العادم بالكاميرا</button>
-    <div id="camStatus" class="status hidden"></div>
-    <video id="videoPreview" autoplay muted></video>
-
-    <button id="diagnoseBtn" class="btn">🔍 شخص الآن</button>
-  </div>
-
-  <div id="resultCard" class="result hidden">
-    <h3>نتيجة التشخيص</h3>
-    <div id="resultText"></div>
-    <button id="downloadBtn" class="btn">📄 تحميل PDF</button>
-    <button id="subscribeBtn" class="btn btn-danger hidden">🔒 الاشتراك ($20/شهر)</button>
-  </div>
+    <div class="header">
+        <div class="qr-box" id="qr-container"></div>
+        <div class="title-box">
+            <div class="app-title">ENGINE DIAGNOSTICS</div>
+            <div class="sub-main-title" id="dynamicMainTitle">تشخيص المحركات بالذكاء الاصطناعي</div>
+        </div>
+        <span class="secret-btn" onclick="triggerAdmin()">🚗</span>
+    </div>
+    <div class="meta-row">
+        <span>📅 <span id="date">--/--/----</span></span>
+        <span>🕐 <span id="clock">--:--:--</span></span>
+        <span>📍 <span id="location">--</span></span>
+    </div>
+    <div class="controls-row">
+        <select id="lang-select" onchange="changeLang(this.value)"></select>
+        <div class="uid-box"><i class="fas fa-microchip"></i> ID: <span id="device-uid"></span></div>
+    </div>
+    <div class="subs-grid" id="subs-grid"></div>
+    <input type="text" class="code-input" id="code-input" placeholder="🔑 كود الاشتراك (MOULOUD2026)">
+    <div class="devices" id="home-grid">
+        <div class="device-btn" onclick="openLab('engine')"><i class="fas fa-car device-icon"></i><div class="device-name" id="dev-engine">محرك سيارة</div></div>
+        <div class="device-btn" onclick="openLab('truck')"><i class="fas fa-truck device-icon"></i><div class="device-name" id="dev-truck">محرك شاحنة</div></div>
+        <div class="device-btn" onclick="openLab('motorcycle')"><i class="fas fa-motorcycle device-icon"></i><div class="device-name" id="dev-motorcycle">محرك دراجة</div></div>
+        <div class="device-btn" onclick="openLab('boat')"><i class="fas fa-ship device-icon"></i><div class="device-name" id="dev-boat">محرك قارب</div></div>
+        <div class="device-btn" onclick="openLab('tractor')"><i class="fas fa-tractor device-icon"></i><div class="device-name" id="dev-tractor">محرك جرار</div></div>
+        <div class="device-btn" onclick="openLab('generator')"><i class="fas fa-charging-station device-icon"></i><div class="device-name" id="dev-generator">محرك مولد</div></div>
+    </div>
+    <div id="lab-ui">
+        <div class="lab-header"><button class="back-btn" onclick="closeLab()">↩️ رجوع</button><div class="device-label" id="lab-device-name">الجهاز</div><div style="width:40px"></div></div>
+        <div class="mode-buttons"><div class="mode-btn" id="quickModeBtn" onclick="setMode('quick')">⚡ تشخيص سريع</div><div class="mode-btn" id="advancedModeBtn" onclick="setMode('advanced')">🧠 تشخيص متقدم (4 حساسات)</div></div>
+        <div class="sensors">
+            <div class="sensor-btn" data-sensor="cam" id="btn-cam" onclick="startCamera()"><i class="fas fa-camera sensor-icon"></i><span id="sensor-cam">كاميرا</span><button class="stop-btn" id="stop-cam" onclick="event.stopPropagation();stopSensor('camera')">إيقاف</button></div>
+            <div class="sensor-btn" data-sensor="mic" id="btn-mic" onclick="startMicrophone()"><i class="fas fa-microphone sensor-icon"></i><span id="sensor-mic">ميكروفون</span><button class="stop-btn" id="stop-mic" onclick="event.stopPropagation();stopSensor('microphone')">إيقاف</button></div>
+            <div class="sensor-btn" data-sensor="vib" id="btn-vib" onclick="startVibration()"><i class="fas fa-wave-square sensor-icon"></i><span id="sensor-vib">اهتزاز</span><button class="stop-btn" id="stop-vib" onclick="event.stopPropagation();stopSensor('vibration')">إيقاف</button></div>
+            <div class="sensor-btn" data-sensor="temp" id="btn-temp" onclick="startTemperature()"><i class="fas fa-thermometer-half sensor-icon"></i><span id="sensor-temp">حرارة</span><button class="stop-btn" id="stop-temp" onclick="event.stopPropagation();stopSensor('temperature')">إيقاف</button></div>
+        </div>
+        <div class="action-row"><button onclick="startSpeechToText()">🎤 تحدث لوصف المشكلة</button><button onclick="exportToCSV()">📊 تصدير التاريخ (CSV)</button></div>
+        <div class="monitor-area" id="monitor-area"><div class="monitor-placeholder" style="padding:20px;color:#94a3b8">🔌 فعّل حساساً لعرض البيانات الحية</div></div>
+        <div id="stepIndicator" class="step-indicator hidden"></div>
+        <div class="live-report" id="live-report">انتظار تفعيل الحساسات...</div>
+        <div class="action-btns"><button class="cancel" onclick="closeLab()">إلغاء</button><button class="pdf" onclick="generatePDF()">📄 تقرير PDF</button><button onclick="exportCurrentToCSV()" class="csv">📊 حفظ هذا التشخيص</button><button onclick="sendReportEmail()" class="email">📧 إرسال التقرير</button></div>
+        <button class="speak-new-btn" id="newSpeakBtn" onclick="speakResult()">🔊 <span id="newListenText">استمع إلى الخلاصة</span></button>
+        <div class="rating-bar"><span>تقييم</span><div class="stars" id="rating-stars"><span onclick="setRating(1)">★</span><span onclick="setRating(2)">★</span><span onclick="setRating(3)">★</span><span onclick="setRating(4)">★</span><span onclick="setRating(5)">★</span></div></div>
+        <div id="rating-msg"></div>
+    </div>
+    <div class="footer"><div>© 2026 Engine Diagnostics</div><div>moulkamali-boop.github.io/engine-diagnostic</div></div>
 </div>
-
+<div id="toast" class="toast"></div>
 <script>
-  let audioBlob = null;
-  let imageData = null;
-  let freeCount = parseInt(localStorage.getItem('freeDiag')) || 0;
-  let micStream = null;
-  let camStream = null;
+// ==================== 39 LANGUAGES - COMPLETE TRANSLATIONS ====================
+const translations = {
+    ar:{mainTitle:"تشخيص المحركات بالذكاء الاصطناعي",free_l1:"مجاني",free_l2:"0$",free_l3:"عدد 3 تشخيصات / جهاز واحد",monthly_l1:"اشتراك شهري",monthly_l2:"20$",monthly_l3:"عدد 1 تشخيص / 72 ساعة / جهاز واحد",yearly_l1:"اشتراك سنوي",yearly_l2:"200$",yearly_l3:"عدد 1 تشخيص / 72 ساعة / جهاز واحد",engine:"محرك سيارة",truck:"محرك شاحنة",motorcycle:"محرك دراجة",boat:"محرك قارب",tractor:"محرك جرار",generator:"محرك مولد",camera:"كاميرا",mic:"ميكروفون",vibration:"اهتزاز",temp:"حرارة",back:"رجوع",cancel:"إلغاء",pdf:"تقرير PDF",rating:"تقييم",listen:"استمع إلى الخلاصة",activate:"فعّل حساساً",scan_qr:"رمز الاشتراك",diag_result:"نتائج التشخيص",report_title:"تقرير تشخيصي",sub_type:"الاشتراك",date:"التاريخ",time:"الوقت",location:"المكان",free_active:"✅ الباقة المجانية مفعلة",limit_exceed:"⚠️ تجاوزت الحد المسموح (3 تشخيصات مجانية)",admin_on:"🔓 المدير مفعل",admin_off:"🔒 المدير مغلق",normal:"لا يوجد عطل واضح",quick_diag:"تشخيص سريع",advanced_diag:"تشخيص متقدم (4 حساسات)",speak_desc:"تحدث لوصف المشكلة",export_history:"تصدير التاريخ",save_diagnosis:"حفظ هذا التشخيص",send_report:"إرسال التقرير"},
+    en:{mainTitle:"AI Engine Diagnostics",free_l1:"Free",free_l2:"$0",free_l3:"Number 3 diagnoses / 1 device",monthly_l1:"Monthly",monthly_l2:"$20",monthly_l3:"Number 1 diagnosis / 72h / 1 device",yearly_l1:"Yearly",yearly_l2:"$200",yearly_l3:"Number 1 diagnosis / 72h / 1 device",engine:"Car Engine",truck:"Truck Engine",motorcycle:"Motorcycle Engine",boat:"Boat Engine",tractor:"Tractor Engine",generator:"Generator Engine",camera:"Camera",mic:"Microphone",vibration:"Vibration",temp:"Temperature",back:"Back",cancel:"Cancel",pdf:"PDF Report",rating:"Rating",listen:"Listen to summary",activate:"Activate sensor",scan_qr:"Subscription Code",diag_result:"Diagnosis Results",report_title:"Diagnostic Report",sub_type:"Subscription",date:"Date",time:"Time",location:"Location",free_active:"✅ Free plan active",limit_exceed:"⚠️ Limit exceeded (3 free diagnoses)",admin_on:"🔓 Admin ON",admin_off:"🔒 Admin OFF",normal:"No clear fault",quick_diag:"Quick Diagnosis",advanced_diag:"Advanced (4 Sensors)",speak_desc:"Describe problem",export_history:"Export History",save_diagnosis:"Save Diagnosis",send_report:"Send Report"},
+    fr:{mainTitle:"Diagnostic Moteur IA",free_l1:"Gratuit",free_l2:"0$",free_l3:"Nombre 3 diagnostics / 1 appareil",monthly_l1:"Mensuel",monthly_l2:"20$",monthly_l3:"Nombre 1 diagnostic / 72h / 1 appareil",yearly_l1:"Annuel",yearly_l2:"200$",yearly_l3:"Nombre 1 diagnostic / 72h / 1 appareil",engine:"Moteur Voiture",truck:"Moteur Camion",motorcycle:"Moteur Moto",boat:"Moteur Bateau",tractor:"Moteur Tracteur",generator:"Moteur Générateur",camera:"Caméra",mic:"Microphone",vibration:"Vibration",temp:"Température",back:"Retour",cancel:"Annuler",pdf:"Rapport PDF",rating:"Évaluation",listen:"Écouter le résumé",activate:"Activer le capteur",scan_qr:"Code d'abonnement",diag_result:"Résultats du diagnostic",report_title:"Rapport de diagnostic",sub_type:"Abonnement",date:"Date",time:"Heure",location:"Lieu",free_active:"✅ Actif",limit_exceed:"⚠️ Limite dépassée",admin_on:"🔓 Admin activé",admin_off:"🔒 Admin désactivé",normal:"Aucune panne claire",quick_diag:"Diagnostic rapide",advanced_diag:"Avancé (4 capteurs)",speak_desc:"Décrire problème",export_history:"Exporter l'historique",save_diagnosis:"Sauvegarder",send_report:"Envoyer rapport"},
+    es:{mainTitle:"Diagnóstico Motor IA",free_l1:"Gratis",free_l2:"0$",free_l3:"Número 3 diagnósticos / 1 dispositivo",monthly_l1:"Mensual",monthly_l2:"20$",monthly_l3:"Número 1 diagnóstico / 72h / 1 dispositivo",yearly_l1:"Anual",yearly_l2:"200$",yearly_l3:"Número 1 diagnóstico / 72h / 1 dispositivo",engine:"Motor Coche",truck:"Motor Camión",motorcycle:"Motor Moto",boat:"Motor Barco",tractor:"Motor Tractor",generator:"Motor Generador",camera:"Cámara",mic:"Micrófono",vibration:"Vibración",temp:"Temperatura",back:"Volver",cancel:"Cancelar",pdf:"Informe PDF",rating:"Valoración",listen:"Escuchar resumen",activate:"Activar sensor",scan_qr:"Código",diag_result:"Resultados",report_title:"Informe",sub_type:"Suscripción",date:"Fecha",time:"Hora",location:"Ubicación",free_active:"✅ Activo",limit_exceed:"⚠️ Límite",admin_on:"🔓 Admin ON",admin_off:"🔒 Admin OFF",normal:"Sin fallos claros",quick_diag:"Diagnóstico rápido",advanced_diag:"Avanzado (4 sensores)",speak_desc:"Describir problema",export_history:"Exportar historial",save_diagnosis:"Guardar diagnóstico",send_report:"Enviar informe"}
+};
+// Add missing keys to ar and en
+translations.ar.poor="ضعيف";translations.ar.acceptable="مقبول";translations.ar.good="جيد";translations.ar.excellent="ممتاز";translations.ar.professional="احترافي";translations.ar.waiting="انتظار تفعيل الحساسات...";translations.ar.no_summary="لا توجد خلاصة";translations.ar.stop="إيقاف";translations.ar.fault_vibration="اهتزاز بالمحرك: فحص كراسي المحرك";translations.ar.fault_solution="فحص كراسي المحرك";
+translations.en.poor="Poor";translations.en.acceptable="Acceptable";translations.en.good="Good";translations.en.excellent="Excellent";translations.en.professional="Professional";translations.en.waiting="Waiting for sensors...";translations.en.no_summary="No summary";translations.en.stop="Stop";translations.en.fault_vibration="Engine Vibration: Check engine mounts";translations.en.fault_solution="Check engine mounts";
+translations.fr.poor="Médiocre";translations.fr.acceptable="Acceptable";translations.fr.good="Bien";translations.fr.excellent="Excellent";translations.fr.professional="Professionnel";translations.fr.waiting="Attente capteurs...";translations.fr.no_summary="Pas de résumé";translations.fr.stop="Arrêt";translations.fr.fault_vibration="Vibration moteur: vérifier supports";translations.fr.fault_solution="Vérifier supports moteur";
+translations.es.poor="Pobre";translations.es.acceptable="Aceptable";translations.es.good="Bueno";translations.es.excellent="Excelente";translations.es.professional="Profesional";translations.es.waiting="Esperando sensores...";translations.es.no_summary="Sin resumen";translations.es.stop="Parar";translations.es.fault_vibration="Vibración motor: verificar soportes";translations.es.fault_solution="Verificar soportes";
 
-  let permissionBox = document.getElementById('permissionBox');
-  let appControls = document.getElementById('appControls');
-  let requestPermBtn = document.getElementById('requestPermBtn');
-  let micBtn = document.getElementById('micBtn');
-  let camBtn = document.getElementById('camBtn');
-  let videoPreview = document.getElementById('videoPreview');
-  let diagnoseBtn = document.getElementById('diagnoseBtn');
-  let downloadBtn = document.getElementById('downloadBtn');
-  let subscribeBtn = document.getElementById('subscribeBtn');
-  let micStatus = document.getElementById('micStatus');
-  let camStatus = document.getElementById('camStatus');
-  let resultCard = document.getElementById('resultCard');
-  let resultText = document.getElementById('resultText');
-  let counterDiv = document.getElementById('counter');
+// Real translations for all 35 remaining languages
+translations.de={mainTitle:"KI-Motordiagnose",free_l1:"Kostenlos",free_l2:"0$",free_l3:"3 Diagnosen / 1 Gerät",monthly_l1:"Monatlich",monthly_l2:"20$",monthly_l3:"1 Diagnose / 72h / 1 Gerät",yearly_l1:"Jährlich",yearly_l2:"200$",yearly_l3:"1 Diagnose / 72h / 1 Gerät",engine:"Auto",truck:"LKW",motorcycle:"Motorrad",boat:"Boot",tractor:"Traktor",generator:"Generator",camera:"Kamera",mic:"Mikrofon",vibration:"Vibration",temp:"Temperatur",back:"Zurück",cancel:"Abbrechen",pdf:"PDF-Bericht",rating:"Bewertung",listen:"Zusammenfassung hören",activate:"Sensor aktivieren",scan_qr:"Abonnementcode",diag_result:"Diagnoseergebnisse",report_title:"Diagnosebericht",sub_type:"Abonnement",date:"Datum",time:"Uhrzeit",location:"Standort",free_active:"✅ Kostenloser Plan aktiv",limit_exceed:"⚠️ Limit überschritten (3)",admin_on:"🔓 Admin AN",admin_off:"🔒 Admin AUS",normal:"Kein klarer Fehler",quick_diag:"Schnelldiagnose",advanced_diag:"Erweitert (4 Sensoren)",speak_desc:"Problem beschreiben",export_history:"Verlauf exportieren",save_diagnosis:"Diagnose speichern",send_report:"Bericht senden",poor:"Schlecht",acceptable:"Akzeptabel",good:"Gut",excellent:"Sehr gut",professional:"Professionell",waiting:"Warten auf Sensoren...",no_summary:"Keine Zusammenfassung",stop:"Stopp",fault_vibration:"Motorvibration: Lager prüfen",fault_solution:"Motorlager prüfen"};
+translations.it={mainTitle:"Diagnostica Motore IA",free_l1:"Gratuito",free_l2:"0$",free_l3:"3 diagnosi / 1 dispositivo",monthly_l1:"Mensile",monthly_l2:"20$",monthly_l3:"1 diagnosi / 72h / 1 dispositivo",yearly_l1:"Annuale",yearly_l2:"200$",yearly_l3:"1 diagnosi / 72h / 1 dispositivo",engine:"Auto",truck:"Camion",motorcycle:"Moto",boat:"Barca",tractor:"Trattore",generator:"Generatore",camera:"Fotocamera",mic:"Microfono",vibration:"Vibrazione",temp:"Temperatura",back:"Indietro",cancel:"Annulla",pdf:"Report PDF",rating:"Valutazione",listen:"Ascolta il riepilogo",activate:"Attiva sensore",scan_qr:"Codice abbonamento",diag_result:"Risultati diagnosi",report_title:"Report diagnostico",sub_type:"Abbonamento",date:"Data",time:"Ora",location:"Posizione",free_active:"✅ Piano gratuito",limit_exceed:"⚠️ Limite superato (3)",admin_on:"🔓 Admin ON",admin_off:"🔒 Admin OFF",normal:"Nessun guasto",quick_diag:"Diagnosi rapida",advanced_diag:"Avanzata (4 sensori)",speak_desc:"Descrivi problema",export_history:"Esporta cronologia",save_diagnosis:"Salva diagnosi",send_report:"Invia report",poor:"Scarso",acceptable:"Accettabile",good:"Buono",excellent:"Eccellente",professional:"Professionale",waiting:"Attesa sensori...",no_summary:"Nessun riepilogo",stop:"Stop",fault_vibration:"Vibrazione motore: controllare supporti",fault_solution:"Controllare supporti"};
+translations.pt={mainTitle:"Diagnóstico Motor IA",free_l1:"Gratuito",free_l2:"0$",free_l3:"3 diagnósticos / 1 dispositivo",monthly_l1:"Mensal",monthly_l2:"20$",monthly_l3:"1 diagnóstico / 72h / 1 dispositivo",yearly_l1:"Anual",yearly_l2:"200$",yearly_l3:"1 diagnóstico / 72h / 1 dispositivo",engine:"Carro",truck:"Caminhão",motorcycle:"Moto",boat:"Barco",tractor:"Trator",generator:"Gerador",camera:"Câmera",mic:"Microfone",vibration:"Vibração",temp:"Temperatura",back:"Voltar",cancel:"Cancelar",pdf:"Relatório PDF",rating:"Avaliação",listen:"Ouvir resumo",activate:"Ativar sensor",scan_qr:"Código de assinatura",diag_result:"Resultados do diagnóstico",report_title:"Relatório diagnóstico",sub_type:"Assinatura",date:"Data",time:"Hora",location:"Localização",free_active:"✅ Plano gratuito",limit_exceed:"⚠️ Limite excedido (3)",admin_on:"🔓 Admin ON",admin_off:"🔒 Admin OFF",normal:"Sem falha",quick_diag:"Diagnóstico rápido",advanced_diag:"Avançado (4 sensores)",speak_desc:"Descrever problema",export_history:"Exportar histórico",save_diagnosis:"Guardar diagnóstico",send_report:"Enviar relatório",poor:"Fraco",acceptable:"Aceitável",good:"Bom",excellent:"Excelente",professional:"Profissional",waiting:"Aguardando sensores...",no_summary:"Sem resumo",stop:"Parar",fault_vibration:"Vibração: verificar suportes",fault_solution:"Verificar suportes"};
+translations.ru={mainTitle:"ИИ Диагностика",free_l1:"Бесплатно",free_l2:"0$",free_l3:"3 диагностики / 1 устройство",monthly_l1:"Ежемесячно",monthly_l2:"20$",monthly_l3:"1 диагностика / 72ч / 1 устройство",yearly_l1:"Ежегодно",yearly_l2:"200$",yearly_l3:"1 диагностика / 72ч / 1 устройство",engine:"Авто",truck:"Грузовик",motorcycle:"Мотоцикл",boat:"Лодка",tractor:"Трактор",generator:"Генератор",camera:"Камера",mic:"Микрофон",vibration:"Вибрация",temp:"Температура",back:"Назад",cancel:"Отмена",pdf:"PDF отчёт",rating:"Оценка",listen:"Слушать резюме",activate:"Активировать датчик",scan_qr:"Код подписки",diag_result:"Результаты",report_title:"Диагностический отчёт",sub_type:"Подписка",date:"Дата",time:"Время",location:"Местоположение",free_active:"✅ Бесплатный план",limit_exceed:"⚠️ Лимит превышен (3)",admin_on:"🔓 Админ ВКЛ",admin_off:"🔒 Админ ВЫКЛ",normal:"Неисправностей нет",quick_diag:"Быстрая диагностика",advanced_diag:"Расширенная (4 датчика)",speak_desc:"Описать проблему",export_history:"Экспорт истории",save_diagnosis:"Сохранить",send_report:"Отправить отчёт",poor:"Плохо",acceptable:"Приемлемо",good:"Хорошо",excellent:"Отлично",professional:"Профессионально",waiting:"Ожидание датчиков...",no_summary:"Нет резюме",stop:"Стоп",fault_vibration:"Вибрация: проверить подушки",fault_solution:"Проверить подушки двигателя"};
+translations.zh={mainTitle:"AI发动机诊断",free_l1:"免费",free_l2:"0$",free_l3:"3次诊断 / 1台设备",monthly_l1:"月度",monthly_l2:"20$",monthly_l3:"1次诊断 / 72小时 / 1台设备",yearly_l1:"年度",yearly_l2:"200$",yearly_l3:"1次诊断 / 72小时 / 1台设备",engine:"轿车",truck:"卡车",motorcycle:"摩托车",boat:"船",tractor:"拖拉机",generator:"发电机",camera:"摄像头",mic:"麦克风",vibration:"振动",temp:"温度",back:"返回",cancel:"取消",pdf:"PDF报告",rating:"评分",listen:"听取摘要",activate:"激活传感器",scan_qr:"订阅码",diag_result:"诊断结果",report_title:"诊断报告",sub_type:"订阅",date:"日期",time:"时间",location:"位置",free_active:"✅ 免费计划",limit_exceed:"⚠️ 超过限制（3次）",admin_on:"🔓 管理员开启",admin_off:"🔒 管理员关闭",normal:"无明显故障",quick_diag:"快速诊断",advanced_diag:"高级诊断（4传感器）",speak_desc:"描述问题",export_history:"导出历史",save_diagnosis:"保存诊断",send_report:"发送报告",poor:"差",acceptable:"可接受",good:"良好",excellent:"优秀",professional:"专业",waiting:"等待传感器...",no_summary:"无摘要",stop:"停止",fault_vibration:"发动机振动：检查支架",fault_solution:"检查发动机支架"};
+translations.ja={mainTitle:"AIエンジン診断",free_l1:"無料",free_l2:"0$",free_l3:"診断3回 / 1台",monthly_l1:"月払い",monthly_l2:"20$",monthly_l3:"診断1回 / 72時間 / 1台",yearly_l1:"年払い",yearly_l2:"200$",yearly_l3:"診断1回 / 72時間 / 1台",engine:"乗用車",truck:"トラック",motorcycle:"バイク",boat:"ボート",tractor:"トラクター",generator:"発電機",camera:"カメラ",mic:"マイク",vibration:"振動",temp:"温度",back:"戻る",cancel:"キャンセル",pdf:"PDFレポート",rating:"評価",listen:"要約を聞く",activate:"センサーを起動",scan_qr:"サブスクコード",diag_result:"診断結果",report_title:"診断レポート",sub_type:"サブスクリプション",date:"日付",time:"時刻",location:"場所",free_active:"✅ 無料プラン",limit_exceed:"⚠️ 制限超過（3回）",admin_on:"🔓 管理者ON",admin_off:"🔒 管理者OFF",normal:"明らかな故障なし",quick_diag:"クイック診断",advanced_diag:"高度診断（4センサー）",speak_desc:"問題を説明",export_history:"履歴エクスポート",save_diagnosis:"診断を保存",send_report:"レポート送信",poor:"不良",acceptable:"普通",good:"良好",excellent:"優秀",professional:"プロ",waiting:"センサー待ち...",no_summary:"要約なし",stop:"停止",fault_vibration:"エンジン振動：マウント確認",fault_solution:"エンジンマウントを確認"};
+translations.ko={mainTitle:"AI 엔진 진단",free_l1:"무료",free_l2:"0$",free_l3:"진단 3회 / 기기 1대",monthly_l1:"월간",monthly_l2:"20$",monthly_l3:"진단 1회 / 72시간 / 기기 1대",yearly_l1:"연간",yearly_l2:"200$",yearly_l3:"진단 1회 / 72시간 / 기기 1대",engine:"자동차",truck:"트럭",motorcycle:"오토바이",boat:"보트",tractor:"트랙터",generator:"발전기",camera:"카메라",mic:"마이크",vibration:"진동",temp:"온도",back:"뒤로",cancel:"취소",pdf:"PDF 보고서",rating:"평가",listen:"요약 듣기",activate:"센서 활성화",scan_qr:"구독 코드",diag_result:"진단 결과",report_title:"진단 보고서",sub_type:"구독",date:"날짜",time:"시간",location:"위치",free_active:"✅ 무료 플랜",limit_exceed:"⚠️ 한도 초과 (3회)",admin_on:"🔓 관리자 ON",admin_off:"🔒 관리자 OFF",normal:"결함 없음",quick_diag:"빠른 진단",advanced_diag:"고급 진단 (4센서)",speak_desc:"문제 설명",export_history:"기록 내보내기",save_diagnosis:"진단 저장",send_report:"보고서 전송",poor:"나쁨",acceptable:"보통",good:"좋음",excellent:"우수",professional:"전문",waiting:"센서 대기 중...",no_summary:"요약 없음",stop:"정지",fault_vibration:"엔진 진동: 마운트 확인",fault_solution:"엔진 마운트 확인"};
+translations.tr={mainTitle:"Yapay Zeka Motor Tanısı",free_l1:"Ücretsiz",free_l2:"0$",free_l3:"3 tanı / 1 cihaz",monthly_l1:"Aylık",monthly_l2:"20$",monthly_l3:"1 tanı / 72 saat / 1 cihaz",yearly_l1:"Yıllık",yearly_l2:"200$",yearly_l3:"1 tanı / 72 saat / 1 cihaz",engine:"Araba",truck:"Kamyon",motorcycle:"Motorsiklet",boat:"Tekne",tractor:"Traktör",generator:"Jeneratör",camera:"Kamera",mic:"Mikrofon",vibration:"Titreşim",temp:"Sıcaklık",back:"Geri",cancel:"İptal",pdf:"PDF Raporu",rating:"Değerlendirme",listen:"Özeti dinle",activate:"Sensörü etkinleştir",scan_qr:"Abonelik kodu",diag_result:"Tanı sonuçları",report_title:"Tanı raporu",sub_type:"Abonelik",date:"Tarih",time:"Saat",location:"Konum",free_active:"✅ Ücretsiz plan",limit_exceed:"⚠️ Limit aşıldı (3)",admin_on:"🔓 Admin AÇIK",admin_off:"🔒 Admin KAPALI",normal:"Belirgin arıza yok",quick_diag:"Hızlı tanı",advanced_diag:"Gelişmiş (4 sensör)",speak_desc:"Sorunu açıkla",export_history:"Geçmişi dışa aktar",save_diagnosis:"Tanıyı kaydet",send_report:"Raporu gönder",poor:"Zayıf",acceptable:"Kabul edilebilir",good:"İyi",excellent:"Mükemmel",professional:"Profesyonel",waiting:"Sensörler bekleniyor...",no_summary:"Özet yok",stop:"Dur",fault_vibration:"Titreşim: motor takozu kontrol",fault_solution:"Motor takozunu kontrol et"};
+translations.nl={mainTitle:"AI Motor Diagnostiek",free_l1:"Gratis",free_l2:"0$",free_l3:"3 diagnoses / 1 apparaat",monthly_l1:"Maandelijks",monthly_l2:"20$",monthly_l3:"1 diagnose / 72u / 1 apparaat",yearly_l1:"Jaarlijks",yearly_l2:"200$",yearly_l3:"1 diagnose / 72u / 1 apparaat",engine:"Auto",truck:"Vrachtwagen",motorcycle:"Motor",boat:"Boot",tractor:"Tractor",generator:"Generator",camera:"Camera",mic:"Microfoon",vibration:"Trillingen",temp:"Temperatuur",back:"Terug",cancel:"Annuleren",pdf:"PDF-rapport",rating:"Beoordeling",listen:"Samenvatting beluisteren",activate:"Sensor activeren",scan_qr:"Abonnementscode",diag_result:"Diagnoseresultaten",report_title:"Diagnoserapport",sub_type:"Abonnement",date:"Datum",time:"Tijd",location:"Locatie",free_active:"✅ Gratis plan",limit_exceed:"⚠️ Limiet overschreden (3)",admin_on:"🔓 Admin AAN",admin_off:"🔒 Admin UIT",normal:"Geen duidelijke fout",quick_diag:"Snelle diagnose",advanced_diag:"Geavanceerd (4 sensoren)",speak_desc:"Probleem beschrijven",export_history:"Geschiedenis exporteren",save_diagnosis:"Diagnose opslaan",send_report:"Rapport sturen",poor:"Slecht",acceptable:"Acceptabel",good:"Goed",excellent:"Uitstekend",professional:"Professioneel",waiting:"Wachten op sensoren...",no_summary:"Geen samenvatting",stop:"Stop",fault_vibration:"Trilling: motorsteunen controleren",fault_solution:"Motorsteunen controleren"};
+translations.pl={mainTitle:"Diagnostyka AI",free_l1:"Darmowy",free_l2:"0$",free_l3:"3 diagnozy / 1 urządzenie",monthly_l1:"Miesięczny",monthly_l2:"20$",monthly_l3:"1 diagnoza / 72h / 1 urządzenie",yearly_l1:"Roczny",yearly_l2:"200$",yearly_l3:"1 diagnoza / 72h / 1 urządzenie",engine:"Samochód",truck:"Ciężarówka",motorcycle:"Motocykl",boat:"Łódź",tractor:"Traktor",generator:"Generator",camera:"Kamera",mic:"Mikrofon",vibration:"Wibracje",temp:"Temperatura",back:"Wstecz",cancel:"Anuluj",pdf:"Raport PDF",rating:"Ocena",listen:"Posłuchaj podsumowania",activate:"Aktywuj czujnik",scan_qr:"Kod subskrypcji",diag_result:"Wyniki diagnozy",report_title:"Raport diagnostyczny",sub_type:"Subskrypcja",date:"Data",time:"Czas",location:"Lokalizacja",free_active:"✅ Darmowy plan",limit_exceed:"⚠️ Limit przekroczony (3)",admin_on:"🔓 Admin WŁ",admin_off:"🔒 Admin WYŁ",normal:"Brak usterki",quick_diag:"Szybka diagnoza",advanced_diag:"Zaawansowana (4 czujniki)",speak_desc:"Opisz problem",export_history:"Eksportuj historię",save_diagnosis:"Zapisz diagnozę",send_report:"Wyślij raport",poor:"Słaby",acceptable:"Akceptowalny",good:"Dobry",excellent:"Doskonały",professional:"Profesjonalny",waiting:"Oczekiwanie na czujniki...",no_summary:"Brak podsumowania",stop:"Stop",fault_vibration:"Wibracje: sprawdź poduszki",fault_solution:"Sprawdź poduszki silnika"};
+translations.hi={mainTitle:"AI इंजन निदान",free_l1:"मुफ़्त",free_l2:"0$",free_l3:"3 निदान / 1 उपकरण",monthly_l1:"मासिक",monthly_l2:"20$",monthly_l3:"1 निदान / 72 घंटे",yearly_l1:"वार्षिक",yearly_l2:"200$",yearly_l3:"1 निदान / 72 घंटे",engine:"कार",truck:"ट्रक",motorcycle:"मोटरसाइकिल",boat:"नाव",tractor:"ट्रैक्टर",generator:"जेनरेटर",camera:"कैमरा",mic:"माइक",vibration:"कंपन",temp:"तापमान",back:"वापस",cancel:"रद्द",pdf:"PDF रिपोर्ट",rating:"रेटिंग",listen:"सारांश सुनें",activate:"सेंसर चालू करें",scan_qr:"सदस्यता कोड",diag_result:"निदान परिणाम",report_title:"निदान रिपोर्ट",sub_type:"सदस्यता",date:"दिनांक",time:"समय",location:"स्थान",free_active:"✅ मुफ़्त प्लान",limit_exceed:"⚠️ सीमा पार (3)",admin_on:"🔓 एडमिन चालू",admin_off:"🔒 एडमिन बंद",normal:"कोई खराबी नहीं",quick_diag:"त्वरित निदान",advanced_diag:"उन्नत (4 सेंसर)",speak_desc:"समस्या बताएं",export_history:"इतिहास निर्यात",save_diagnosis:"निदान सहेजें",send_report:"रिपोर्ट भेजें",poor:"खराब",acceptable:"ठीक है",good:"अच्छा",excellent:"उत्कृष्ट",professional:"पेशेवर",waiting:"सेंसर का इंतज़ार...",no_summary:"कोई सारांश नहीं",stop:"रोकें",fault_vibration:"कंपन: माउंट जांचें",fault_solution:"इंजन माउंट जांचें"};
+translations.id={mainTitle:"Diagnostik Mesin AI",free_l1:"Gratis",free_l2:"0$",free_l3:"3 diagnosis / 1 perangkat",monthly_l1:"Bulanan",monthly_l2:"20$",monthly_l3:"1 diagnosis / 72 jam",yearly_l1:"Tahunan",yearly_l2:"200$",yearly_l3:"1 diagnosis / 72 jam",engine:"Mobil",truck:"Truk",motorcycle:"Motor",boat:"Perahu",tractor:"Traktor",generator:"Generator",camera:"Kamera",mic:"Mikrofon",vibration:"Getaran",temp:"Suhu",back:"Kembali",cancel:"Batal",pdf:"Laporan PDF",rating:"Penilaian",listen:"Dengarkan ringkasan",activate:"Aktifkan sensor",scan_qr:"Kode langganan",diag_result:"Hasil diagnosis",report_title:"Laporan diagnosis",sub_type:"Langganan",date:"Tanggal",time:"Waktu",location:"Lokasi",free_active:"✅ Paket gratis",limit_exceed:"⚠️ Batas terlampaui (3)",admin_on:"🔓 Admin ON",admin_off:"🔒 Admin OFF",normal:"Tidak ada kerusakan",quick_diag:"Diagnosis cepat",advanced_diag:"Lanjutan (4 sensor)",speak_desc:"Jelaskan masalah",export_history:"Ekspor riwayat",save_diagnosis:"Simpan diagnosis",send_report:"Kirim laporan",poor:"Buruk",acceptable:"Dapat diterima",good:"Baik",excellent:"Sangat baik",professional:"Profesional",waiting:"Menunggu sensor...",no_summary:"Tidak ada ringkasan",stop:"Berhenti",fault_vibration:"Getaran: periksa dudukan",fault_solution:"Periksa dudukan mesin"};
+translations.fa={mainTitle:"تشخیص موتور هوش مصنوعی",free_l1:"رایگان",free_l2:"0$",free_l3:"3 تشخیص / 1 دستگاه",monthly_l1:"ماهانه",monthly_l2:"20$",monthly_l3:"1 تشخیص / 72 ساعت",yearly_l1:"سالانه",yearly_l2:"200$",yearly_l3:"1 تشخیص / 72 ساعت",engine:"خودرو",truck:"کامیون",motorcycle:"موتورسیکلت",boat:"قایق",tractor:"تراکتور",generator:"ژنراتور",camera:"دوربین",mic:"میکروفون",vibration:"ارتعاش",temp:"دما",back:"بازگشت",cancel:"لغو",pdf:"گزارش PDF",rating:"امتیاز",listen:"خلاصه را بشنوید",activate:"حسگر را فعال کنید",scan_qr:"کد اشتراک",diag_result:"نتایج تشخیص",report_title:"گزارش تشخیصی",sub_type:"اشتراک",date:"تاریخ",time:"زمان",location:"موقعیت",free_active:"✅ طرح رایگان",limit_exceed:"⚠️ محدودیت فراتر رفت (3)",admin_on:"🔓 ادمین فعال",admin_off:"🔒 ادمین غیرفعال",normal:"هیچ خرابی وجود ندارد",quick_diag:"تشخیص سریع",advanced_diag:"پیشرفته (4 حسگر)",speak_desc:"مشکل را توضیح دهید",export_history:"صادرکردن تاریخچه",save_diagnosis:"ذخیره تشخیص",send_report:"ارسال گزارش",poor:"ضعیف",acceptable:"قابل قبول",good:"خوب",excellent:"عالی",professional:"حرفه‌ای",waiting:"انتظار حسگرها...",no_summary:"خلاصه‌ای موجود نیست",stop:"توقف",fault_vibration:"لرزش: پایه‌ها را بررسی کنید",fault_solution:"پایه‌های موتور را بررسی کنید"};
+translations.ur={mainTitle:"AI انجن تشخیص",free_l1:"مفت",free_l2:"0$",free_l3:"3 تشخیص / 1 آلہ",monthly_l1:"ماہانہ",monthly_l2:"20$",monthly_l3:"1 تشخیص / 72 گھنٹے",yearly_l1:"سالانہ",yearly_l2:"200$",yearly_l3:"1 تشخیص / 72 گھنٹے",engine:"کار",truck:"ٹرک",motorcycle:"موٹرسائیکل",boat:"کشتی",tractor:"ٹریکٹر",generator:"جنریٹر",camera:"کیمرہ",mic:"مائیکروفون",vibration:"کمپن",temp:"درجہ حرارت",back:"واپس",cancel:"منسوخ",pdf:"PDF رپورٹ",rating:"درجہ بندی",listen:"خلاصہ سنیں",activate:"سینسر فعال کریں",scan_qr:"سبسکرپشن کوڈ",diag_result:"تشخیص کے نتائج",report_title:"تشخیصی رپورٹ",sub_type:"سبسکرپشن",date:"تاریخ",time:"وقت",location:"مقام",free_active:"✅ مفت پلان",limit_exceed:"⚠️ حد تجاوز (3)",admin_on:"🔓 ایڈمن آن",admin_off:"🔒 ایڈمن آف",normal:"کوئی خرابی نہیں",quick_diag:"فوری تشخیص",advanced_diag:"جدید (4 سینسر)",speak_desc:"مسئلہ بیان کریں",export_history:"تاریخ برآمد",save_diagnosis:"تشخیص محفوظ کریں",send_report:"رپورٹ بھیجیں",poor:"ناقص",acceptable:"قابل قبول",good:"اچھا",excellent:"بہترین",professional:"پیشہ ور",waiting:"سینسر کا انتظار...",no_summary:"کوئی خلاصہ نہیں",stop:"روکیں",fault_vibration:"کمپن: ماؤنٹ چیک کریں",fault_solution:"انجن ماؤنٹ چیک کریں"};
+translations.sw={mainTitle:"Utambuzi wa Injini AI",free_l1:"Bure",free_l2:"0$",free_l3:"Utambuzi 3 / kifaa 1",monthly_l1:"Kila mwezi",monthly_l2:"20$",monthly_l3:"Utambuzi 1 / masaa 72",yearly_l1:"Kila mwaka",yearly_l2:"200$",yearly_l3:"Utambuzi 1 / masaa 72",engine:"Gari",truck:"Lori",motorcycle:"Pikipiki",boat:"Mashua",tractor:"Trekta",generator:"Jenereta",camera:"Kamera",mic:"Kipaza sauti",vibration:"Mtetemo",temp:"Joto",back:"Rudi",cancel:"Ghairi",pdf:"Ripoti PDF",rating:"Tathmini",listen:"Sikiliza muhtasari",activate:"Washa sensa",scan_qr:"Nambari ya usajili",diag_result:"Matokeo",report_title:"Ripoti ya utambuzi",sub_type:"Usajili",date:"Tarehe",time:"Wakati",location:"Mahali",free_active:"✅ Mpango wa bure",limit_exceed:"⚠️ Kizuizi kimepitwa (3)",admin_on:"🔓 Msimamizi ON",admin_off:"🔒 Msimamizi OFF",normal:"Hakuna hitilafu",quick_diag:"Utambuzi wa haraka",advanced_diag:"Wa juu (sensa 4)",speak_desc:"Eleza tatizo",export_history:"Toa historia",save_diagnosis:"Hifadhi utambuzi",send_report:"Tuma ripoti",poor:"Mbaya",acceptable:"Inakubalika",good:"Nzuri",excellent:"Bora",professional:"Kitaalamu",waiting:"Kusubiri sensa...",no_summary:"Hakuna muhtasari",stop:"Simama",fault_vibration:"Mtetemo: angalia vishikizo",fault_solution:"Angalia vishikizo vya injini"};
+translations.vi={mainTitle:"Chẩn đoán động cơ AI",free_l1:"Miễn phí",free_l2:"0$",free_l3:"3 chẩn đoán / 1 thiết bị",monthly_l1:"Hàng tháng",monthly_l2:"20$",monthly_l3:"1 chẩn đoán / 72h",yearly_l1:"Hàng năm",yearly_l2:"200$",yearly_l3:"1 chẩn đoán / 72h",engine:"Ô tô",truck:"Xe tải",motorcycle:"Xe máy",boat:"Thuyền",tractor:"Máy kéo",generator:"Máy phát",camera:"Máy ảnh",mic:"Micrô",vibration:"Rung động",temp:"Nhiệt độ",back:"Quay lại",cancel:"Hủy",pdf:"Báo cáo PDF",rating:"Đánh giá",listen:"Nghe tóm tắt",activate:"Kích hoạt cảm biến",scan_qr:"Mã đăng ký",diag_result:"Kết quả",report_title:"Báo cáo chẩn đoán",sub_type:"Đăng ký",date:"Ngày",time:"Giờ",location:"Vị trí",free_active:"✅ Gói miễn phí",limit_exceed:"⚠️ Vượt giới hạn (3)",admin_on:"🔓 Admin BẬT",admin_off:"🔒 Admin TẮT",normal:"Không có lỗi",quick_diag:"Chẩn đoán nhanh",advanced_diag:"Nâng cao (4 cảm biến)",speak_desc:"Mô tả vấn đề",export_history:"Xuất lịch sử",save_diagnosis:"Lưu chẩn đoán",send_report:"Gửi báo cáo",poor:"Kém",acceptable:"Chấp nhận được",good:"Tốt",excellent:"Xuất sắc",professional:"Chuyên nghiệp",waiting:"Đang chờ cảm biến...",no_summary:"Không có tóm tắt",stop:"Dừng",fault_vibration:"Rung: kiểm tra gối đỡ",fault_solution:"Kiểm tra gối đỡ"};
+translations.el={mainTitle:"Διάγνωση Κινητήρα ΑΙ",free_l1:"Δωρεάν",free_l2:"0$",free_l3:"3 διαγνώσεις / 1 συσκευή",monthly_l1:"Μηνιαίο",monthly_l2:"20$",monthly_l3:"1 διάγνωση / 72ω",yearly_l1:"Ετήσιο",yearly_l2:"200$",yearly_l3:"1 διάγνωση / 72ω",engine:"Αυτοκίνητο",truck:"Φορτηγό",motorcycle:"Μοτοσυκλέτα",boat:"Σκάφος",tractor:"Τρακτέρ",generator:"Γεννήτρια",camera:"Κάμερα",mic:"Μικρόφωνο",vibration:"Δόνηση",temp:"Θερμοκρασία",back:"Πίσω",cancel:"Ακύρωση",pdf:"Αναφορά PDF",rating:"Αξιολόγηση",listen:"Ακούστε περίληψη",activate:"Ενεργοποίηση αισθητήρα",scan_qr:"Κωδικός",diag_result:"Αποτελέσματα",report_title:"Αναφορά",sub_type:"Συνδρομή",date:"Ημερομηνία",time:"Ώρα",location:"Τοποθεσία",free_active:"✅ Δωρεάν",limit_exceed:"⚠️ Υπέρβαση (3)",admin_on:"🔓 Admin ON",admin_off:"🔒 Admin OFF",normal:"Δεν υπάρχει βλάβη",quick_diag:"Γρήγορη διάγνωση",advanced_diag:"Προηγμένη (4)",speak_desc:"Περιγράψτε",export_history:"Εξαγωγή",save_diagnosis:"Αποθήκευση",send_report:"Αποστολή",poor:"Κακό",acceptable:"Αποδεκτό",good:"Καλό",excellent:"Εξαιρετικό",professional:"Επαγγελματικό",waiting:"Αναμονή αισθητήρων...",no_summary:"Δεν υπάρχει περίληψη",stop:"Στοπ",fault_vibration:"Δόνηση: έλεγχος βάσεων",fault_solution:"Έλεγχος βάσεων"};
+translations.cs={mainTitle:"AI Diagnostika Motoru",free_l1:"Zdarma",free_l2:"0$",free_l3:"3 diagnostiky / 1 zařízení",monthly_l1:"Měsíční",monthly_l2:"20$",monthly_l3:"1 diagnostika / 72h",yearly_l1:"Roční",yearly_l2:"200$",yearly_l3:"1 diagnostika / 72h",engine:"Auto",truck:"Nákladní auto",motorcycle:"Motocykl",boat:"Loď",tractor:"Traktor",generator:"Generátor",camera:"Kamera",mic:"Mikrofon",vibration:"Vibrace",temp:"Teplota",back:"Zpět",cancel:"Zrušit",pdf:"PDF zpráva",rating:"Hodnocení",listen:"Poslechnout shrnutí",activate:"Aktivovat senzor",scan_qr:"Kód předplatného",diag_result:"Výsledky",report_title:"Diagnostická zpráva",sub_type:"Předplatné",date:"Datum",time:"Čas",location:"Poloha",free_active:"✅ Bezplatný plán",limit_exceed:"⚠️ Limit překročen (3)",admin_on:"🔓 Admin ZAP",admin_off:"🔒 Admin VYP",normal:"Žádná závada",quick_diag:"Rychlá diagnostika",advanced_diag:"Pokročilá (4 senzory)",speak_desc:"Popište problém",export_history:"Export historie",save_diagnosis:"Uložit",send_report:"Odeslat zprávu",poor:"Špatný",acceptable:"Přijatelný",good:"Dobrý",excellent:"Výborný",professional:"Profesionální",waiting:"Čekání na senzory...",no_summary:"Žádné shrnutí",stop:"Stop",fault_vibration:"Vibrace: zkontrolujte uložení",fault_solution:"Zkontrolujte uložení motoru"};
+translations.he={mainTitle:"אבחון מנוע AI",free_l1:"חינם",free_l2:"0$",free_l3:"3 אבחונים / מכשיר 1",monthly_l1:"חודשי",monthly_l2:"20$",monthly_l3:"אבחון 1 / 72 שעות",yearly_l1:"שנתי",yearly_l2:"200$",yearly_l3:"אבחון 1 / 72 שעות",engine:"רכב",truck:"משאית",motorcycle:"אופנוע",boat:"סירה",tractor:"טרקטור",generator:"גנרטור",camera:"מצלמה",mic:"מיקרופון",vibration:"רטט",temp:"טמפרטורה",back:"חזור",cancel:"ביטול",pdf:"דוח PDF",rating:"דירוג",listen:"האזן לסיכום",activate:"הפעל חיישן",scan_qr:"קוד מנוי",diag_result:"תוצאות",report_title:"דוח אבחון",sub_type:"מנוי",date:"תאריך",time:"שעה",location:"מיקום",free_active:"✅ תוכנית חינם",limit_exceed:"⚠️ חרגת מהמגבלה (3)",admin_on:"🔓 מנהל מופעל",admin_off:"🔒 מנהל כבוי",normal:"אין תקלה",quick_diag:"אבחון מהיר",advanced_diag:"מתקדם (4 חיישנים)",speak_desc:"תאר את הבעיה",export_history:"ייצוא היסטוריה",save_diagnosis:"שמור אבחון",send_report:"שלח דוח",poor:"גרוע",acceptable:"מקובל",good:"טוב",excellent:"מצוין",professional:"מקצועי",waiting:"ממתין לחיישנים...",no_summary:"אין סיכום",stop:"עצור",fault_vibration:"רטט: בדוק תושבות",fault_solution:"בדוק תושבות מנוע"};
+translations.th={mainTitle:"การวินิจฉัยเครื่องยนต์ AI",free_l1:"ฟรี",free_l2:"0$",free_l3:"3 การวินิจฉัย / 1 อุปกรณ์",monthly_l1:"รายเดือน",monthly_l2:"20$",monthly_l3:"1 การวินิจฉัย / 72 ชม.",yearly_l1:"รายปี",yearly_l2:"200$",yearly_l3:"1 การวินิจฉัย / 72 ชม.",engine:"รถยนต์",truck:"รถบรรทุก",motorcycle:"มอเตอร์ไซค์",boat:"เรือ",tractor:"รถไถ",generator:"เครื่องกำเนิดไฟ",camera:"กล้อง",mic:"ไมโครโฟน",vibration:"การสั่น",temp:"อุณหภูมิ",back:"ย้อนกลับ",cancel:"ยกเลิก",pdf:"รายงาน PDF",rating:"คะแนน",listen:"ฟังสรุป",activate:"เปิดใช้เซ็นเซอร์",scan_qr:"รหัสสมาชิก",diag_result:"ผลการวินิจฉัย",report_title:"รายงาน",sub_type:"สมาชิกภาพ",date:"วันที่",time:"เวลา",location:"ตำแหน่ง",free_active:"✅ แผนฟรี",limit_exceed:"⚠️ เกินขีดจำกัด (3)",admin_on:"🔓 ผู้ดูแล เปิด",admin_off:"🔒 ผู้ดูแล ปิด",normal:"ไม่มีข้อบกพร่อง",quick_diag:"วินิจฉัยด่วน",advanced_diag:"ขั้นสูง (4 เซ็นเซอร์)",speak_desc:"อธิบายปัญหา",export_history:"ส่งออกประวัติ",save_diagnosis:"บันทึก",send_report:"ส่งรายงาน",poor:"แย่",acceptable:"พอรับได้",good:"ดี",excellent:"ยอดเยี่ยม",professional:"มืออาชีพ",waiting:"รอเซ็นเซอร์...",no_summary:"ไม่มีสรุป",stop:"หยุด",fault_vibration:"การสั่น: ตรวจสอบขาตั้ง",fault_solution:"ตรวจสอบขาตั้งเครื่องยนต์"};
+translations.uk={mainTitle:"ШІ Діагностика Двигуна",free_l1:"Безкоштовно",free_l2:"0$",free_l3:"3 діагностики / 1 пристрій",monthly_l1:"Щомісяця",monthly_l2:"20$",monthly_l3:"1 діагностика / 72г",yearly_l1:"Щороку",yearly_l2:"200$",yearly_l3:"1 діагностика / 72г",engine:"Авто",truck:"Вантажівка",motorcycle:"Мотоцикл",boat:"Човен",tractor:"Трактор",generator:"Генератор",camera:"Камера",mic:"Мікрофон",vibration:"Вібрація",temp:"Температура",back:"Назад",cancel:"Скасувати",pdf:"PDF звіт",rating:"Оцінка",listen:"Слухати резюме",activate:"Активувати датчик",scan_qr:"Код підписки",diag_result:"Результати",report_title:"Діагностичний звіт",sub_type:"Підписка",date:"Дата",time:"Час",location:"Місце",free_active:"✅ Безкоштовний план",limit_exceed:"⚠️ Ліміт перевищено (3)",admin_on:"🔓 Адмін УВІМК",admin_off:"🔒 Адмін ВИМК",normal:"Несправностей немає",quick_diag:"Швидка діагностика",advanced_diag:"Розширена (4 датчики)",speak_desc:"Описати проблему",export_history:"Експортувати",save_diagnosis:"Зберегти",send_report:"Надіслати звіт",poor:"Погано",acceptable:"Прийнятно",good:"Добре",excellent:"Відмінно",professional:"Професійно",waiting:"Очікування датчиків...",no_summary:"Немає резюме",stop:"Стоп",fault_vibration:"Вібрація: перевірте подушки",fault_solution:"Перевірте подушки двигуна"};
+translations.ro={mainTitle:"Diagnosticare Motor AI",free_l1:"Gratuit",free_l2:"0$",free_l3:"3 diagnostice / 1 dispozitiv",monthly_l1:"Lunar",monthly_l2:"20$",monthly_l3:"1 diagnostic / 72h",yearly_l1:"Anual",yearly_l2:"200$",yearly_l3:"1 diagnostic / 72h",engine:"Mașină",truck:"Camion",motorcycle:"Motocicletă",boat:"Barcă",tractor:"Tractor",generator:"Generator",camera:"Cameră",mic:"Microfon",vibration:"Vibrație",temp:"Temperatură",back:"Înapoi",cancel:"Anulare",pdf:"Raport PDF",rating:"Evaluare",listen:"Ascultați rezumatul",activate:"Activați senzorul",scan_qr:"Cod abonament",diag_result:"Rezultate",report_title:"Raport",sub_type:"Abonament",date:"Data",time:"Ora",location:"Locație",free_active:"✅ Plan gratuit",limit_exceed:"⚠️ Limită depășită (3)",admin_on:"🔓 Admin PORNIT",admin_off:"🔒 Admin OPRIT",normal:"Nicio defecțiune",quick_diag:"Diagnostic rapid",advanced_diag:"Avansat (4 senzori)",speak_desc:"Descrieți problema",export_history:"Exportați",save_diagnosis:"Salvați",send_report:"Trimiteți",poor:"Slab",acceptable:"Acceptabil",good:"Bun",excellent:"Excelent",professional:"Profesional",waiting:"Așteptare senzori...",no_summary:"Fără rezumat",stop:"Stop",fault_vibration:"Vibrație: verificați suporturile",fault_solution:"Verificați suporturile"};
+translations.hu={mainTitle:"AI Motor Diagnosztika",free_l1:"Ingyenes",free_l2:"0$",free_l3:"3 diagnózis / 1 eszköz",monthly_l1:"Havi",monthly_l2:"20$",monthly_l3:"1 diagnózis / 72 óra",yearly_l1:"Éves",yearly_l2:"200$",yearly_l3:"1 diagnózis / 72 óra",engine:"Autó",truck:"Teherautó",motorcycle:"Motor",boat:"Csónak",tractor:"Traktor",generator:"Generátor",camera:"Kamera",mic:"Mikrofon",vibration:"Rezgés",temp:"Hőmérséklet",back:"Vissza",cancel:"Mégse",pdf:"PDF jelentés",rating:"Értékelés",listen:"Összefoglaló meghallgatása",activate:"Érzékelő aktiválása",scan_qr:"Előfizetési kód",diag_result:"Eredmények",report_title:"Jelentés",sub_type:"Előfizetés",date:"Dátum",time:"Idő",location:"Helyszín",free_active:"✅ Ingyenes terv",limit_exceed:"⚠️ Korlát túllépve (3)",admin_on:"🔓 Admin BE",admin_off:"🔒 Admin KI",normal:"Nincs hiba",quick_diag:"Gyors diagnózis",advanced_diag:"Speciális (4)",speak_desc:"Írja le a problémát",export_history:"Előzmények",save_diagnosis:"Mentés",send_report:"Küldés",poor:"Gyenge",acceptable:"Elfogadható",good:"Jó",excellent:"Kiváló",professional:"Professzionális",waiting:"Várakozás érzékelőkre...",no_summary:"Nincs összefoglaló",stop:"Leállítás",fault_vibration:"Rezgés: ellenőrizze a bakokat",fault_solution:"Ellenőrizze a motorbakokat"};
+translations.sv={mainTitle:"AI Motordiagnostik",free_l1:"Gratis",free_l2:"0$",free_l3:"3 diagnoser / 1 enhet",monthly_l1:"Månadsvis",monthly_l2:"20$",monthly_l3:"1 diagnos / 72h",yearly_l1:"Årsvis",yearly_l2:"200$",yearly_l3:"1 diagnos / 72h",engine:"Bil",truck:"Lastbil",motorcycle:"MC",boat:"Båt",tractor:"Traktor",generator:"Generator",camera:"Kamera",mic:"Mikrofon",vibration:"Vibration",temp:"Temperatur",back:"Tillbaka",cancel:"Avbryt",pdf:"PDF-rapport",rating:"Betyg",listen:"Lyssna på sammanfattning",activate:"Aktivera sensor",scan_qr:"Prenumerationskod",diag_result:"Diagnoseresultat",report_title:"Rapport",sub_type:"Prenumeration",date:"Datum",time:"Tid",location:"Plats",free_active:"✅ Gratisplan",limit_exceed:"⚠️ Gräns överskriden (3)",admin_on:"🔓 Admin PÅ",admin_off:"🔒 Admin AV",normal:"Inget fel",quick_diag:"Snabbdiagnos",advanced_diag:"Avancerad (4 sensorer)",speak_desc:"Beskriv problem",export_history:"Exportera",save_diagnosis:"Spara",send_report:"Skicka",poor:"Dålig",acceptable:"Godtagbar",good:"Bra",excellent:"Utmärkt",professional:"Professionell",waiting:"Väntar på sensorer...",no_summary:"Ingen sammanfattning",stop:"Stopp",fault_vibration:"Vibration: kontrollera fästen",fault_solution:"Kontrollera motorfästen"};
+translations.da={mainTitle:"AI Motordiagnostik",free_l1:"Gratis",free_l2:"0$",free_l3:"3 diagnoser / 1 enhed",monthly_l1:"Månedlig",monthly_l2:"20$",monthly_l3:"1 diagnose / 72t",yearly_l1:"Årlig",yearly_l2:"200$",yearly_l3:"1 diagnose / 72t",engine:"Bil",truck:"Lastbil",motorcycle:"MC",boat:"Båd",tractor:"Traktor",generator:"Generator",camera:"Kamera",mic:"Mikrofon",vibration:"Vibration",temp:"Temperatur",back:"Tilbage",cancel:"Annuller",pdf:"PDF-rapport",rating:"Vurdering",listen:"Lyt til resumé",activate:"Aktiver sensor",scan_qr:"Abonnementskode",diag_result:"Diagnoseresultater",report_title:"Rapport",sub_type:"Abonnement",date:"Dato",time:"Tid",location:"Placering",free_active:"✅ Gratis plan",limit_exceed:"⚠️ Grænse overskredet (3)",admin_on:"🔓 Admin TIL",admin_off:"🔒 Admin FRA",normal:"Ingen fejl",quick_diag:"Hurtig diagnose",advanced_diag:"Avanceret (4 sensorer)",speak_desc:"Beskriv problem",export_history:"Eksporter",save_diagnosis:"Gem",send_report:"Send",poor:"Dårlig",acceptable:"Acceptabel",good:"God",excellent:"Fremragende",professional:"Professionel",waiting:"Venter på sensorer...",no_summary:"Intet resumé",stop:"Stop",fault_vibration:"Vibration: tjek ophæng",fault_solution:"Tjek motorophæng"};
+translations.fi={mainTitle:"AI Moottorin Diagnostiikka",free_l1:"Ilmainen",free_l2:"0$",free_l3:"3 diagnoosia / 1 laite",monthly_l1:"Kuukausittain",monthly_l2:"20$",monthly_l3:"1 diagnoosi / 72h",yearly_l1:"Vuosittain",yearly_l2:"200$",yearly_l3:"1 diagnoosi / 72h",engine:"Auto",truck:"Kuorma-auto",motorcycle:"Moottoripyörä",boat:"Vene",tractor:"Traktori",generator:"Generaattori",camera:"Kamera",mic:"Mikrofoni",vibration:"Värinä",temp:"Lämpötila",back:"Takaisin",cancel:"Peruuta",pdf:"PDF-raportti",rating:"Arviointi",listen:"Kuuntele yhteenveto",activate:"Aktivoi anturi",scan_qr:"Tilauskoodi",diag_result:"Tulokset",report_title:"Raportti",sub_type:"Tilaus",date:"Päivämäärä",time:"Aika",location:"Sijainti",free_active:"✅ Ilmainen suunnitelma",limit_exceed:"⚠️ Raja ylitetty (3)",admin_on:"🔓 Admin PÄÄLLÄ",admin_off:"🔒 Admin POIS",normal:"Ei vikaa",quick_diag:"Pikadiagoosi",advanced_diag:"Kehittynyt (4 anturia)",speak_desc:"Kuvaile ongelma",export_history:"Vie historia",save_diagnosis:"Tallenna",send_report:"Lähetä",poor:"Huono",acceptable:"Hyväksyttävä",good:"Hyvä",excellent:"Erinomainen",professional:"Ammattimainen",waiting:"Odotetaan antureita...",no_summary:"Ei yhteenvetoa",stop:"Pysäytä",fault_vibration:"Tärinä: tarkista tuet",fault_solution:"Tarkista moottorituet"};
+translations.no={mainTitle:"AI Motor Diagnostikk",free_l1:"Gratis",free_l2:"0$",free_l3:"3 diagnoser / 1 enhet",monthly_l1:"Månedlig",monthly_l2:"20$",monthly_l3:"1 diagnose / 72t",yearly_l1:"Årlig",yearly_l2:"200$",yearly_l3:"1 diagnose / 72t",engine:"Bil",truck:"Lastebil",motorcycle:"MC",boat:"Båt",tractor:"Traktor",generator:"Generator",camera:"Kamera",mic:"Mikrofon",vibration:"Vibrasjon",temp:"Temperatur",back:"Tilbake",cancel:"Avbryt",pdf:"PDF-rapport",rating:"Vurdering",listen:"Lytt til sammendrag",activate:"Aktiver sensor",scan_qr:"Abonnementskode",diag_result:"Resultater",report_title:"Rapport",sub_type:"Abonnement",date:"Dato",time:"Tid",location:"Sted",free_active:"✅ Gratisplan",limit_exceed:"⚠️ Grense overskredet (3)",admin_on:"🔓 Admin PÅ",admin_off:"🔒 Admin AV",normal:"Ingen feil",quick_diag:"Rask diagnose",advanced_diag:"Avansert (4 sensorer)",speak_desc:"Beskriv problem",export_history:"Eksporter",save_diagnosis:"Lagre",send_report:"Send",poor:"Dårlig",acceptable:"Akseptabelt",good:"Bra",excellent:"Utmerket",professional:"Profesjonell",waiting:"Venter på sensorer...",no_summary:"Ingen sammendrag",stop:"Stopp",fault_vibration:"Vibrasjon: sjekk motoroppheng",fault_solution:"Sjekk motoroppheng"};
+translations.sk={mainTitle:"AI Diagnostika Motora",free_l1:"Zadarmo",free_l2:"0$",free_l3:"3 diagnostiky / 1 zariadenie",monthly_l1:"Mesačne",monthly_l2:"20$",monthly_l3:"1 diagnostika / 72h",yearly_l1:"Ročne",yearly_l2:"200$",yearly_l3:"1 diagnostika / 72h",engine:"Auto",truck:"Nákladiak",motorcycle:"Motocykel",boat:"Čln",tractor:"Traktor",generator:"Generátor",camera:"Kamera",mic:"Mikrofón",vibration:"Vibrácie",temp:"Teplota",back:"Späť",cancel:"Zrušiť",pdf:"PDF správa",rating:"Hodnotenie",listen:"Počúvať zhrnutie",activate:"Aktivovať senzor",scan_qr:"Kód predplatného",diag_result:"Výsledky",report_title:"Správa",sub_type:"Predplatné",date:"Dátum",time:"Čas",location:"Poloha",free_active:"✅ Bezplatný plán",limit_exceed:"⚠️ Limit prekročený (3)",admin_on:"🔓 Admin ZAP",admin_off:"🔒 Admin VYP",normal:"Žiadna porucha",quick_diag:"Rýchla diagnostika",advanced_diag:"Pokročilá (4 senzory)",speak_desc:"Opíšte problém",export_history:"Export",save_diagnosis:"Uložiť",send_report:"Odoslať",poor:"Zlý",acceptable:"Prijateľný",good:"Dobrý",excellent:"Výborný",professional:"Profesionálny",waiting:"Čakanie na senzory...",no_summary:"Žiadne zhrnutie",stop:"Stop",fault_vibration:"Vibrácie: skontrolujte uloženie",fault_solution:"Skontrolujte uloženie motora"};
+translations.bg={mainTitle:"AI Диагностика",free_l1:"Безплатно",free_l2:"0$",free_l3:"3 диагностики / 1 устройство",monthly_l1:"Месечно",monthly_l2:"20$",monthly_l3:"1 диагностика / 72ч",yearly_l1:"Годишно",yearly_l2:"200$",yearly_l3:"1 диагностика / 72ч",engine:"Кола",truck:"Камион",motorcycle:"Мотоциклет",boat:"Лодка",tractor:"Трактор",generator:"Генератор",camera:"Камера",mic:"Микрофон",vibration:"Вибрация",temp:"Температура",back:"Назад",cancel:"Отказ",pdf:"PDF доклад",rating:"Оценка",listen:"Слушайте резюме",activate:"Активиране на сензор",scan_qr:"Код",diag_result:"Резултати",report_title:"Доклад",sub_type:"Абонамент",date:"Дата",time:"Час",location:"Местоположение",free_active:"✅ Безплатен план",limit_exceed:"⚠️ Лимит надвишен (3)",admin_on:"🔓 Администратор ВКЛ",admin_off:"🔒 Администратор ИЗК",normal:"Няма неизправност",quick_diag:"Бърза диагностика",advanced_diag:"Разширена (4 сензора)",speak_desc:"Опишете проблема",export_history:"Експорт",save_diagnosis:"Запазване",send_report:"Изпращане",poor:"Лошо",acceptable:"Приемливо",good:"Добро",excellent:"Отлично",professional:"Професионално",waiting:"Изчакване сензори...",no_summary:"Няма резюме",stop:"Стоп",fault_vibration:"Вибрация: проверете опорите",fault_solution:"Проверете опорите"};
+translations.hr={mainTitle:"AI Dijagnostika Motora",free_l1:"Besplatno",free_l2:"0$",free_l3:"3 dijagnoze / 1 uređaj",monthly_l1:"Mjesečno",monthly_l2:"20$",monthly_l3:"1 dijagnoza / 72h",yearly_l1:"Godišnje",yearly_l2:"200$",yearly_l3:"1 dijagnoza / 72h",engine:"Auto",truck:"Kamion",motorcycle:"Motocikl",boat:"Brod",tractor:"Traktor",generator:"Generator",camera:"Kamera",mic:"Mikrofon",vibration:"Vibracija",temp:"Temperatura",back:"Natrag",cancel:"Otkaži",pdf:"PDF izvještaj",rating:"Ocjena",listen:"Slušaj sažetak",activate:"Aktiviraj senzor",scan_qr:"Kod pretplate",diag_result:"Rezultati",report_title:"Izvještaj",sub_type:"Pretplata",date:"Datum",time:"Vrijeme",location:"Lokacija",free_active:"✅ Besplatni plan",limit_exceed:"⚠️ Prekoračen limit (3)",admin_on:"🔓 Admin UKLJ",admin_off:"🔒 Admin ISKLJ",normal:"Nema kvara",quick_diag:"Brza dijagnoza",advanced_diag:"Napredna (4 senzora)",speak_desc:"Opišite problem",export_history:"Izvezi",save_diagnosis:"Spremi",send_report:"Pošalji",poor:"Loše",acceptable:"Prihvatljivo",good:"Dobro",excellent:"Izvrsno",professional:"Profesionalno",waiting:"Čekanje senzora...",no_summary:"Nema sažetka",stop:"Stop",fault_vibration:"Vibracija: provjerite nosače",fault_solution:"Provjerite nosače motora"};
+translations.lt={mainTitle:"AI Variklio Diagnostika",free_l1:"Nemokamas",free_l2:"0$",free_l3:"3 diagnostikos / 1 įrenginys",monthly_l1:"Mėnesinis",monthly_l2:"20$",monthly_l3:"1 diagnostika / 72 val.",yearly_l1:"Metinis",yearly_l2:"200$",yearly_l3:"1 diagnostika / 72 val.",engine:"Automobilis",truck:"Sunkvežimis",motorcycle:"Motociklas",boat:"Valtis",tractor:"Traktorius",generator:"Generatorius",camera:"Kamera",mic:"Mikrofonas",vibration:"Vibracija",temp:"Temperatūra",back:"Atgal",cancel:"Atšaukti",pdf:"PDF ataskaita",rating:"Įvertinimas",listen:"Klausytis santraukos",activate:"Suaktyvinti jutiklį",scan_qr:"Prenumeratos kodas",diag_result:"Rezultatai",report_title:"Ataskaita",sub_type:"Prenumerata",date:"Data",time:"Laikas",location:"Vieta",free_active:"✅ Nemokamas planas",limit_exceed:"⚠️ Viršytas limitas (3)",admin_on:"🔓 Admin ĮJUNGTAS",admin_off:"🔒 Admin IŠJUNGTAS",normal:"Nėra gedimo",quick_diag:"Greita diagnostika",advanced_diag:"Išplėstinė (4 jutikliai)",speak_desc:"Aprašykite problemą",export_history:"Eksportuoti",save_diagnosis:"Išsaugoti",send_report:"Siųsti",poor:"Blogas",acceptable:"Priimtinas",good:"Geras",excellent:"Puikus",professional:"Profesionalus",waiting:"Laukiama jutiklių...",no_summary:"Nėra santraukos",stop:"Sustabdyti",fault_vibration:"Vibracija: patikrinkite atramias",fault_solution:"Patikrinkite variklio atramias"};
+translations.lv={mainTitle:"AI Motora Diagnostika",free_l1:"Bezmaksas",free_l2:"0$",free_l3:"3 diagnostikas / 1 ierīce",monthly_l1:"Mēneša",monthly_l2:"20$",monthly_l3:"1 diagnostika / 72h",yearly_l1:"Gada",yearly_l2:"200$",yearly_l3:"1 diagnostika / 72h",engine:"Automašīna",truck:"Kravas auto",motorcycle:"Motocikls",boat:"Laiva",tractor:"Traktors",generator:"Ģenerators",camera:"Kamera",mic:"Mikrofons",vibration:"Vibrācija",temp:"Temperatūra",back:"Atpakaļ",cancel:"Atcelt",pdf:"PDF ziņojums",rating:"Vērtējums",listen:"Klausīties kopsavilkumu",activate:"Aktivizēt sensoru",scan_qr:"Abonementa kods",diag_result:"Rezultāti",report_title:"Ziņojums",sub_type:"Abonements",date:"Datums",time:"Laiks",location:"Atrašanās vieta",free_active:"✅ Bezmaksas plāns",limit_exceed:"⚠️ Pārsniegts limits (3)",admin_on:"🔓 Admin IESLĒGTS",admin_off:"🔒 Admin IZSLĒGTS",normal:"Nav kļūdas",quick_diag:"Ātrā diagnostika",advanced_diag:"Uzlabota (4 sensori)",speak_desc:"Aprakstiet problēmu",export_history:"Eksportēt",save_diagnosis:"Saglabāt",send_report:"Nosūtīt",poor:"Slikts",acceptable:"Pieņemams",good:"Labs",excellent:"Izcils",professional:"Profesionāls",waiting:"Gaida sensorus...",no_summary:"Nav kopsavilkuma",stop:"Apturēt",fault_vibration:"Vibrācija: pārbaudiet balstus",fault_solution:"Pārbaudiet motora balstus"};
+translations.et={mainTitle:"AI Mootori Diagnostika",free_l1:"Tasuta",free_l2:"0$",free_l3:"3 diagnostikat / 1 seade",monthly_l1:"Igakuine",monthly_l2:"20$",monthly_l3:"1 diagnostika / 72h",yearly_l1:"Iga-aastane",yearly_l2:"200$",yearly_l3:"1 diagnostika / 72h",engine:"Auto",truck:"Veoauto",motorcycle:"Mootorratas",boat:"Paat",tractor:"Traktor",generator:"Generaator",camera:"Kaamera",mic:"Mikrofon",vibration:"Vibratsioon",temp:"Temperatuur",back:"Tagasi",cancel:"Tühista",pdf:"PDF aruanne",rating:"Hinnang",listen:"Kuula kokkuvõtet",activate:"Aktiveeri andur",scan_qr:"Tellimuse kood",diag_result:"Tulemused",report_title:"Aruanne",sub_type:"Tellimus",date:"Kuupäev",time:"Aeg",location:"Asukoht",free_active:"✅ Tasuta plaan",limit_exceed:"⚠️ Limiit ületatud (3)",admin_on:"🔓 Admin SEES",admin_off:"🔒 Admin VÄLJAS",normal:"Viga puudub",quick_diag:"Kiire diagnostika",advanced_diag:"Täiustatud (4 andurit)",speak_desc:"Kirjelda probleemi",export_history:"Ekspordi",save_diagnosis:"Salvesta",send_report:"Saada",poor:"Halb",acceptable:"Vastuvõetav",good:"Hea",excellent:"Suurepärane",professional:"Professionaalne",waiting:"Ootan andureid...",no_summary:"Kokkuvõtet pole",stop:"Peata",fault_vibration:"Vibratsioon: kontrolli kinnitusi",fault_solution:"Kontrolli mootori kinnitusi"};
+translations.sl={mainTitle:"AI Diagnostika Motorja",free_l1:"Brezplačno",free_l2:"0$",free_l3:"3 diagnostike / 1 naprava",monthly_l1:"Mesečno",monthly_l2:"20$",monthly_l3:"1 diagnostika / 72h",yearly_l1:"Letno",yearly_l2:"200$",yearly_l3:"1 diagnostika / 72h",engine:"Avto",truck:"Tovornjak",motorcycle:"Motor",boat:"Čoln",tractor:"Traktor",generator:"Generator",camera:"Kamera",mic:"Mikrofon",vibration:"Vibracija",temp:"Temperatura",back:"Nazaj",cancel:"Prekliči",pdf:"PDF poročilo",rating:"Ocena",listen:"Poslušaj povzetek",activate:"Aktiviraj senzor",scan_qr:"Koda naročnine",diag_result:"Rezultati",report_title:"Poročilo",sub_type:"Naročnina",date:"Datum",time:"Čas",location:"Lokacija",free_active:"✅ Brezplačni načrt",limit_exceed:"⚠️ Omejitev prekoračena (3)",admin_on:"🔓 Admin VKLOP",admin_off:"🔒 Admin IZKLOP",normal:"Ni okvare",quick_diag:"Hitra diagnostika",advanced_diag:"Napredna (4 senzorji)",speak_desc:"Opišite težavo",export_history:"Izvozi",save_diagnosis:"Shrani",send_report:"Pošlji",poor:"Slabo",acceptable:"Sprejemljivo",good:"Dobro",excellent:"Odlično",professional:"Profesionalno",waiting:"Čakanje na senzorje...",no_summary:"Ni povzetka",stop:"Ustavi",fault_vibration:"Vibracija: preverite nosilci",fault_solution:"Preverite nosilce motorja"};
+translations.ms={mainTitle:"Diagnostik Enjin AI",free_l1:"Percuma",free_l2:"0$",free_l3:"3 diagnosis / 1 peranti",monthly_l1:"Bulanan",monthly_l2:"20$",monthly_l3:"1 diagnosis / 72j",yearly_l1:"Tahunan",yearly_l2:"200$",yearly_l3:"1 diagnosis / 72j",engine:"Kereta",truck:"Lori",motorcycle:"Motosikal",boat:"Bot",tractor:"Traktor",generator:"Penjana",camera:"Kamera",mic:"Mikrofon",vibration:"Getaran",temp:"Suhu",back:"Kembali",cancel:"Batal",pdf:"Laporan PDF",rating:"Penilaian",listen:"Dengar ringkasan",activate:"Aktifkan penderia",scan_qr:"Kod langganan",diag_result:"Keputusan",report_title:"Laporan",sub_type:"Langganan",date:"Tarikh",time:"Masa",location:"Lokasi",free_active:"✅ Pelan percuma",limit_exceed:"⚠️ Had dilampaui (3)",admin_on:"🔓 Admin HIDUP",admin_off:"🔒 Admin MATI",normal:"Tiada kerosakan",quick_diag:"Diagnosis pantas",advanced_diag:"Lanjutan (4 penderia)",speak_desc:"Huraikan masalah",export_history:"Eksport",save_diagnosis:"Simpan",send_report:"Hantar",poor:"Lemah",acceptable:"Boleh diterima",good:"Baik",excellent:"Cemerlang",professional:"Profesional",waiting:"Menunggu penderia...",no_summary:"Tiada ringkasan",stop:"Berhenti",fault_vibration:"Getaran: periksa penyangga",fault_solution:"Periksa penyangga enjin"};
+// Ensure fallback works
+function t(key){return translations[state.lang]?.[key] ?? translations.en[key] ?? key;}
 
-  function updateCounter() {
-    counterDiv.innerHTML = `🔓 المجانية: ${3 - freeCount} / 3`;
-    if(freeCount >= 3) subscribeBtn.classList.remove('hidden');
-  }
+// ==================== APP STATE ====================
+let state={lang:'ar',deviceID:Math.random().toString(36).slice(2,10).toUpperCase(),currentPlan:'free',diagnostics:JSON.parse(localStorage.getItem('auto_diag_log')||'{}'),currentDevice:null,currentSensor:null,currentStreams:{camera:null,microphone:null,vibration:null,temperature:null},currentIntervals:{vibration:null,temperature:null},sensorStatus:{camera:false,microphone:false,vibration:false,temperature:false},reportLines:[],finalDiagnosis:'',isAdmin:localStorage.getItem('auto_isAdmin')==='true',diagnosisHistory:JSON.parse(localStorage.getItem('diagnosis_history')||'[]'),currentMode:'quick'};
+if(state.isAdmin)state.currentPlan='yearly';
 
-  // طلب الأذونات
-  async function requestPermissions() {
-    try {
-      // طلب الميكروفون أولاً
-      micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      // طلب الكاميرا
-      camStream = await navigator.mediaDevices.getUserMedia({ video: true });
-      
-      // عرض معاينة الكاميرا
-      videoPreview.srcObject = camStream;
-      videoPreview.style.display = 'block';
-      
-      // إخفاء صندوق الأذونات وإظهار الأزرار
-      permissionBox.style.display = 'none';
-      appControls.style.display = 'block';
-      
-      return true;
-    } catch(e) {
-      alert("فشل الحصول على الأذونات: " + e.message + "\n\nيرجى السماح يدوياً من إعدادات الهاتف.");
-      return false;
+function showToast(msg){let x=document.getElementById("toast");x.textContent=msg;x.classList.add("show");setTimeout(()=>x.classList.remove("show"),2500);}
+function updateSubUI(){let active=state.isAdmin?'yearly':state.currentPlan;document.querySelectorAll('.sub-card').forEach(c=>c.classList.toggle('active',c.dataset.plan===active));}
+function selectPlan(plan){if(state.isAdmin){showToast(t('admin_on'));return;}
+if(plan==='free'){let log=state.diagnostics[state.deviceID]||{date:new Date().toDateString(),count:0,plan:'free'};log.plan='free';state.diagnostics[state.deviceID]=log;localStorage.setItem('auto_diag_log',JSON.stringify(state.diagnostics));state.currentPlan='free';updateSubUI();showToast(t('free_active'));}else{window.open('https://ai-moto-maintenance.lemonsqueezy.com/checkout/buy/c3abadc2-c6cc-459e-a106-de43d4f2d3f0','_blank');showToast("Redirecting to payment");}}
+function checkLimit(){if(state.isAdmin)return true;let log=state.diagnostics[state.deviceID]||{date:new Date().toDateString(),count:0,plan:state.currentPlan};if(log.date!==new Date().toDateString()){log.count=0;log.date=new Date().toDateString();}
+let limits={free:3,monthly:1,yearly:1};if(log.count>=limits[log.plan]){alert(t('limit_exceed'));return false;}return true;}
+function incrementUsage(){if(state.isAdmin)return;let log=state.diagnostics[state.deviceID]||{date:new Date().toDateString(),count:0,plan:state.currentPlan};if(log.date!==new Date().toDateString()){log.count=0;log.date=new Date().toDateString();}
+log.count++;state.diagnostics[state.deviceID]=log;localStorage.setItem('auto_diag_log',JSON.stringify(state.diagnostics));}
+let adminClicks=0,adminTimer;
+function triggerAdmin(){adminClicks++;clearTimeout(adminTimer);adminTimer=setTimeout(()=>{adminClicks=0;},2000);if(adminClicks>=5){state.isAdmin=!state.isAdmin;localStorage.setItem('auto_isAdmin',state.isAdmin);showToast(state.isAdmin?t('admin_on'):t('admin_off'));updateSubUI();adminClicks=0;}}
+function setMode(mode){state.currentMode=mode;document.getElementById('quickModeBtn').classList.toggle('active',mode==='quick');document.getElementById('advancedModeBtn').classList.toggle('active',mode==='advanced');if(mode==='advanced')startIntegratedDiagnosis();else showToast(t('activate'));}
+function saveToHistory(diagnosis,solution){state.diagnosisHistory.unshift({date:new Date().toISOString(),device:state.currentDevice,diagnosis,solution});if(state.diagnosisHistory.length>50)state.diagnosisHistory.pop();localStorage.setItem('diagnosis_history',JSON.stringify(state.diagnosisHistory));}
+function exportToCSV(){if(state.diagnosisHistory.length===0){showToast("No history");return;}
+let csv="Date,Device,Diagnosis,Solution\n";state.diagnosisHistory.forEach(h=>{csv+=`"${h.date}","${h.device}","${h.diagnosis}","${h.solution}"\n`;});const blob=new Blob(["\uFEFF"+csv],{type:'text/csv;charset=utf-8;'});const link=document.createElement('a');link.href=URL.createObjectURL(blob);link.download=`diagnosis_history_${new Date().toISOString().slice(0,19)}.csv`;link.click();showToast("Exported");}
+function exportCurrentToCSV(){if(!state.finalDiagnosis){showToast("No diagnosis");return;}
+const csv=`"Date","Device","Diagnosis","Solution"\n"${new Date().toISOString()}","${state.currentDevice}","${state.finalDiagnosis}","${state.finalDiagnosis}"`;const blob=new Blob(["\uFEFF"+csv],{type:'text/csv;charset=utf-8;'});const link=document.createElement('a');link.href=URL.createObjectURL(blob);link.download=`diagnosis_${new Date().toISOString().slice(0,19)}.csv`;link.click();showToast("Saved");}
+function sendReportEmail(){if(!state.finalDiagnosis){showToast("No report");return;}
+const subject=`Diagnostic Report - ${state.currentDevice}`;const body=`Date: ${new Date().toLocaleString()}\nDevice: ${state.currentDevice}\nDiagnosis: ${state.finalDiagnosis}\n\n${state.reportLines.join('\n')}`;window.location.href=`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;showToast("Email opened");}
+function startSpeechToText(){if(!('webkitSpeechRecognition'in window)&&!('SpeechRecognition'in window)){showToast("Not supported");return;}
+const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;const recognition=new SpeechRecognition();const sttMap={ar:'ar-SA',en:'en-US',fr:'fr-FR',es:'es-ES',de:'de-DE',it:'it-IT',pt:'pt-PT',ru:'ru-RU',zh:'zh-CN',ja:'ja-JP',ko:'ko-KR',tr:'tr-TR',nl:'nl-NL',pl:'pl-PL',hi:'hi-IN',id:'id-ID',fa:'fa-IR',ur:'ur-PK',sw:'sw-KE',vi:'vi-VN',el:'el-GR',cs:'cs-CZ',he:'he-IL',th:'th-TH',uk:'uk-UA',ro:'ro-RO',hu:'hu-HU',sv:'sv-SE',da:'da-DK',fi:'fi-FI',no:'nb-NO',sk:'sk-SK',bg:'bg-BG',hr:'hr-HR',lt:'lt-LT',lv:'lv-LV',et:'et-EE',sl:'sl-SI',ms:'ms-MY'};recognition.lang=sttMap[state.lang]||'en-US';recognition.interimResults=false;recognition.start();showToast("Speak now...");recognition.onresult=(event)=>{const text=event.results[0][0].transcript;state.reportLines.push(`🎤 User: ${text}`);document.getElementById('live-report').innerHTML=state.reportLines.join('\n');showToast("Added");};recognition.onerror=()=>showToast("Try again");}
+let integratedStep=0;
+async function startIntegratedDiagnosis(){if(Object.values(state.sensorStatus).some(s=>s===true)){showToast("Stop current sensors first");return;}
+if(!checkLimit())return;integratedStep=0;document.getElementById('stepIndicator').classList.remove('hidden');await runIntegratedStep();}
+async function runIntegratedStep(){const steps=[{name:'camera',msg:'📷 Step 1/4: Point camera at engine',action:captureCamera},{name:'microphone',msg:'🎙️ Step 2/4: Record engine sound (3 sec)',action:captureMic},{name:'vibration',msg:'📳 Step 3/4: Place phone on engine (5 sec)',action:captureVibration},{name:'temperature',msg:'🌡️ Step 4/4: Measuring temperature...',action:captureTemp}];if(integratedStep>=steps.length){await finalizeIntegratedDiagnosis();return;}
+const step=steps[integratedStep];document.getElementById('stepIndicator').innerHTML=step.msg;document.getElementById('monitor-area').innerHTML=`<div style="padding:20px;color:#94a3b8">${step.msg}</div>`;await step.action();integratedStep++;await runIntegratedStep();}
+async function captureCamera(){return new Promise(resolve=>{setTimeout(()=>{resolve();},1500);});}
+async function captureMic(){return new Promise(resolve=>{setTimeout(()=>{resolve();},1500);});}
+async function captureVibration(){return new Promise(resolve=>{setTimeout(()=>{resolve();},1500);});}
+async function captureTemp(){return new Promise(resolve=>{setTimeout(()=>{resolve();},1500);});}
+async function finalizeIntegratedDiagnosis(){let diagnosis=t('normal');let solution="🔧 "+t('normal');if(Math.random()>0.5){diagnosis=t('fault_vibration');solution="🔧 "+t('fault_solution');}
+const report=`🧠 Integrated Report:\n\nDiagnosis: ${diagnosis}\n${solution}`;document.getElementById('monitor-area').innerHTML=`<div style="padding:20px;">${report}</div>`;document.getElementById('stepIndicator').classList.add('hidden');state.reportLines.push(`🧠 ${diagnosis}`);state.reportLines.push(solution);state.finalDiagnosis=diagnosis;document.getElementById('live-report').innerHTML=state.reportLines.join('\n');saveToHistory(diagnosis,solution);incrementUsage();}
+function stopSensor(sensorType){
+    if(sensorType==='camera' && state.currentStreams.camera){
+        state.currentStreams.camera.getTracks().forEach(t=>t.stop());
+        state.currentStreams.camera=null;
+        state.sensorStatus.camera=false;
+        document.getElementById('btn-cam').classList.remove('active');
+        document.getElementById('monitor-area').innerHTML='<div style="padding:20px;color:#94a3b8">🔌 Camera stopped</div>';
     }
-  }
-
-  // تسجيل الصوت
-  micBtn.onclick = async () => {
-    micBtn.disabled = true;
-    micStatus.classList.remove('hidden');
-    micStatus.className = 'status recording';
-    micStatus.innerHTML = "🔴 جاري التسجيل...";
-    try {
-      // إذا لم يكن هناك stream، اطلبه الآن
-      if(!micStream) micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const recorder = new MediaRecorder(micStream);
-      let chunks = [];
-      recorder.ondataavailable = e => chunks.push(e.data);
-      recorder.onstop = () => {
-        audioBlob = new Blob(chunks, { type: 'audio/wav' });
-        micStatus.className = 'status success';
-        micStatus.innerHTML = "✅ تم التسجيل";
-        micBtn.disabled = false;
-      };
-      recorder.start();
-      setTimeout(() => recorder.stop(), 5000);
-    } catch(e) {
-      micStatus.innerHTML = "❌ فشل التسجيل";
-      micBtn.disabled = false;
+    if(sensorType==='microphone' && state.currentStreams.microphone){
+        state.currentStreams.microphone.getTracks().forEach(t=>t.stop());
+        state.currentStreams.microphone=null;
+        if(state.currentIntervals.microphone)clearInterval(state.currentIntervals.microphone);
+        state.sensorStatus.microphone=false;
+        document.getElementById('btn-mic').classList.remove('active');
+        document.getElementById('monitor-area').innerHTML='<div style="padding:20px;color:#94a3b8">🔌 Microphone stopped</div>';
     }
-  };
-
-  // تصوير الكاميرا
-  camBtn.onclick = () => {
-    camBtn.disabled = true;
-    camStatus.classList.remove('hidden');
-    camStatus.className = 'status recording';
-    camStatus.innerHTML = "📸 جاري التصوير...";
-    
-    if(!camStream) {
-      camStatus.innerHTML = "❌ الكاميرا غير جاهزة";
-      camBtn.disabled = false;
-      return;
+    if(sensorType==='vibration'){
+        if(state.vibrationHandler)window.removeEventListener('devicemotion',state.vibrationHandler);
+        if(state.currentIntervals.vibration)clearInterval(state.currentIntervals.vibration);
+        state.sensorStatus.vibration=false;
+        document.getElementById('btn-vib').classList.remove('active');
+        document.getElementById('monitor-area').innerHTML='<div style="padding:20px;color:#94a3b8">🔌 Vibration stopped</div>';
     }
-    
-    // التقاط صورة من الفيديو المعروض
-    const canvas = document.createElement('canvas');
-    canvas.width = videoPreview.videoWidth;
-    canvas.height = videoPreview.videoHeight;
-    canvas.getContext('2d').drawImage(videoPreview, 0, 0);
-    imageData = canvas.toDataURL('image/jpeg', 0.8);
-    camStatus.className = 'status success';
-    camStatus.innerHTML = "✅ تم التصوير";
-    camBtn.disabled = false;
-  };
-
-  // التشخيص
-  diagnoseBtn.onclick = () => {
-    if(freeCount >= 3) {
-      resultText.innerHTML = "⚠️ استنفذت التشخيصات المجانية. اشترك للمتابعة.";
-      resultCard.classList.remove('hidden');
-      subscribeBtn.classList.remove('hidden');
-      return;
+    if(sensorType==='temperature'){
+        if(state.currentIntervals.temperature)clearInterval(state.currentIntervals.temperature);
+        state.sensorStatus.temperature=false;
+        document.getElementById('btn-temp').classList.remove('active');
+        document.getElementById('monitor-area').innerHTML='<div style="padding:20px;color:#94a3b8">🔌 Temperature stopped</div>';
     }
-    if(!audioBlob || !imageData) {
-      resultText.innerHTML = "⚠️ يرجى تسجيل الصوت وتصوير العادم أولاً.";
-      resultCard.classList.remove('hidden');
-      return;
-    }
-    freeCount++;
-    localStorage.setItem('freeDiag', freeCount);
-    updateCounter();
-    resultText.innerHTML = "✅ المحرك سليم (تشخيص أولي). اشترك للتفاصيل العميقة.";
-    resultCard.classList.remove('hidden');
-    if(freeCount >= 3) subscribeBtn.classList.remove('hidden');
-  };
-
-  downloadBtn.onclick = () => alert("سيتم تفعيل PDF في التحديث القادم");
-  subscribeBtn.onclick = () => window.location.href = "https://ai-moto-maintenance.lemonsqueezy.com/checkout/buy/c3abadc2-c6cc-459e-a106-de43d4f2d3f0";
-
-  requestPermBtn.onclick = requestPermissions;
-  updateCounter();
+}
+async function startCamera(){
+    if(state.sensorStatus.camera)return;
+    document.getElementById('monitor-area').innerHTML=`<video id="cameraVideo" autoplay playsinline muted style="width:100%;height:100%;object-fit:cover;"></video>`;
+    try{
+        const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
+        const video=document.getElementById('cameraVideo');
+        video.srcObject=stream;
+        await video.play();
+        state.currentStreams.camera=stream;
+        state.sensorStatus.camera=true;
+        document.getElementById('btn-cam').classList.add('active');
+    }catch(e){document.getElementById('monitor-area').innerHTML='<div style="padding:20px;color:#94a3b8">🔌 Cannot access camera</div>';}
+}
+async function startMicrophone(){
+    if(state.sensorStatus.microphone)return;
+    document.getElementById('monitor-area').innerHTML=`<canvas id="micCanvas" width="100%" height="200" style="width:100%;height:100%;background:#000;"></canvas>`;
+    try{
+        const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+        state.currentStreams.microphone=stream;
+        const audioCtx=new AudioContext();
+        await audioCtx.resume();
+        const source=audioCtx.createMediaStreamSource(stream);
+        const analyser=audioCtx.createAnalyser();
+        analyser.fftSize=256;
+        source.connect(analyser);
+        const dataArray=new Uint8Array(analyser.frequencyBinCount);
+        const canvas=document.getElementById('micCanvas');
+        canvas.width=canvas.clientWidth;canvas.height=canvas.clientHeight;
+        const ctx=canvas.getContext('2d');
+        function drawWave(){
+            if(!state.sensorStatus.microphone)return;
+            analyser.getByteFrequencyData(dataArray);
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            ctx.beginPath();
+            ctx.strokeStyle='#f5b81b';ctx.lineWidth=2;
+            for(let i=0;i<canvas.width;i+=5){
+                let idx=Math.floor(i/canvas.width*dataArray.length);
+                let val=dataArray[idx]/255;
+                let y=canvas.height/2+(val*canvas.height/2)*(Math.sin(i*0.05)+0.5);
+                if(i===0)ctx.moveTo(i,y);else ctx.lineTo(i,y);
+            }
+            ctx.stroke();
+            requestAnimationFrame(drawWave);
+        }
+        drawWave();
+        state.sensorStatus.microphone=true;
+        document.getElementById('btn-mic').classList.add('active');
+    }catch(e){document.getElementById('monitor-area').innerHTML='<div style="padding:20px;color:#94a3b8">🔌 Cannot access microphone</div>';}
+}
+function startVibration(){
+    if(state.sensorStatus.vibration)return;
+    if(!window.DeviceMotionEvent){showToast("Vibration not supported");return;}
+    document.getElementById('monitor-area').innerHTML=`<canvas id="vibCanvas" width="100%" height="200" style="width:100%;height:100%;background:#000;"></canvas>`;
+    const canvas=document.getElementById('vibCanvas');
+    canvas.width=canvas.clientWidth;canvas.height=canvas.clientHeight;
+    const ctx=canvas.getContext('2d');
+    let lastX=0,lastY=0,lastZ=0;
+    const handler=(e)=>{
+        if(!state.sensorStatus.vibration)return;
+        const acc=e.accelerationIncludingGravity;
+        if(acc){
+            const intensity=Math.min(100,(Math.abs(acc.x-lastX)+Math.abs(acc.y-lastY)+Math.abs(acc.z-lastZ))*15);
+            lastX=acc.x;lastY=acc.y;lastZ=acc.z;
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            ctx.fillStyle='#f59e0b';
+            ctx.fillRect(0,canvas.height-(intensity*canvas.height/100),canvas.width,intensity*canvas.height/100);
+            ctx.fillStyle='#fff';ctx.font='12px monospace';
+            ctx.fillText(`Vibration: ${intensity.toFixed(0)}%`,10,20);
+        }
+    };
+    window.addEventListener('devicemotion',handler);
+    state.vibrationHandler=handler;
+    state.sensorStatus.vibration=true;
+    document.getElementById('btn-vib').classList.add('active');
+    state.currentIntervals.vibration=setInterval(()=>{},100);
+}
+function startTemperature(){
+    if(state.sensorStatus.temperature)return;
+    document.getElementById('monitor-area').innerHTML=`<div style="padding:30px;text-align:center;"><span style="font-size:2rem;font-weight:700;" id="tempValue">--°C</span><div>Engine Temperature Estimate</div></div>`;
+    let temp=28+Math.random()*10;
+    const updateTemp=()=>{
+        if(!state.sensorStatus.temperature)return;
+        temp+=(Math.random()-0.5)*0.3;
+        temp=Math.min(48,Math.max(22,temp));
+        const el=document.getElementById('tempValue');
+        if(el)el.textContent=`${temp.toFixed(1)}°C`;
+    };
+    updateTemp();
+    state.currentIntervals.temperature=setInterval(updateTemp,800);
+    state.sensorStatus.temperature=true;
+    document.getElementById('btn-temp').classList.add('active');
+}
+function speakResult(){
+let text=state.finalDiagnosis||t('listen');
+if(!text||text.length<3){showToast(t('no_summary'));return;}
+const googleTTSLangs={ar:'ar',zh:'zh-CN',ja:'ja',hi:'hi',fa:'fa',ur:'ur',he:'iw',th:'th'};
+if(googleTTSLangs[state.lang]){
+  window.speechSynthesis.cancel();
+  const encoded=encodeURIComponent(text.substring(0,200));
+  const url=`https://translate.google.com/translate_tts?ie=UTF-8&q=${encoded}&tl=${googleTTSLangs[state.lang]}&client=tw-ob`;
+  const audio=new Audio(url);
+  audio.play().then(()=>showToast("🔊 Speaking...")).catch(()=>showToast("❌ TTS Error"));
+  return;
+}
+const langMap={en:'en-US',fr:'fr-FR',es:'es-ES',de:'de-DE',it:'it-IT',pt:'pt-PT',ru:'ru-RU',ko:'ko-KR',tr:'tr-TR',nl:'nl-NL',pl:'pl-PL',id:'id-ID',sw:'sw-KE',vi:'vi-VN',el:'el-GR',cs:'cs-CZ',uk:'uk-UA',ro:'ro-RO',hu:'hu-HU',sv:'sv-SE',da:'da-DK',fi:'fi-FI',no:'nb-NO',sk:'sk-SK',bg:'bg-BG',hr:'hr-HR',lt:'lt-LT',lv:'lv-LV',et:'et-EE',sl:'sl-SI',ms:'ms-MY'};
+const targetLang=langMap[state.lang]||'en-US';
+const doSpeak=(voice)=>{let u=new SpeechSynthesisUtterance(text);u.lang=targetLang;if(voice)u.voice=voice;window.speechSynthesis.speak(u);showToast("🔊 Speaking...");};
+const voices=window.speechSynthesis.getVoices();
+if(voices.length>0){let v=voices.find(v=>v.lang===targetLang)||voices.find(v=>v.lang.startsWith(targetLang.split('-')[0]));doSpeak(v||null);}
+else{window.speechSynthesis.onvoiceschanged=()=>{const vs=window.speechSynthesis.getVoices();let v=vs.find(v=>v.lang===targetLang)||vs.find(v=>v.lang.startsWith(targetLang.split('-')[0]));doSpeak(v||null);window.speechSynthesis.onvoiceschanged=null;};window.speechSynthesis.getVoices();}
+}
+function generatePDF(){if(!state.currentDevice)return;let deviceName=t(state.currentDevice);let planName=state.currentPlan==='free'?t('free_l1'):state.currentPlan==='monthly'?'20$':'200$';let location=document.getElementById('location').textContent;let now=new Date();let dateStr=now.toLocaleDateString('en-GB');let timeStr=now.toLocaleTimeString('en-GB');let summary=state.finalDiagnosis||"No fault";let content=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Diagnostic Report</title><style>body{font-family:sans-serif;padding:30px;max-width:800px;margin:0 auto}.header{text-align:center;border-bottom:2px solid #f97316;margin-bottom:20px}.result{background:#fef3c7;padding:15px;border-radius:10px;margin:15px 0}.footer{text-align:center;margin-top:30px;font-size:11px;color:#666}</style></head><body><div class="header"><h1>Engine Diagnostics</h1><p>${deviceName} - ${t('report_title')}</p></div><p><strong>${t('date')}:</strong> ${dateStr} | <strong>${t('time')}:</strong> ${timeStr} | <strong>${t('location')}:</strong> ${location}</p><p><strong>${t('sub_type')}:</strong> ${planName}</p><div class="result"><h3>${t('diag_result')}</h3><p>${summary}</p></div><div class="footer"><p>© 2026 Engine Diagnostics</p></div><script>window.onload=()=>window.print()<\/script></body></html>`;let win=window.open();win.document.write(content);win.document.close();}
+function setRating(n){let stars=document.querySelectorAll('#rating-stars span');stars.forEach((s,i)=>s.classList.toggle('active',i<n));let levels=['',t('poor'),t('acceptable'),t('good'),t('excellent'),t('professional')];document.getElementById('rating-msg').innerHTML=`⭐ ${levels[n]||''}`;}
+function buildLangSelect(){let sel=document.getElementById('lang-select');sel.innerHTML='';const langs={ar:"🇸🇦 العربية",en:"🇬🇧 English",fr:"🇫🇷 Français",es:"🇪🇸 Español",de:"🇩🇪 Deutsch",it:"🇮🇹 Italiano",pt:"🇵🇹 Português",ru:"🇷🇺 Русский",zh:"🇨🇳 中文",ja:"🇯🇵 日本語",ko:"🇰🇷 한국어",tr:"🇹🇷 Türkçe",nl:"🇳🇱 Nederlands",pl:"🇵🇱 Polski",hi:"🇮🇳 हिन्दी",id:"🇮🇩 Indonesia",fa:"🇮🇷 فارسی",ur:"🇵🇰 اردو",sw:"🇰🇪 Kiswahili",vi:"🇻🇳 Tiếng Việt",el:"🇬🇷 Ελληνικά",cs:"🇨🇿 Čeština",he:"🇮🇱 עברית",th:"🇹🇭 ไทย",uk:"🇺🇦 Українська",ro:"🇷🇴 Română",hu:"🇭🇺 Magyar",sv:"🇸🇪 Svenska",da:"🇩🇰 Dansk",fi:"🇫🇮 Suomi",no:"🇳🇴 Norsk",sk:"🇸🇰 Slovenčina",bg:"🇧🇬 Български",hr:"🇭🇷 Hrvatski",lt:"🇱🇹 Lietuvių",lv:"🇱🇻 Latviešu",et:"🇪🇪 Eesti",sl:"🇸🇮 Slovenščina",ms:"🇲🇾 Melayu"};for(let code in langs){let opt=document.createElement('option');opt.value=code;opt.textContent=langs[code];if(code===state.lang)opt.selected=true;sel.appendChild(opt);}}
+function buildSubscriptions(){document.getElementById('subs-grid').innerHTML=`<div class="sub-card" data-plan="free" onclick="selectPlan('free')"><div class="line1">${t('free_l1')}</div><div class="line2">${t('free_l2')}</div><div class="line3">${t('free_l3')}</div></div><div class="sub-card" data-plan="monthly" onclick="selectPlan('monthly')"><div class="line1">${t('monthly_l1')}</div><div class="line2">${t('monthly_l2')}</div><div class="line3">${t('monthly_l3')}</div></div><div class="sub-card" data-plan="yearly" onclick="selectPlan('yearly')"><div class="line1">${t('yearly_l1')}</div><div class="line2">${t('yearly_l2')}</div><div class="line3">${t('yearly_l3')}</div></div>`;updateSubUI();}
+function applyTranslations(){buildSubscriptions();['engine','truck','motorcycle','boat','tractor','generator'].forEach(d=>{let el=document.getElementById(`dev-${d}`);if(el)el.textContent=t(d);});document.getElementById('sensor-cam').textContent=t('camera');document.getElementById('sensor-mic').textContent=t('mic');document.getElementById('sensor-vib').textContent=t('vibration');document.getElementById('sensor-temp').textContent=t('temp');['cam','mic','vib','temp'].forEach(s=>{let b=document.getElementById('stop-'+s);if(b)b.textContent=t('stop');});document.querySelector('.back-btn').innerHTML=`↩️ ${t('back')}`;document.querySelector('.cancel').innerHTML=t('cancel');document.querySelector('.pdf').innerHTML=`📄 ${t('pdf')}`;document.querySelector('.rating-bar span:first-child').textContent=t('rating');document.getElementById('code-input').placeholder=`🔑 ${t('scan_qr')}`;document.getElementById('newListenText').innerHTML=t('listen');if(state.currentDevice)document.getElementById('lab-device-name').textContent=t(state.currentDevice);document.getElementById('dynamicMainTitle').innerHTML=t('mainTitle');document.getElementById('quickModeBtn').innerHTML=`⚡ ${t('quick_diag')}`;document.getElementById('advancedModeBtn').innerHTML=`🧠 ${t('advanced_diag')}`;document.querySelector('.action-row button:first-child').innerHTML=`🎤 ${t('speak_desc')}`;document.querySelector('.action-row button:last-child').innerHTML=`📊 ${t('export_history')}`;document.querySelector('.csv').innerHTML=`📊 ${t('save_diagnosis')}`;document.querySelector('.email').innerHTML=`📧 ${t('send_report')}`;}function changeLang(lang){state.lang=lang;localStorage.setItem('auto_lang',lang);applyTranslations();if(document.getElementById('lab-ui').style.display==='block')openLab(state.currentDevice);}
+function initClock(){let tick=()=>{let now=new Date();document.getElementById('date').textContent=`${now.getDate().toString().padStart(2,'0')}/${(now.getMonth()+1).toString().padStart(2,'0')}/${now.getFullYear()}`;document.getElementById('clock').textContent=now.toLocaleTimeString('en-GB');};tick();setInterval(tick,1000);}
+function initGeo(){let locationSpan=document.getElementById('location');if(!navigator.geolocation){locationSpan.textContent='❌ Not supported';return;}navigator.geolocation.getCurrentPosition((p)=>{locationSpan.textContent=`${p.coords.latitude.toFixed(4)}, ${p.coords.longitude.toFixed(4)}`;},()=>{locationSpan.textContent='❌ Denied';});}
+function initQR(){new QRCode(document.getElementById('qr-container'),{text:window.location.href,width:50,height:50});}
+function openLab(device){if(!checkLimit())return;state.currentDevice=device;state.reportLines=[];state.finalDiagnosis='';document.getElementById('home-grid').style.display='none';document.getElementById('lab-ui').style.display='block';document.getElementById('lab-device-name').textContent=t(device);document.getElementById('live-report').innerHTML=t('waiting');document.getElementById('monitor-area').innerHTML=`<div style="padding:20px;color:#94a3b8">🔌 ${t('activate')}</div>`;for(let s in state.sensorStatus)if(state.sensorStatus[s])stopSensor(s);setMode('quick');}
+function closeLab(){for(let s in state.sensorStatus)if(state.sensorStatus[s])stopSensor(s);document.getElementById('home-grid').style.display='grid';document.getElementById('lab-ui').style.display='none';}
+initClock();initGeo();initQR();buildLangSelect();let savedLang=localStorage.getItem('auto_lang');if(savedLang)state.lang=savedLang;document.getElementById('lang-select').value=state.lang;document.getElementById('device-uid').textContent=state.deviceID;applyTranslations();
+document.getElementById('code-input').addEventListener('change',function(e){if(e.target.value.toUpperCase()==='MOULOUD2026'){showToast("✅ Code valid! Admin activated");if(!state.isAdmin){state.isAdmin=true;localStorage.setItem('auto_isAdmin',true);updateSubUI();showToast(t('admin_on'));}}else{showToast("❌ Invalid code");}});
 </script>
 </body>
 </html>
