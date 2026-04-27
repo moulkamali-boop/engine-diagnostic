@@ -1,22 +1,39 @@
 {
-  "name": "تشخيص المحرك - Engine Diagnostic",
-  "short_name": "تشخيص المحرك",
+  "name": "AI Engine Diagnostics Pro",
+  "short_name": "Engine Diag",
+  "description": "تشخيص المحركات بالذكاء الاصطناعي – 39 لغة، حساسات الهاتف، تقارير smart",
   "start_url": ".",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#0a0a0a",
-  "theme_color": "#1a1a1a",
-  "description": "تشخيص ذكي لأي محرك باستخدام الكاميرا والميكروفون",
+  "theme_color": "#f97316",
+  "background_color": "#0a0c12",
+  "orientation": "portrait-primary",
+  "lang": "ar",
+  "dir": "rtl",
   "icons": [
     {
-      "src": "https://via.placeholder.com/192x192?text=ED",
+      "src": "icons/icon-144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "https://via.placeholder.com/512x512?text=ED",
+      "src": "icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
   ],
-  "lang": "ar"
+  "shortcuts": [
+    {
+      "name": "تشخيص سريع",
+      "short_name": "سريع",
+      "description": "افتح التطبيق مباشرة للتشخيص",
+      "url": "/index.html"
+    }
+  ]
 }
