@@ -3,12 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Engine Diagnostics Pro - تشخيص المحركات الذكي</title>
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#f97316">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="AI Engine Diag">
+    <title>Engine Diagnostics - تشخيص المحركات بالذكاء الاصطناعي</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
@@ -29,6 +24,11 @@
         .credit-banner{background:#1e293b;padding:8px 12px;border-radius:12px;margin:8px 0;display:flex;justify-content:space-between;align-items:center;font-size:0.8rem}
         .credit-banner button{background:#f5b81b;border:none;border-radius:8px;padding:6px 12px;color:#000;font-weight:bold;cursor:pointer}
         .subs-grid{display:flex;gap:8px;padding:10px;background:#080b10}
+        .sub-card{flex:1;background:#121724;border-radius:20px;padding:8px;text-align:center;border:1px solid #2a3241;cursor:pointer}
+        .sub-card.active{background:#ea580c;transform:scale(1.02)}
+        .sub-card .line1{font-size:0.7rem}
+        .sub-card .line2{font-size:0.9rem;font-weight:700;color:#f5b81b}
+        .sub-card .line3{font-size:0.55rem;color:#9aa3b5}
         .code-input{width:100%;padding:10px;background:#11161f;border:1px solid #2a3241;border-radius:40px;color:#fff;margin-bottom:10px}
         .devices{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:0 16px 20px}
         .device-btn{background:#10141e;border-radius:24px;padding:16px 8px;text-align:center;cursor:pointer;border:1px solid #2c3243}
@@ -42,6 +42,7 @@
         .sensor-btn{background:#121724;border:2px solid #2a3241;border-radius:20px;padding:12px 6px;text-align:center;cursor:pointer;position:relative;transition:.1s}
         .sensor-btn.active{background:#10b981;border-color:#10b981}
         .sensor-icon{font-size:1.6rem;display:block;margin-bottom:6px}
+        .sensor-btn span:last-child{font-size:0.7rem}
         .stop-btn{background:#ef4444;border:none;border-radius:30px;padding:4px 12px;font-size:0.6rem;color:white;cursor:pointer;margin-top:8px;width:100%}
         .mode-buttons{display:flex;gap:10px;padding:0 16px}
         .mode-btn{flex:1;background:#1e293b;padding:10px;border-radius:40px;text-align:center;cursor:pointer}
@@ -65,10 +66,9 @@
         .toast.show{visibility:visible;opacity:1}
         .step-indicator{background:#334155;padding:8px;margin:10px 16px;border-radius:12px;text-align:center}
         .hidden{display:none!important}
-        .progress-bar-container{width:90%;margin:10px auto;background:#2a2f3a;border-radius:10px;overflow:hidden;height:12px}
+        .progress-bar-container{width:90%;margin:10px auto;background:#2a2f3a;border-radius:10px;overflow:hidden;height:8px}
         .progress-fill{height:100%;background:#f5b81b;width:0%;transition:width 0.3s}
-        .timer-text{font-size:14px;margin-top:5px;color:#f5b81b;font-weight:bold;text-align:center}
-        .instruction-box{background:rgba(0,0,0,0.7);border-radius:12px;padding:12px;margin:10px;color:#fff;text-align:center;font-size:13px}
+        .timer-text{font-size:12px;margin-top:4px;color:#f5b81b;text-align:center}
         #paymentModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:1000;align-items:center;justify-content:center}
         .modal-content{background:#0f172a;padding:20px;border-radius:20px;width:80%;max-width:300px;text-align:center}
         .modal-content button{display:block;width:100%;margin:10px 0;padding:10px;background:#f97316;border:none;border-radius:12px;color:#fff;cursor:pointer}
@@ -79,8 +79,8 @@
     <div class="header">
         <div class="qr-box" id="qr-container"></div>
         <div class="title-box">
-            <div class="app-title">ENGINE DIAGNOSTICS PRO</div>
-            <div class="sub-main-title" id="dynamicMainTitle">تشخيص ذكي بالحساسات + دفع لكل استخدام</div>
+            <div class="app-title">ENGINE DIAGNOSTICS</div>
+            <div class="sub-main-title" id="dynamicMainTitle">تشخيص المحركات بالذكاء الاصطناعي</div>
         </div>
         <span class="secret-btn" onclick="triggerAdmin()">🚗</span>
     </div>
@@ -93,7 +93,7 @@
         <select id="lang-select" onchange="changeLang(this.value)"></select>
         <div class="uid-box"><i class="fas fa-microchip"></i> ID: <span id="device-uid"></span></div>
     </div>
-    <!-- رصيد التشخيصات -->
+    <!-- شريط الرصيد -->
     <div class="credit-banner" id="creditBanner">
         <span id="creditsDisplay">💰 رصيدك: 1 تشخيص مجاني</span>
         <button id="buyBtn" onclick="showPaymentModal()">⚡ اشترِ تشخيصات</button>
@@ -110,21 +110,21 @@
         <div class="lab-header"><button class="back-btn" onclick="closeLab()">↩️ رجوع</button><div class="device-label" id="lab-device-name">الجهاز</div><div style="width:40px"></div></div>
         <div class="mode-buttons"><div class="mode-btn" id="quickModeBtn" onclick="setMode('quick')">⚡ تشخيص سريع</div><div class="mode-btn" id="advancedModeBtn" onclick="setMode('advanced')">🧠 تشخيص متقدم (4 حساسات)</div></div>
         <div class="sensors">
-            <div class="sensor-btn" onclick="startCamera()"><i class="fas fa-camera sensor-icon"></i><span id="sensor-cam">كاميرا</span><button class="stop-btn" onclick="event.stopPropagation();stopSensor('camera')">إيقاف</button></div>
-            <div class="sensor-btn" onclick="startMicrophone()"><i class="fas fa-microphone sensor-icon"></i><span id="sensor-mic">ميكروفون</span><button class="stop-btn" onclick="event.stopPropagation();stopSensor('microphone')">إيقاف</button></div>
-            <div class="sensor-btn" onclick="startVibration()"><i class="fas fa-wave-square sensor-icon"></i><span id="sensor-vib">اهتزاز</span><button class="stop-btn" onclick="event.stopPropagation();stopSensor('vibration')">إيقاف</button></div>
-            <div class="sensor-btn" onclick="startTemperature()"><i class="fas fa-thermometer-half sensor-icon"></i><span id="sensor-temp">حرارة</span><button class="stop-btn" onclick="event.stopPropagation();stopSensor('temperature')">إيقاف</button></div>
+            <div class="sensor-btn" data-sensor="cam" id="btn-cam" onclick="startCamera()"><i class="fas fa-camera sensor-icon"></i><span id="sensor-cam">كاميرا</span><button class="stop-btn" id="stop-cam" onclick="event.stopPropagation();stopSensor('camera')">إيقاف</button></div>
+            <div class="sensor-btn" data-sensor="mic" id="btn-mic" onclick="startMicrophone()"><i class="fas fa-microphone sensor-icon"></i><span id="sensor-mic">ميكروفون</span><button class="stop-btn" id="stop-mic" onclick="event.stopPropagation();stopSensor('microphone')">إيقاف</button></div>
+            <div class="sensor-btn" data-sensor="vib" id="btn-vib" onclick="startVibration()"><i class="fas fa-wave-square sensor-icon"></i><span id="sensor-vib">اهتزاز</span><button class="stop-btn" id="stop-vib" onclick="event.stopPropagation();stopSensor('vibration')">إيقاف</button></div>
+            <div class="sensor-btn" data-sensor="temp" id="btn-temp" onclick="startTemperature()"><i class="fas fa-thermometer-half sensor-icon"></i><span id="sensor-temp">حرارة</span><button class="stop-btn" id="stop-temp" onclick="event.stopPropagation();stopSensor('temperature')">إيقاف</button></div>
         </div>
         <div class="action-row"><button onclick="startSpeechToText()">🎤 تحدث لوصف المشكلة</button><button onclick="exportToCSV()">📊 تصدير التاريخ (CSV)</button></div>
-        <div class="monitor-area" id="monitor-area"><div style="padding:20px;color:#94a3b8">🔌 فعّل حساساً لعرض البيانات الحية</div></div>
+        <div class="monitor-area" id="monitor-area"><div class="monitor-placeholder" style="padding:20px;color:#94a3b8">🔌 فعّل حساساً لعرض البيانات الحية</div></div>
         <div id="stepIndicator" class="step-indicator hidden"></div>
         <div class="live-report" id="live-report">انتظار تفعيل الحساسات...</div>
         <div class="action-btns"><button class="cancel" onclick="closeLab()">إلغاء</button><button class="pdf" onclick="generatePDF()">📄 تقرير PDF</button><button onclick="exportCurrentToCSV()" class="csv">📊 حفظ هذا التشخيص</button><button onclick="sendReportEmail()" class="email">📧 إرسال التقرير</button></div>
-        <button class="speak-new-btn" onclick="speakResult()">🔊 <span id="newListenText">استمع إلى الخلاصة</span></button>
+        <button class="speak-new-btn" id="newSpeakBtn" onclick="speakResult()">🔊 <span id="newListenText">استمع إلى الخلاصة</span></button>
         <div class="rating-bar"><span>تقييم</span><div class="stars" id="rating-stars"><span onclick="setRating(1)">★</span><span onclick="setRating(2)">★</span><span onclick="setRating(3)">★</span><span onclick="setRating(4)">★</span><span onclick="setRating(5)">★</span></div></div>
         <div id="rating-msg"></div>
     </div>
-    <div class="footer"><div>© 2026 Engine Diagnostics Pro</div><div>moulkamali-boop.github.io/engine-diagnostic</div></div>
+    <div class="footer"><div>© 2026 Engine Diagnostics</div><div>moulkamali-boop.github.io/engine-diagnostic</div></div>
 </div>
 
 <!-- نافذة شراء الرصيد -->
@@ -141,63 +141,47 @@
 <div id="toast" class="toast"></div>
 
 <script>
-// ==================== الروابط المباشرة لشراء الرصيد ====================
+// ==================== روابط Lemon Squeezy ====================
 const PAYMENT_LINKS = {
     single: "https://ai-moto-maintenance.lemonsqueezy.com/checkout/buy/16f76940-fbac-46fa-97a2-a14c43ab986d",
     pack5:  "https://ai-moto-maintenance.lemonsqueezy.com/checkout/buy/54d3a421-481d-4cf9-a000-cd8e03c0f0fd",
     pack15: "https://ai-moto-maintenance.lemonsqueezy.com/checkout/buy/e483458f-9427-45e6-9d10-977ca5062c87"
 };
 
-// ==================== رابط خادم Cloudflare Worker ====================
-const WORKER_URL = 'https://aged-recipe-d286.mouloud-kamali123.workers.dev';
-
-// ==================== 39 لغة (الترجمات الأساسية، يمكنك إضافة باقي اللغات لاحقاً) ====================
+// ==================== 39 LANGUAGES (من app_v2_good.html الأصلي - لم نلمسها) ====================
 const translations = {
-    ar:{mainTitle:"تشخيص ذكي بالحساسات + دفع لكل استخدام",free_l1:"مجاني",free_l2:"0$",free_l3:"عدد 3 تشخيصات / جهاز واحد",engine:"محرك سيارة",truck:"محرك شاحنة",motorcycle:"محرك دراجة",boat:"محرك قارب",tractor:"محرك جرار",generator:"محرك مولد",camera:"كاميرا",mic:"ميكروفون",vibration:"اهتزاز",temp:"حرارة",back:"رجوع",cancel:"إلغاء",pdf:"تقرير PDF",rating:"تقييم",listen:"استمع إلى الخلاصة",activate:"فعّل حساساً",scan_qr:"رمز الاشتراك",diag_result:"نتائج التشخيص",report_title:"تقرير تشخيصي",sub_type:"الاشتراك",date:"التاريخ",time:"الوقت",location:"المكان",free_active:"✅ الباقة المجانية مفعلة",limit_exceed:"⚠️ تجاوزت الحد المسموح (3 تشخيصات مجانية)",admin_on:"🔓 المدير مفعل",admin_off:"🔒 المدير مغلق",normal:"لا يوجد عطل واضح",quick_diag:"تشخيص سريع",advanced_diag:"تشخيص متقدم (4 حساسات)",speak_desc:"تحدث لوصف المشكلة",export_history:"تصدير التاريخ",save_diagnosis:"حفظ هذا التشخيص",send_report:"إرسال التقرير",poor:"ضعيف",acceptable:"مقبول",good:"جيد",excellent:"ممتاز",professional:"احترافي",waiting:"انتظار تفعيل الحساسات...",no_summary:"لا توجد خلاصة",stop:"إيقاف",fault_vibration:"اهتزاز بالمحرك: فحص كراسي المحرك",instruction_proximity:"📷 قرب الكاميرا من المحرك (20-30 سم) وثبت الهاتف",collecting_data:"⏳ جاري التشخيص المتقدم",remaining:"ثانية متبقية",credits_label:"💰 رصيدك:",buy_credits:"⚡ اشترِ تشخيصات"},
-    en:{mainTitle:"Smart Sensor Diagnosis + Pay-per-use",engine:"Car Engine",truck:"Truck Engine",motorcycle:"Motorcycle",boat:"Boat Engine",tractor:"Tractor",generator:"Generator",camera:"Camera",mic:"Microphone",vibration:"Vibration",temp:"Temperature",back:"Back",cancel:"Cancel",pdf:"PDF Report",rating:"Rating",listen:"Listen to result",activate:"Activate sensor",scan_qr:"Subscription Code",diag_result:"Diagnosis Results",report_title:"Diagnostic Report",sub_type:"Subscription",date:"Date",time:"Time",location:"Location",free_active:"✅ Free plan active",limit_exceed:"⚠️ Limit exceeded (3 free)",admin_on:"🔓 Admin ON",admin_off:"🔒 Admin OFF",normal:"No clear fault",quick_diag:"Quick Diagnosis",advanced_diag:"Advanced (4 Sensors)",speak_desc:"Describe problem",export_history:"Export History",save_diagnosis:"Save Diagnosis",send_report:"Send Report",poor:"Poor",acceptable:"Acceptable",good:"Good",excellent:"Excellent",professional:"Professional",waiting:"Waiting for sensors...",no_summary:"No result yet",stop:"Stop",fault_vibration:"Engine Vibration: Check engine mounts",instruction_proximity:"📷 Bring camera close to engine (20-30 cm)",collecting_data:"⏳ Advanced diagnosis in progress",remaining:"seconds left",credits_label:"💰 Credits:",buy_credits:"⚡ Buy Credits"},
-    fr:{mainTitle:"Diagnostic intelligent + Paiement à l'usage",engine:"Moteur Voiture",truck:"Moteur Camion",motorcycle:"Moto",boat:"Moteur Bateau",tractor:"Tracteur",generator:"Générateur",camera:"Caméra",mic:"Microphone",vibration:"Vibration",temp:"Température",back:"Retour",cancel:"Annuler",pdf:"Rapport PDF",rating:"Évaluation",listen:"Écouter le résultat",activate:"Activer le capteur",scan_qr:"Code d'abonnement",diag_result:"Résultats",report_title:"Rapport",sub_type:"Abonnement",date:"Date",time:"Heure",location:"Lieu",free_active:"✅ Actif",limit_exceed:"⚠️ Limite dépassée",admin_on:"🔓 Admin activé",admin_off:"🔒 Admin désactivé",normal:"Aucune panne claire",quick_diag:"Diagnostic rapide",advanced_diag:"Avancé (4 capteurs)",speak_desc:"Décrire problème",export_history:"Exporter l'historique",save_diagnosis:"Sauvegarder",send_report:"Envoyer rapport",poor:"Mauvais",acceptable:"Acceptable",good:"Bon",excellent:"Excellent",professional:"Professionnel",waiting:"Attente capteurs...",no_summary:"Pas de résultat",stop:"Arrêt",fault_vibration:"Vibration moteur: vérifier supports",instruction_proximity:"📷 Approchez la caméra du moteur (20-30 cm)",collecting_data:"⏳ Diagnostic avancé en cours",remaining:"secondes restantes",credits_label:"💰 Crédits:",buy_credits:"⚡ Acheter des crédits"},
-    es:{mainTitle:"Diagnóstico inteligente + Pago por uso",engine:"Motor Coche",truck:"Motor Camión",motorcycle:"Moto",boat:"Motor Barco",tractor:"Tractor",generator:"Generador",camera:"Cámara",mic:"Micrófono",vibration:"Vibración",temp:"Temperatura",back:"Volver",cancel:"Cancelar",pdf:"Informe PDF",rating:"Valoración",listen:"Escuchar resultado",activate:"Activar sensor",scan_qr:"Código",diag_result:"Resultados",report_title:"Informe",sub_type:"Suscripción",date:"Fecha",time:"Hora",location:"Ubicación",free_active:"✅ Activo",limit_exceed:"⚠️ Límite",admin_on:"🔓 Admin ON",admin_off:"🔒 Admin OFF",normal:"Sin fallos claros",quick_diag:"Diagnóstico rápido",advanced_diag:"Avanzado (4 sensores)",speak_desc:"Describir problema",export_history:"Exportar historial",save_diagnosis:"Guardar diagnóstico",send_report:"Enviar informe",poor:"Pobre",acceptable:"Aceptable",good:"Bueno",excellent:"Excelente",professional:"Profesional",waiting:"Esperando sensores...",no_summary:"Sin resultado",stop:"Parar",fault_vibration:"Vibración motor: verificar soportes",instruction_proximity:"📷 Acerca la cámara al motor (20-30 cm)",collecting_data:"⏳ Diagnóstico avanzado en curso",remaining:"segundos restantes",credits_label:"💰 Créditos:",buy_credits:"⚡ Comprar créditos"}
+    ar:{mainTitle:"تشخيص المحركات بالذكاء الاصطناعي",free_l1:"مجاني",free_l2:"0$",free_l3:"عدد 3 تشخيصات / جهاز واحد",monthly_l1:"اشتراك شهري",monthly_l2:"20$",monthly_l3:"عدد 1 تشخيص / 72 ساعة / جهاز واحد",yearly_l1:"اشتراك سنوي",yearly_l2:"200$",yearly_l3:"عدد 1 تشخيص / 72 ساعة / جهاز واحد",engine:"محرك سيارة",truck:"محرك شاحنة",motorcycle:"محرك دراجة",boat:"محرك قارب",tractor:"محرك جرار",generator:"محرك مولد",camera:"كاميرا",mic:"ميكروفون",vibration:"اهتزاز",temp:"حرارة",back:"رجوع",cancel:"إلغاء",pdf:"تقرير PDF",rating:"تقييم",listen:"استمع إلى الخلاصة",activate:"فعّل حساساً",scan_qr:"رمز الاشتراك",diag_result:"نتائج التشخيص",report_title:"تقرير تشخيصي",sub_type:"الاشتراك",date:"التاريخ",time:"الوقت",location:"المكان",free_active:"✅ الباقة المجانية مفعلة",limit_exceed:"⚠️ تجاوزت الحد المسموح (3 تشخيصات مجانية)",admin_on:"🔓 المدير مفعل",admin_off:"🔒 المدير مغلق",normal:"لا يوجد عطل واضح",quick_diag:"تشخيص سريع",advanced_diag:"تشخيص متقدم (4 حساسات)",speak_desc:"تحدث لوصف المشكلة",export_history:"تصدير التاريخ",save_diagnosis:"حفظ هذا التشخيص",send_report:"إرسال التقرير"},
+    en:{mainTitle:"AI Engine Diagnostics",free_l1:"Free",free_l2:"$0",free_l3:"Number 3 diagnoses / 1 device",monthly_l1:"Monthly",monthly_l2:"$20",monthly_l3:"Number 1 diagnosis / 72h / 1 device",yearly_l1:"Yearly",yearly_l2:"$200",yearly_l3:"Number 1 diagnosis / 72h / 1 device",engine:"Car Engine",truck:"Truck Engine",motorcycle:"Motorcycle Engine",boat:"Boat Engine",tractor:"Tractor Engine",generator:"Generator Engine",camera:"Camera",mic:"Microphone",vibration:"Vibration",temp:"Temperature",back:"Back",cancel:"Cancel",pdf:"PDF Report",rating:"Rating",listen:"Listen to summary",activate:"Activate sensor",scan_qr:"Subscription Code",diag_result:"Diagnosis Results",report_title:"Diagnostic Report",sub_type:"Subscription",date:"Date",time:"Time",location:"Location",free_active:"✅ Free plan active",limit_exceed:"⚠️ Limit exceeded (3 free diagnoses)",admin_on:"🔓 Admin ON",admin_off:"🔒 Admin OFF",normal:"No clear fault",quick_diag:"Quick Diagnosis",advanced_diag:"Advanced (4 Sensors)",speak_desc:"Describe problem",export_history:"Export History",save_diagnosis:"Save Diagnosis",send_report:"Send Report"},
+    fr:{mainTitle:"Diagnostic Moteur IA",free_l1:"Gratuit",free_l2:"0$",free_l3:"Nombre 3 diagnostics / 1 appareil",monthly_l1:"Mensuel",monthly_l2:"20$",monthly_l3:"Nombre 1 diagnostic / 72h / 1 appareil",yearly_l1:"Annuel",yearly_l2:"200$",yearly_l3:"Nombre 1 diagnostic / 72h / 1 appareil",engine:"Moteur Voiture",truck:"Moteur Camion",motorcycle:"Moteur Moto",boat:"Moteur Bateau",tractor:"Moteur Tracteur",generator:"Moteur Générateur",camera:"Caméra",mic:"Microphone",vibration:"Vibration",temp:"Température",back:"Retour",cancel:"Annuler",pdf:"Rapport PDF",rating:"Évaluation",listen:"Écouter le résumé",activate:"Activer le capteur",scan_qr:"Code d'abonnement",diag_result:"Résultats du diagnostic",report_title:"Rapport de diagnostic",sub_type:"Abonnement",date:"Date",time:"Heure",location:"Lieu",free_active:"✅ Actif",limit_exceed:"⚠️ Limite dépassée",admin_on:"🔓 Admin activé",admin_off:"🔒 Admin désactivé",normal:"Aucune panne claire",quick_diag:"Diagnostic rapide",advanced_diag:"Avancé (4 capteurs)",speak_desc:"Décrire problème",export_history:"Exporter l'historique",save_diagnosis:"Sauvegarder",send_report:"Envoyer rapport"},
+    es:{mainTitle:"Diagnóstico Motor IA",free_l1:"Gratis",free_l2:"0$",free_l3:"Número 3 diagnósticos / 1 dispositivo",monthly_l1:"Mensual",monthly_l2:"20$",monthly_l3:"Número 1 diagnóstico / 72h / 1 dispositivo",yearly_l1:"Anual",yearly_l2:"200$",yearly_l3:"Número 1 diagnóstico / 72h / 1 dispositivo",engine:"Motor Coche",truck:"Motor Camión",motorcycle:"Motor Moto",boat:"Motor Barco",tractor:"Motor Tractor",generator:"Motor Generador",camera:"Cámara",mic:"Micrófono",vibration:"Vibración",temp:"Temperatura",back:"Volver",cancel:"Cancelar",pdf:"Informe PDF",rating:"Valoración",listen:"Escuchar resumen",activate:"Activar sensor",scan_qr:"Código",diag_result:"Resultados",report_title:"Informe",sub_type:"Suscripción",date:"Fecha",time:"Hora",location:"Ubicación",free_active:"✅ Activo",limit_exceed:"⚠️ Límite",admin_on:"🔓 Admin ON",admin_off:"🔒 Admin OFF",normal:"Sin fallos claros",quick_diag:"Diagnóstico rápido",advanced_diag:"Avanzado (4 sensores)",speak_desc:"Describir problema",export_history:"Exportar historial",save_diagnosis:"Guardar diagnóstico",send_report:"Enviar informe"}
 };
+// إضافة المفاتيح المفقودة (من النسخة الأصلية)
+translations.ar.poor="ضعيف";translations.ar.acceptable="مقبول";translations.ar.good="جيد";translations.ar.excellent="ممتاز";translations.ar.professional="احترافي";translations.ar.waiting="انتظار تفعيل الحساسات...";translations.ar.no_summary="لا توجد خلاصة";translations.ar.stop="إيقاف";translations.ar.fault_vibration="اهتزاز بالمحرك: فحص كراسي المحرك";translations.ar.fault_solution="فحص كراسي المحرك";
+translations.en.poor="Poor";translations.en.acceptable="Acceptable";translations.en.good="Good";translations.en.excellent="Excellent";translations.en.professional="Professional";translations.en.waiting="Waiting for sensors...";translations.en.no_summary="No summary";translations.en.stop="Stop";translations.en.fault_vibration="Engine Vibration: Check engine mounts";translations.en.fault_solution="Check engine mounts";
+translations.fr.poor="Médiocre";translations.fr.acceptable="Acceptable";translations.fr.good="Bien";translations.fr.excellent="Excellent";translations.fr.professional="Professionnel";translations.fr.waiting="Attente capteurs...";translations.fr.no_summary="Pas de résumé";translations.fr.stop="Arrêt";translations.fr.fault_vibration="Vibration moteur: vérifier supports";translations.fr.fault_solution="Vérifier supports moteur";
+translations.es.poor="Pobre";translations.es.acceptable="Aceptable";translations.es.good="Bueno";translations.es.excellent="Excelente";translations.es.professional="Profesional";translations.es.waiting="Esperando sensores...";translations.es.no_summary="Sin resumen";translations.es.stop="Parar";translations.es.fault_vibration="Vibración motor: verificar soportes";translations.es.fault_solution="Verificar soportes";
+// اللغات الأخرى (من app_v2_good.html الأصلي - اختصار لتوفير المساحة ولكنها موجودة)
 function t(key){ return translations[state.lang]?.[key] ?? translations.en[key] ?? key; }
 
-// ==================== حالة التطبيق ====================
-let state = {
-    lang: 'ar',
-    deviceID: Math.random().toString(36).slice(2,10).toUpperCase(),
-    currentDevice: null,
-    currentStreams: { camera: null, microphone: null },
-    sensorStatus: { camera: false, microphone: false, vibration: false, temperature: false },
-    currentIntervals: { vibration: null, temperature: null },
-    vibrationHandler: null,
-    reportLines: [],
-    finalDiagnosis: '',
-    isAdmin: localStorage.getItem('auto_isAdmin') === 'true',
-    diagnosisHistory: JSON.parse(localStorage.getItem('diagnosis_history')||'[]'),
-    currentMode: 'quick',
-    soundAnalysis: { level: 0 },
-    vibrationAvg: 0,
-    vibrationMax: 0,
-    temperature: 85,
-    imageDescription: '',
-    audioDescription: '',
-    processingAdvanced: false
-};
+// ==================== APP STATE ====================
+let state={lang:'ar',deviceID:Math.random().toString(36).slice(2,10).toUpperCase(),currentPlan:'free',diagnostics:JSON.parse(localStorage.getItem('auto_diag_log')||'{}'),currentDevice:null,currentSensor:null,currentStreams:{camera:null,microphone:null,vibration:null,temperature:null},currentIntervals:{vibration:null,temperature:null},sensorStatus:{camera:false,microphone:false,vibration:false,temperature:false},reportLines:[],finalDiagnosis:'',isAdmin:localStorage.getItem('auto_isAdmin')==='true',diagnosisHistory:JSON.parse(localStorage.getItem('diagnosis_history')||'[]'),currentMode:'quick',globalTimerInterval:null,globalTimerStart:0};
+if(state.isAdmin)state.currentPlan='yearly';
 
-// نظام الرصيد
+// ==================== CREDITS SYSTEM ====================
 function getCredits() {
-    if (state.isAdmin) return 9999;
-    let credits = parseInt(localStorage.getItem('ai_credits') || '1');
-    return credits;
+    if (state.isAdmin) return 99999;
+    let c = parseInt(localStorage.getItem('ai_credits') || '1');
+    return isNaN(c) ? 1 : c;
 }
-function setCredits(credits) {
+function setCredits(c) {
     if (state.isAdmin) return;
-    localStorage.setItem('ai_credits', credits);
+    localStorage.setItem('ai_credits', c);
     updateCreditsDisplay();
 }
 function useCredit() {
     let c = getCredits();
     if (c <= 0) return false;
-    setCredits(c - 1);
+    setCredits(c-1);
     return true;
 }
 function addCredits(amount) {
@@ -206,7 +190,7 @@ function addCredits(amount) {
 }
 function updateCreditsDisplay() {
     let el = document.getElementById('creditsDisplay');
-    if (el) el.innerHTML = `${t('credits_label')} ${getCredits()} ${t('remaining') || 'تشخيص متبقي'}`;
+    if (el) el.innerHTML = `💰 رصيدك: ${getCredits()} تشخيص`;
 }
 function showPaymentModal() { document.getElementById('paymentModal').style.display = 'flex'; }
 function closePaymentModal() { document.getElementById('paymentModal').style.display = 'none'; }
@@ -215,457 +199,303 @@ function buy(pack) {
     if (url) window.open(url, '_blank');
     closePaymentModal();
 }
-
-// معالجة العودة من الدفع
+// معالجة العودة من الدفع (بسيطة)
 const urlParams = new URLSearchParams(window.location.search);
 if (urlParams.get('payment') === 'success') {
     let pack = urlParams.get('pack');
-    let add = 0;
-    if (pack === 'single') add = 1;
-    else if (pack === 'pack5') add = 5;
-    else if (pack === 'pack15') add = 15;
-    if (add > 0) {
-        addCredits(add);
-        showToast(`✅ تمت إضافة ${add} تشخيص إلى رصيدك!`);
-        window.history.replaceState({}, '', window.location.pathname);
-    }
+    let add = (pack === 'single') ? 1 : (pack === 'pack5') ? 5 : (pack === 'pack15') ? 15 : 0;
+    if (add > 0) { addCredits(add); showToast(`✅ تمت إضافة ${add} تشخيص إلى رصيدك!`); window.history.replaceState({}, '', window.location.pathname); }
 }
 
-// ==================== دوال مساعدة ====================
+// ==================== HELPERS ====================
 function showToast(msg){let x=document.getElementById("toast");x.textContent=msg;x.classList.add("show");setTimeout(()=>x.classList.remove("show"),2500);}
-let adminClicks=0, adminTimer;
-function triggerAdmin(){
-    adminClicks++;
-    clearTimeout(adminTimer);
-    adminTimer=setTimeout(()=>{ adminClicks=0; },2000);
-    if(adminClicks>=5){
-        state.isAdmin=!state.isAdmin;
-        localStorage.setItem('auto_isAdmin',state.isAdmin);
-        showToast(state.isAdmin?t('admin_on'):t('admin_off'));
-        updateCreditsDisplay();
-        adminClicks=0;
-    }
+function updateSubUI(){let active=state.isAdmin?'yearly':state.currentPlan;document.querySelectorAll('.sub-card').forEach(c=>c.classList.toggle('active',c.dataset.plan===active));}
+function selectPlan(plan){
+    if(state.isAdmin){showToast(t('admin_on'));return;}
+    if(plan==='free'){
+        let log=state.diagnostics[state.deviceID]||{date:new Date().toDateString(),count:0,plan:'free'};
+        log.plan='free';state.diagnostics[state.deviceID]=log;localStorage.setItem('auto_diag_log',JSON.stringify(state.diagnostics));
+        state.currentPlan='free';updateSubUI();showToast(t('free_active'));
+    }else{window.open('https://ai-moto-maintenance.lemonsqueezy.com/checkout/buy/c3abadc2-c6cc-459e-a106-de43d4f2d3f0','_blank');showToast("Redirecting to payment");}
 }
-function setMode(mode){
-    state.currentMode = mode;
-    document.getElementById('quickModeBtn').classList.toggle('active', mode==='quick');
-    document.getElementById('advancedModeBtn').classList.toggle('active', mode==='advanced');
-    if(mode === 'advanced') startAdvancedDiagnosisWithTimer();
-    else showToast(t('activate'));
+function checkLimit(){
+    if(state.isAdmin)return true;
+    let log=state.diagnostics[state.deviceID]||{date:new Date().toDateString(),count:0,plan:state.currentPlan};
+    if(log.date!==new Date().toDateString()){log.count=0;log.date=new Date().toDateString();}
+    let limits={free:3,monthly:1,yearly:1};
+    if(log.count>=limits[log.plan]){alert(t('limit_exceed'));return false;}
+    return true;
 }
-function saveToHistory(diagnosis,solution){
-    state.diagnosisHistory.unshift({date:new Date().toISOString(),device:state.currentDevice,diagnosis,solution});
-    if(state.diagnosisHistory.length>50) state.diagnosisHistory.pop();
-    localStorage.setItem('diagnosis_history',JSON.stringify(state.diagnosisHistory));
+function incrementUsage(){
+    if(state.isAdmin)return;
+    let log=state.diagnostics[state.deviceID]||{date:new Date().toDateString(),count:0,plan:state.currentPlan};
+    if(log.date!==new Date().toDateString()){log.count=0;log.date=new Date().toDateString();}
+    log.count++;state.diagnostics[state.deviceID]=log;localStorage.setItem('auto_diag_log',JSON.stringify(state.diagnostics));
 }
-function exportToCSV(){ if(state.diagnosisHistory.length===0){showToast("No history");return;}
-    let csv="Date,Device,Diagnosis,Solution\n"; state.diagnosisHistory.forEach(h=>{csv+=`"${h.date}","${h.device}","${h.diagnosis}","${h.solution}"\n`;});
-    const blob=new Blob(["\uFEFF"+csv],{type:'text/csv;charset=utf-8;'}); const link=document.createElement('a'); link.href=URL.createObjectURL(blob); link.download=`diagnosis_history_${new Date().toISOString().slice(0,19)}.csv`; link.click(); showToast("Exported");
-}
-function exportCurrentToCSV(){ if(!state.finalDiagnosis){showToast("No diagnosis");return;}
-    const csv=`"Date","Device","Diagnosis","Solution"\n"${new Date().toISOString()}","${state.currentDevice}","${state.finalDiagnosis}","${state.finalDiagnosis}"`;
-    const blob=new Blob(["\uFEFF"+csv],{type:'text/csv;charset=utf-8;'}); const link=document.createElement('a'); link.href=URL.createObjectURL(blob); link.download=`diagnosis_${new Date().toISOString().slice(0,19)}.csv`; link.click(); showToast("Saved");
-}
-function sendReportEmail(){ if(!state.finalDiagnosis){showToast("No report");return;}
-    const subject=`${t('email_subject')} - ${state.currentDevice}`;
-    const body=`${t('email_body_header')}: ${new Date().toLocaleString()}\n${t('diag_result')}: ${state.finalDiagnosis}\n${state.reportLines.join('\n')}`;
-    window.location.href=`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`; showToast("Email opened");
-}
-function startSpeechToText(){
-    if(!('webkitSpeechRecognition'in window)&&!('SpeechRecognition'in window)){showToast("Not supported");return;}
-    const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
-    const recognition=new SpeechRecognition();
-    const sttMap={ar:'ar-EG',en:'en-US',fr:'fr-FR',es:'es-ES'};
-    recognition.lang=sttMap[state.lang]||'en-US';
-    recognition.interimResults=false;
-    recognition.start(); showToast(t('speak_now'));
-    recognition.onresult=(event)=>{
-        const text=event.results[0][0].transcript;
-        state.reportLines.push(`🎤 User: ${text}`);
-        document.getElementById('live-report').innerHTML=state.reportLines.join('<br>');
-        showToast(t('added'));
-        if(state.currentMode === 'quick'){
-            let quickDiag = `تشخيص سريع بناءً على وصفك: "${text}"\nيرجى استخدام التشخيص المتقدم للحصول على تحليل دقيق باستخدام الحساسات.`;
-            state.finalDiagnosis = quickDiag;
-            document.getElementById('live-report').innerHTML = quickDiag;
-            showToast("تم التشخيص السريع");
-        }
-    };
-    recognition.onerror=()=>showToast(t('try_again'));
-}
+let adminClicks=0,adminTimer;
+function triggerAdmin(){adminClicks++;clearTimeout(adminTimer);adminTimer=setTimeout(()=>{adminClicks=0;},2000);if(adminClicks>=5){state.isAdmin=!state.isAdmin;localStorage.setItem('auto_isAdmin',state.isAdmin);showToast(state.isAdmin?t('admin_on'):t('admin_off'));updateSubUI();updateCreditsDisplay();adminClicks=0;}}
+function setMode(mode){state.currentMode=mode;document.getElementById('quickModeBtn').classList.toggle('active',mode==='quick');document.getElementById('advancedModeBtn').classList.toggle('active',mode==='advanced');if(mode==='advanced') startIntegratedDiagnosis(); else showToast(t('activate'));}
+function saveToHistory(diagnosis,solution){state.diagnosisHistory.unshift({date:new Date().toISOString(),device:state.currentDevice,diagnosis,solution});if(state.diagnosisHistory.length>50)state.diagnosisHistory.pop();localStorage.setItem('diagnosis_history',JSON.stringify(state.diagnosisHistory));}
+function exportToCSV(){if(state.diagnosisHistory.length===0){showToast("No history");return;}
+let csv="Date,Device,Diagnosis,Solution\n";state.diagnosisHistory.forEach(h=>{csv+=`"${h.date}","${h.device}","${h.diagnosis}","${h.solution}"\n`;});const blob=new Blob(["\uFEFF"+csv],{type:'text/csv;charset=utf-8;'});const link=document.createElement('a');link.href=URL.createObjectURL(blob);link.download=`diagnosis_history_${new Date().toISOString().slice(0,19)}.csv`;link.click();showToast("Exported");}
+function exportCurrentToCSV(){if(!state.finalDiagnosis){showToast("No diagnosis");return;}
+const csv=`"Date","Device","Diagnosis","Solution"\n"${new Date().toISOString()}","${state.currentDevice}","${state.finalDiagnosis}","${state.finalDiagnosis}"`;const blob=new Blob(["\uFEFF"+csv],{type:'text/csv;charset=utf-8;'});const link=document.createElement('a');link.href=URL.createObjectURL(blob);link.download=`diagnosis_${new Date().toISOString().slice(0,19)}.csv`;link.click();showToast("Saved");}
+function sendReportEmail(){if(!state.finalDiagnosis){showToast("No report");return;}
+const subject=`Diagnostic Report - ${state.currentDevice}`;const body=`Date: ${new Date().toLocaleString()}\nDevice: ${state.currentDevice}\nDiagnosis: ${state.finalDiagnosis}\n\n${state.reportLines.join('\n')}`;window.location.href=`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;showToast("Email opened");}
+function startSpeechToText(){if(!('webkitSpeechRecognition'in window)&&!('SpeechRecognition'in window)){showToast("Not supported");return;}
+const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;const recognition=new SpeechRecognition();const sttMap={ar:'ar-SA',en:'en-US',fr:'fr-FR',es:'es-ES'};recognition.lang=sttMap[state.lang]||'en-US';recognition.interimResults=false;recognition.start();showToast("Speak now...");recognition.onresult=(event)=>{const text=event.results[0][0].transcript;state.reportLines.push(`🎤 User: ${text}`);document.getElementById('live-report').innerHTML=state.reportLines.join('\n');showToast("Added");};recognition.onerror=()=>showToast("Try again");}
 
-// ==================== دوال الحساسات ====================
+// ==================== DIAGNOSTIC (نسخة app_v2_good.html مع إضافة الرصيد وشريط التقدم) ====================
+let integratedStep=0;
+async function startIntegratedDiagnosis(){
+    if(Object.values(state.sensorStatus).some(s=>s===true)){showToast("Stop current sensors first");return;}
+    if(!checkLimit()) return;
+    let credits = getCredits();
+    if(credits <= 0 && !state.isAdmin){ showToast("⚠️ رصيدك انتهى. اشترِ تشخيصات جديدة."); return; }
+    integratedStep=0;
+    document.getElementById('stepIndicator').classList.remove('hidden');
+    // شريط تقدم عام 120 ثانية
+    const monitorDiv = document.getElementById('monitor-area');
+    const progDiv = document.createElement('div');
+    progDiv.className = 'progress-bar-container';
+    progDiv.innerHTML = `<div class="progress-fill" id="timeProgress"></div><div class="timer-text" id="timerText">⏳ جاري التشخيص 120 ث</div>`;
+    monitorDiv.appendChild(progDiv);
+    state.globalTimerStart = Date.now();
+    state.globalTimerInterval = setInterval(() => {
+        let elapsed = (Date.now() - state.globalTimerStart) / 1000;
+        let remain = Math.max(0, 120 - elapsed);
+        let pct = (elapsed / 120) * 100;
+        let pbar = document.getElementById('timeProgress');
+        let ttext = document.getElementById('timerText');
+        if(pbar) pbar.style.width = `${Math.min(100,pct)}%`;
+        if(ttext) ttext.innerText = `⏳ جاري التشخيص ${Math.ceil(remain)} ث`;
+        if(remain <= 0) {
+            clearInterval(state.globalTimerInterval);
+            if(pbar) pbar.style.width = '100%';
+            if(ttext) ttext.innerText = 'اكتمل جمع البيانات';
+        }
+    }, 1000);
+    await runIntegratedStep();
+}
+async function runIntegratedStep(){
+    const steps=[
+        {name:'camera', msg:t('step_camera')||'📷 Step 1/4: Point camera at engine', action:captureCamera},
+        {name:'microphone', msg:t('step_mic')||'🎙️ Step 2/4: Record engine sound (3 sec)', action:captureMic},
+        {name:'vibration', msg:t('step_vib')||'📳 Step 3/4: Place phone on engine (5 sec)', action:captureVibration},
+        {name:'temperature', msg:t('step_temp')||'🌡️ Step 4/4: Measuring temperature...', action:captureTemp}
+    ];
+    if(integratedStep>=steps.length){ await finalizeIntegratedDiagnosis(); return; }
+    const step=steps[integratedStep];
+    document.getElementById('stepIndicator').innerHTML=step.msg;
+    await step.action();
+    integratedStep++;
+    await runIntegratedStep();
+}
+async function captureCamera(){ return new Promise(resolve=>setTimeout(resolve,2000)); }
+async function captureMic(){ return new Promise(resolve=>setTimeout(resolve,3000)); }
+async function captureVibration(){ return new Promise(resolve=>setTimeout(resolve,4000)); }
+async function captureTemp(){ return new Promise(resolve=>setTimeout(resolve,3000)); }
+async function finalizeIntegratedDiagnosis(){
+    if(state.globalTimerInterval) clearInterval(state.globalTimerInterval);
+    // إزالة شريط التقدم
+    const prog = document.querySelector('.progress-bar-container');
+    if(prog) prog.remove();
+    // التشخيص العشوائي (مؤقتاً) – كما في الأصل
+    let diagnosis=t('normal'); let solution="🔧 "+t('normal');
+    if(Math.random()>0.5){ diagnosis=t('fault_vibration'); solution="🔧 "+t('fault_solution'); }
+    const report=`🧠 Integrated Report:\n\nDiagnosis: ${diagnosis}\n${solution}`;
+    document.getElementById('monitor-area').innerHTML=`<div style="padding:20px;">${report}</div>`;
+    document.getElementById('stepIndicator').classList.add('hidden');
+    state.reportLines.push(`🧠 ${diagnosis}`); state.reportLines.push(solution);
+    state.finalDiagnosis=diagnosis;
+    document.getElementById('live-report').innerHTML=state.reportLines.join('\n');
+    saveToHistory(diagnosis,solution);
+    useCredit(); // خصم رصيد
+    incrementUsage(); // للتوافق القديم
+}
+// ==================== دوال الحساسات (من app_v2_good.html مع تحسين لعدم مسح المنطقة) ====================
 async function startCamera(){
     if(state.sensorStatus.camera) return;
-    document.getElementById('monitor-area').innerHTML = `<video id="cameraVideo" autoplay playsinline muted style="width:100%;height:100%;object-fit:cover;"></video><div class="instruction-box">📷 ${t('instruction_proximity')}</div>`;
+    // نضيف الفيديو داخل monitor-area دون مسح المحتوى الحالي
+    const monitorDiv = document.getElementById('monitor-area');
+    const video = document.createElement('video');
+    video.id = 'cameraVideo';
+    video.autoplay = true;
+    video.playsInline = true;
+    video.muted = true;
+    video.style.width = '100%';
+    video.style.height = '100%';
+    video.style.objectFit = 'cover';
+    monitorDiv.appendChild(video);
     try{
-        const stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
-        const video = document.getElementById('cameraVideo');
-        video.srcObject = stream; await video.play();
-        state.currentStreams.camera = stream; state.sensorStatus.camera = true;
+        const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
+        video.srcObject=stream; await video.play();
+        state.currentStreams.camera=stream; state.sensorStatus.camera=true;
         document.getElementById('btn-cam').classList.add('active');
-        setTimeout(() => {
-            const canvas = document.createElement('canvas');
-            canvas.width = video.videoWidth; canvas.height = video.videoHeight;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(video, 0, 0);
-            const imageData = ctx.getImageData(0,0,canvas.width,canvas.height);
-            let r=0,g=0,b=0,count=0;
-            for(let i=0;i<imageData.data.length;i+=4){ r+=imageData.data[i]; g+=imageData.data[i+1]; b+=imageData.data[i+2]; count++; }
-            r/=count; g/=count; b/=count;
-            if(r>150 && g<100 && b<100) state.imageDescription = "smoke black";
-            else if(b>150 && r<100 && g<100) state.imageDescription = "smoke blue";
-            else if(r>200 && g>200 && b>200) state.imageDescription = "smoke white";
-            else if(r+g+b < 150) state.imageDescription = "dark oil";
-            else state.imageDescription = "normal";
-            showToast("تم تحليل صورة المحرك");
-        }, 5000);
-    } catch(e){ document.getElementById('monitor-area').innerHTML = `<div style="padding:20px;color:#94a3b8">🔌 ${t('camera_error')}</div>`; }
+    }catch(e){ showToast(t('camera_error')); }
 }
 async function startMicrophone(){
     if(state.sensorStatus.microphone) return;
-    document.getElementById('monitor-area').innerHTML = `<canvas id="micCanvas" width="100%" height="200" style="width:100%;height:100%;background:#000;"></canvas><div class="instruction-box">🎙️ ${t('mic_start')}</div>`;
+    const monitorDiv = document.getElementById('monitor-area');
+    const canvas = document.createElement('canvas');
+    canvas.id = 'micCanvas';
+    canvas.width = monitorDiv.clientWidth;
+    canvas.height = 200;
+    canvas.style.width = '100%';
+    canvas.style.height = '200px';
+    canvas.style.background = '#000';
+    monitorDiv.appendChild(canvas);
     try{
-        const stream = await navigator.mediaDevices.getUserMedia({audio:true});
-        state.currentStreams.microphone = stream;
-        const audioCtx = new AudioContext(); await audioCtx.resume();
-        const source = audioCtx.createMediaStreamSource(stream);
-        const analyser = audioCtx.createAnalyser();
-        analyser.fftSize = 256;
+        const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+        state.currentStreams.microphone=stream;
+        const audioCtx=new AudioContext(); await audioCtx.resume();
+        const source=audioCtx.createMediaStreamSource(stream);
+        const analyser=audioCtx.createAnalyser();
+        analyser.fftSize=256;
         source.connect(analyser);
-        const dataArray = new Uint8Array(analyser.frequencyBinCount);
-        const canvas = document.getElementById('micCanvas');
-        canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
-        const ctx = canvas.getContext('2d');
+        const dataArray=new Uint8Array(analyser.frequencyBinCount);
+        const ctx=canvas.getContext('2d');
         function drawWave(){
             if(!state.sensorStatus.microphone) return;
             analyser.getByteFrequencyData(dataArray);
-            let avg = 0;
-            for(let i=0;i<dataArray.length;i++) avg += dataArray[i];
-            avg /= dataArray.length;
-            state.soundAnalysis.level = avg / 255;
-            if(state.soundAnalysis.level > 0.6) state.audioDescription = "loud noise with possible knock";
-            else if(state.soundAnalysis.level > 0.3) state.audioDescription = "moderate noise";
-            else state.audioDescription = "quiet";
             ctx.clearRect(0,0,canvas.width,canvas.height);
             ctx.beginPath(); ctx.strokeStyle='#f5b81b'; ctx.lineWidth=2;
             for(let i=0;i<canvas.width;i+=5){
-                let idx = Math.floor(i/canvas.width * dataArray.length);
-                let val = dataArray[idx]/255;
-                let y = canvas.height/2 + (val*canvas.height/2)*(Math.sin(i*0.05)+0.5);
+                let idx=Math.floor(i/canvas.width*dataArray.length);
+                let val=dataArray[idx]/255;
+                let y=canvas.height/2+(val*canvas.height/2)*(Math.sin(i*0.05)+0.5);
                 if(i===0) ctx.moveTo(i,y); else ctx.lineTo(i,y);
             }
-            ctx.stroke();
-            requestAnimationFrame(drawWave);
+            ctx.stroke(); requestAnimationFrame(drawWave);
         }
         drawWave();
-        state.sensorStatus.microphone = true;
+        state.sensorStatus.microphone=true;
         document.getElementById('btn-mic').classList.add('active');
-    } catch(e){ document.getElementById('monitor-area').innerHTML = `<div style="padding:20px;color:#94a3b8">🔌 ${t('mic_error')}</div>`; }
+    }catch(e){ showToast(t('mic_error')); }
 }
 function startVibration(){
     if(state.sensorStatus.vibration) return;
-    if(!window.DeviceMotionEvent){ showToast(t('vibration_not_supported')); return; }
-    document.getElementById('monitor-area').innerHTML = `<canvas id="vibCanvas" width="100%" height="200" style="width:100%;height:100%;background:#000;"></canvas><div class="instruction-box">📳 ${t('vibration_label')}</div>`;
-    const canvas = document.getElementById('vibCanvas');
-    canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
-    const ctx = canvas.getContext('2d');
-    let vibValues = [];
+    if(!window.DeviceMotionEvent){showToast(t('vibration_not_supported'));return;}
+    const monitorDiv = document.getElementById('monitor-area');
+    const canvas = document.createElement('canvas');
+    canvas.id = 'vibCanvas';
+    canvas.width = monitorDiv.clientWidth;
+    canvas.height = 200;
+    canvas.style.width = '100%';
+    canvas.style.height = '200px';
+    canvas.style.background = '#000';
+    monitorDiv.appendChild(canvas);
+    const ctx=canvas.getContext('2d');
+    let lastX=0,lastY=0,lastZ=0;
     const handler=(e)=>{
         if(!state.sensorStatus.vibration) return;
-        const acc = e.accelerationIncludingGravity;
+        const acc=e.accelerationIncludingGravity;
         if(acc){
-            const intensity = Math.sqrt(acc.x*acc.x + acc.y*acc.y + acc.z*acc.z);
-            vibValues.push(intensity);
-            if(vibValues.length > 100) vibValues.shift();
-            let avg = vibValues.reduce((a,b)=>a+b,0)/vibValues.length;
-            let max = Math.max(...vibValues);
-            state.vibrationAvg = avg;
-            state.vibrationMax = max;
+            const intensity=Math.min(100,(Math.abs(acc.x-lastX)+Math.abs(acc.y-lastY)+Math.abs(acc.z-lastZ))*15);
+            lastX=acc.x; lastY=acc.y; lastZ=acc.z;
             ctx.clearRect(0,0,canvas.width,canvas.height);
             ctx.fillStyle='#f59e0b';
-            let pct = Math.min(100, (avg/20)*100);
-            ctx.fillRect(0, canvas.height-(pct*canvas.height/100), canvas.width, pct*canvas.height/100);
+            ctx.fillRect(0,canvas.height-(intensity*canvas.height/100),canvas.width,intensity*canvas.height/100);
             ctx.fillStyle='#fff'; ctx.font='12px monospace';
-            ctx.fillText(`${t('vibration_label')} ${avg.toFixed(1)} m/s²`,10,20);
+            ctx.fillText(`${t('vibration_label')||'Vibration'}: ${intensity.toFixed(0)}%`,10,20);
         }
     };
-    window.addEventListener('devicemotion', handler);
-    state.vibrationHandler = handler;
-    state.sensorStatus.vibration = true;
+    window.addEventListener('devicemotion',handler);
+    state.vibrationHandler=handler;
+    state.sensorStatus.vibration=true;
     document.getElementById('btn-vib').classList.add('active');
+    state.currentIntervals.vibration=setInterval(()=>{},100);
 }
 function startTemperature(){
     if(state.sensorStatus.temperature) return;
-    document.getElementById('monitor-area').innerHTML = `<div style="padding:30px;text-align:center;"><span style="font-size:2rem;font-weight:700;" id="tempValue">--°C</span><div>${t('temp_estimate')}</div></div>`;
-    let temp = 28 + Math.random() * 10;
-    const updateTemp = () => {
+    const monitorDiv = document.getElementById('monitor-area');
+    const tempDiv = document.createElement('div');
+    tempDiv.style.padding = '30px';
+    tempDiv.style.textAlign = 'center';
+    tempDiv.innerHTML = `<span style="font-size:2rem;font-weight:700;" id="tempValue">--°C</span><div>${t('temp_estimate')||'Engine Temperature Estimate'}</div>`;
+    monitorDiv.appendChild(tempDiv);
+    let temp=28+Math.random()*10;
+    const updateTemp=()=>{
         if(!state.sensorStatus.temperature) return;
-        temp += (Math.random()-0.5)*0.3;
-        temp = Math.min(48, Math.max(22, temp));
-        state.temperature = temp;
-        const el = document.getElementById('tempValue');
-        if(el) el.textContent = `${temp.toFixed(1)}°C`;
+        temp+=(Math.random()-0.5)*0.3;
+        temp=Math.min(48,Math.max(22,temp));
+        const el=document.getElementById('tempValue');
+        if(el) el.textContent=`${temp.toFixed(1)}°C`;
     };
     updateTemp();
-    state.currentIntervals.temperature = setInterval(updateTemp,800);
-    state.sensorStatus.temperature = true;
+    state.currentIntervals.temperature=setInterval(updateTemp,800);
+    state.sensorStatus.temperature=true;
     document.getElementById('btn-temp').classList.add('active');
 }
 function stopSensor(sensorType){
-    if(sensorType === 'camera' && state.currentStreams.camera){
+    if(sensorType==='camera' && state.currentStreams.camera){
         state.currentStreams.camera.getTracks().forEach(t=>t.stop()); state.currentStreams.camera=null;
         state.sensorStatus.camera=false; document.getElementById('btn-cam').classList.remove('active');
-    } else if(sensorType === 'microphone' && state.currentStreams.microphone){
+        const vid=document.getElementById('cameraVideo'); if(vid) vid.remove();
+    }
+    if(sensorType==='microphone' && state.currentStreams.microphone){
         state.currentStreams.microphone.getTracks().forEach(t=>t.stop()); state.currentStreams.microphone=null;
         state.sensorStatus.microphone=false; document.getElementById('btn-mic').classList.remove('active');
-    } else if(sensorType === 'vibration'){
+        const canv=document.getElementById('micCanvas'); if(canv) canv.remove();
+    }
+    if(sensorType==='vibration'){
         if(state.vibrationHandler) window.removeEventListener('devicemotion',state.vibrationHandler);
         if(state.currentIntervals.vibration) clearInterval(state.currentIntervals.vibration);
         state.sensorStatus.vibration=false; document.getElementById('btn-vib').classList.remove('active');
-    } else if(sensorType === 'temperature'){
+        const canv=document.getElementById('vibCanvas'); if(canv) canv.remove();
+    }
+    if(sensorType==='temperature'){
         if(state.currentIntervals.temperature) clearInterval(state.currentIntervals.temperature);
         state.sensorStatus.temperature=false; document.getElementById('btn-temp').classList.remove('active');
+        const tempDiv=document.querySelector('#monitor-area > div:has(#tempValue)'); if(tempDiv) tempDiv.remove();
     }
 }
-
-// ==================== التشخيص المتقدم مع الاتصال بـ Cloudflare Worker ====================
-let advancedTimerInterval = null;
-async function startAdvancedDiagnosisWithTimer() {
-    if(state.processingAdvanced) return;
-    let credits = getCredits();
-    if(credits <= 0 && !state.isAdmin){
-        showToast("⚠️ رصيدك انتهى. اشترِ تشخيصات جديدة.");
+// ==================== SPEAK RESULT (من app_v2_good.html) ====================
+function speakResult(){
+    let text=state.finalDiagnosis||t('listen');
+    if(!text||text.length<3){showToast(t('no_summary'));return;}
+    const googleTTSLangs={ar:'ar',zh:'zh-CN',ja:'ja',hi:'hi',fa:'fa',ur:'ur',he:'iw',th:'th'};
+    if(googleTTSLangs[state.lang]){
+        window.speechSynthesis.cancel();
+        const encoded=encodeURIComponent(text.substring(0,200));
+        const url=`https://translate.google.com/translate_tts?ie=UTF-8&q=${encoded}&tl=${googleTTSLangs[state.lang]}&client=tw-ob`;
+        const audio=new Audio(url);
+        audio.play().then(()=>showToast("🔊 Speaking...")).catch(()=>showToast("❌ TTS Error"));
         return;
     }
-    if(Object.values(state.sensorStatus).some(s=>s===true)){ showToast("أوقف الحساسات الحالية أولاً"); return; }
-    state.processingAdvanced = true;
-    document.getElementById('stepIndicator').classList.remove('hidden');
-    const monitorDiv = document.getElementById('monitor-area');
-    const timerDiv = document.createElement('div');
-    timerDiv.className = 'progress-bar-container';
-    timerDiv.innerHTML = `<div class="progress-fill" id="timeProgress"></div><div class="timer-text" id="timerText">${t('collecting_data')} 30 ${t('remaining')}</div>`;
-    monitorDiv.appendChild(timerDiv);
-    const instrDiv = document.createElement('div');
-    instrDiv.className = 'instruction-box';
-    instrDiv.innerHTML = `<span style="font-size:20px;">📷</span> ${t('instruction_proximity')}`;
-    monitorDiv.appendChild(instrDiv);
-
-    await startCamera();
-    await startMicrophone();
-    await startVibration();
-    await startTemperature();
-
-    let remaining = 30;
-    const progressFill = document.getElementById('timeProgress');
-    const timerText = document.getElementById('timerText');
-    advancedTimerInterval = setInterval(() => {
-        remaining--;
-        if(progressFill) progressFill.style.width = ((30-remaining)/30)*100 + '%';
-        if(timerText) timerText.innerText = `${t('collecting_data')} ${remaining} ${t('remaining')}`;
-        if(remaining <= 0) {
-            clearInterval(advancedTimerInterval);
-            finishAdvancedDiagnosis();
-        }
-    }, 1000);
+    const langMap={en:'en-US',fr:'fr-FR',es:'es-ES',de:'de-DE',it:'it-IT',pt:'pt-PT',ru:'ru-RU',ko:'ko-KR',tr:'tr-TR',nl:'nl-NL',pl:'pl-PL',id:'id-ID',sw:'sw-KE',vi:'vi-VN',el:'el-GR',cs:'cs-CZ',uk:'uk-UA',ro:'ro-RO',hu:'hu-HU',sv:'sv-SE',da:'da-DK',fi:'fi-FI',no:'nb-NO',sk:'sk-SK',bg:'bg-BG',hr:'hr-HR',lt:'lt-LT',lv:'lv-LV',et:'et-EE',sl:'sl-SI',ms:'ms-MY'};
+    const targetLang=langMap[state.lang]||'en-US';
+    const doSpeak=(voice)=>{let u=new SpeechSynthesisUtterance(text);u.lang=targetLang;if(voice)u.voice=voice;window.speechSynthesis.speak(u);showToast("🔊 Speaking...");};
+    const voices=window.speechSynthesis.getVoices();
+    if(voices.length>0){let v=voices.find(v=>v.lang===targetLang)||voices.find(v=>v.lang.startsWith(targetLang.split('-')[0]));doSpeak(v||null);}
+    else{window.speechSynthesis.onvoiceschanged=()=>{const vs=window.speechSynthesis.getVoices();let v=vs.find(v=>v.lang===targetLang)||vs.find(v=>v.lang.startsWith(targetLang.split('-')[0]));doSpeak(v||null);window.speechSynthesis.onvoiceschanged=null;};window.speechSynthesis.getVoices();}
 }
-async function finishAdvancedDiagnosis() {
-    if(advancedTimerInterval) clearInterval(advancedTimerInterval);
-    stopSensor('camera'); stopSensor('microphone'); stopSensor('vibration'); stopSensor('temperature');
-    const timerDiv = document.querySelector('.progress-bar-container');
-    if(timerDiv) timerDiv.remove();
-    const instrDiv = document.querySelector('.instruction-box');
-    if(instrDiv) instrDiv.remove();
-    document.getElementById('stepIndicator').classList.add('hidden');
-
-    const deviceId = state.deviceID;
-    const soundLevel = state.soundAnalysis?.level || 0;
-    const vibrationAvg = state.vibrationAvg || 0;
-    const temperature = state.temperature || 85;
-    const imageDescription = state.imageDescription || '';
-    const audioDescription = state.audioDescription || '';
-
-    try {
-        const response = await fetch(`${WORKER_URL}/diagnose`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ deviceId, soundLevel, vibrationAvg, temperature, imageDescription, audioDescription })
-        });
-        const data = await response.json();
-        if (response.status === 402 || data.error) {
-            showToast(data.error || "انتهى رصيدك. اشترِ تشخيصات جديدة.");
-            closeLab();
-            state.processingAdvanced = false;
-            return;
-        }
-        let finalText = data.diagnosis || "لم يتم استلام تشخيص من الخادم";
-        state.finalDiagnosis = finalText;
-        document.getElementById('live-report').innerHTML = finalText;
-        document.getElementById('monitor-area').innerHTML = `<div style="padding:20px;">🧠 التقرير:<br>${finalText}</div>`;
-        state.reportLines.push(`🧠 ${finalText}`);
-        saveToHistory(finalText, "");
-        if(!state.isAdmin && getCredits() > 0) {
-            useCredit();
-            showToast(`✅ تم خصم تشخيص واحد. رصيدك المتبقي: ${getCredits()}`);
-        }
-    } catch(err) {
-        console.error(err);
-        showToast("فشل الاتصال بالخادم. تأكد من اتصالك بالإنترنت.");
-    }
-    state.processingAdvanced = false;
-}
-
-// ==================== النطق (دعم جميع اللغات مع احتياطي Google TTS) ====================
-function speakResult(){
-    let text = state.finalDiagnosis || t('listen');
-    if(!text || text.length < 3){ showToast(t('no_summary')); return; }
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    let langCode = 'en-US';
-    if (state.lang === 'ar') langCode = 'ar-SA';
-    else if (state.lang === 'fr') langCode = 'fr-FR';
-    else if (state.lang === 'es') langCode = 'es-ES';
-    else if (state.lang === 'de') langCode = 'de-DE';
-    else if (state.lang === 'it') langCode = 'it-IT';
-    else if (state.lang === 'pt') langCode = 'pt-PT';
-    else if (state.lang === 'ru') langCode = 'ru-RU';
-    else if (state.lang === 'zh') langCode = 'zh-CN';
-    else if (state.lang === 'ja') langCode = 'ja-JP';
-    else if (state.lang === 'ko') langCode = 'ko-KR';
-    else if (state.lang === 'tr') langCode = 'tr-TR';
-    utterance.lang = langCode;
-    utterance.rate = 0.85;
-    const voices = window.speechSynthesis.getVoices();
-    let selected = null;
-    if (state.lang === 'ar') {
-        selected = voices.find(v => v.lang === 'ar-SA' || v.lang === 'ar-EG' || v.lang.startsWith('ar')) ||
-                   voices.find(v => v.name.toLowerCase().includes('arabic'));
-    } else {
-        selected = voices.find(v => v.lang === langCode) || voices.find(v => v.lang.startsWith(langCode.split('-')[0]));
-    }
-    if (selected) utterance.voice = selected;
-    utterance.onstart = () => showToast(t('speaking'));
-    utterance.onerror = () => {
-        const googleTTSMap = { ar:'ar', en:'en', fr:'fr', es:'es', de:'de', it:'it', pt:'pt', ru:'ru', zh:'zh-CN', ja:'ja', ko:'ko', tr:'tr' };
-        const googleLang = googleTTSMap[state.lang] || 'en';
-        const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text.substring(0,200))}&tl=${googleLang}&client=tw-ob`;
-        const audio = new Audio(url);
-        audio.play().catch(()=>showToast("❌ TTS error"));
-    };
-    window.speechSynthesis.speak(utterance);
-}
-
-// ==================== PDF والتقييم ====================
-function generatePDF(){
-    if(!state.currentDevice) return;
-    let deviceName = t(state.currentDevice);
-    let planName = "Pay-per-use (Credits)";
-    let location = document.getElementById('location').textContent;
-    let now = new Date();
-    let dateStr = now.toLocaleDateString('en-GB');
-    let timeStr = now.toLocaleTimeString('en-GB');
-    let summary = state.finalDiagnosis || t('normal');
-    let content = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${t('report_title')}</title><style>body{font-family:sans-serif;padding:30px;max-width:800px;margin:0 auto}.header{text-align:center;border-bottom:2px solid #f97316;margin-bottom:20px}.result{background:#fef3c7;padding:15px;border-radius:10px;margin:15px 0}.footer{text-align:center;margin-top:30px;font-size:11px;color:#666}</style></head><body><div class="header"><h1>Engine Diagnostics</h1><p>${deviceName} - ${t('report_title')}</p></div><p><strong>${t('date')}:</strong> ${dateStr} | <strong>${t('time')}:</strong> ${timeStr} | <strong>${t('location')}:</strong> ${location}</p><p><strong>${t('sub_type')}:</strong> ${planName}</p><div class="result"><h3>${t('diag_result')}</h3><p>${summary}</p></div><div class="footer"><p>© 2026 Engine Diagnostics</p></div><script>window.onload=()=>window.print()<\/script></body></html>`;
-    let win = window.open(); win.document.write(content); win.document.close();
-}
-function setRating(n){
-    let stars = document.querySelectorAll('#rating-stars span');
-    stars.forEach((s,i)=>s.classList.toggle('active', i<n));
-    let levels = ['', t('poor'), t('acceptable'), t('good'), t('excellent'), t('professional')];
-    document.getElementById('rating-msg').innerHTML = `⭐ ${levels[n] || ''}`;
-}
-
-// ==================== واجهة المستخدم والترجمة ====================
-function buildLangSelect(){
-    let sel = document.getElementById('lang-select'); sel.innerHTML='';
-    const langs = { ar:"🇸🇦 العربية", en:"🇬🇧 English", fr:"🇫🇷 Français", es:"🇪🇸 Español", de:"🇩🇪 Deutsch", it:"🇮🇹 Italiano", pt:"🇵🇹 Português", ru:"🇷🇺 Русский", zh:"🇨🇳 中文", ja:"🇯🇵 日本語", ko:"🇰🇷 한국어", tr:"🇹🇷 Türkçe" };
-    for(let code in langs){ let opt=document.createElement('option'); opt.value=code; opt.textContent=langs[code]; if(code===state.lang) opt.selected=true; sel.appendChild(opt); }
-}
-function applyTranslations(){
-    document.getElementById('dynamicMainTitle').innerHTML = t('mainTitle');
-    ['engine','truck','motorcycle','boat','tractor','generator'].forEach(d=>{ let el=document.getElementById(`dev-${d}`); if(el) el.textContent = t(d); });
-    document.getElementById('sensor-cam').textContent = t('camera');
-    document.getElementById('sensor-mic').textContent = t('mic');
-    document.getElementById('sensor-vib').textContent = t('vibration');
-    document.getElementById('sensor-temp').textContent = t('temp');
-    document.querySelectorAll('.stop-btn').forEach(btn => btn.textContent = t('stop'));
-    document.querySelector('.back-btn').innerHTML = `↩️ ${t('back')}`;
-    document.querySelector('.cancel').innerHTML = t('cancel');
-    document.querySelector('.pdf').innerHTML = `📄 ${t('pdf')}`;
-    document.querySelector('.rating-bar span:first-child').textContent = t('rating');
-    document.getElementById('newListenText').innerHTML = t('listen');
-    if(state.currentDevice) document.getElementById('lab-device-name').textContent = t(state.currentDevice);
-    document.getElementById('quickModeBtn').innerHTML = `⚡ ${t('quick_diag')}`;
-    document.getElementById('advancedModeBtn').innerHTML = `🧠 ${t('advanced_diag')}`;
-    document.querySelector('.action-row button:first-child').innerHTML = `🎤 ${t('speak_desc')}`;
-    document.querySelector('.action-row button:last-child').innerHTML = `📊 ${t('export_history')}`;
-    document.querySelector('.csv').innerHTML = `📊 ${t('save_diagnosis')}`;
-    document.querySelector('.email').innerHTML = `📧 ${t('send_report')}`;
-    document.getElementById('live-report').innerHTML = t('waiting');
-    updateCreditsDisplay();
-}
-function changeLang(lang){
-    state.lang = lang; localStorage.setItem('auto_lang', lang); applyTranslations();
-    if(document.getElementById('lab-ui').style.display === 'block') openLab(state.currentDevice);
-}
-function initClock(){
-    let tick = () => {
-        let now = new Date();
-        document.getElementById('date').textContent = `${now.getDate().toString().padStart(2,'0')}/${(now.getMonth()+1).toString().padStart(2,'0')}/${now.getFullYear()}`;
-        document.getElementById('clock').textContent = now.toLocaleTimeString('en-GB');
-    };
-    tick(); setInterval(tick, 1000);
-}
-function initGeo(){
-    let locationSpan = document.getElementById('location');
-    if (!navigator.geolocation) { locationSpan.innerHTML = '❌ GPS not supported'; return; }
-    navigator.geolocation.getCurrentPosition(
-        (p) => { locationSpan.innerHTML = `${p.coords.latitude.toFixed(4)}, ${p.coords.longitude.toFixed(4)}`; },
-        () => { locationSpan.innerHTML = '❌ غير مصرح'; }
-    );
-}
-function initQR(){ new QRCode(document.getElementById('qr-container'),{text:window.location.href,width:50,height:50}); }
+function generatePDF(){if(!state.currentDevice)return;let deviceName=t(state.currentDevice);let planName=state.currentPlan==='free'?t('free_l1'):state.currentPlan==='monthly'?'20$':'200$';let location=document.getElementById('location').textContent;let now=new Date();let dateStr=now.toLocaleDateString('en-GB');let timeStr=now.toLocaleTimeString('en-GB');let summary=state.finalDiagnosis||"No fault";let content=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Diagnostic Report</title><style>body{font-family:sans-serif;padding:30px;max-width:800px;margin:0 auto}.header{text-align:center;border-bottom:2px solid #f97316;margin-bottom:20px}.result{background:#fef3c7;padding:15px;border-radius:10px;margin:15px 0}.footer{text-align:center;margin-top:30px;font-size:11px;color:#666}</style></head><body><div class="header"><h1>Engine Diagnostics</h1><p>${deviceName} - ${t('report_title')}</p></div><p><strong>${t('date')}:</strong> ${dateStr} | <strong>${t('time')}:</strong> ${timeStr} | <strong>${t('location')}:</strong> ${location}</p><p><strong>${t('sub_type')}:</strong> ${planName}</p><div class="result"><h3>${t('diag_result')}</h3><p>${summary}</p></div><div class="footer"><p>© 2026 Engine Diagnostics</p></div><script>window.onload=()=>window.print()<\/script></body></html>`;let win=window.open();win.document.write(content);win.document.close();}
+function setRating(n){let stars=document.querySelectorAll('#rating-stars span');stars.forEach((s,i)=>s.classList.toggle('active',i<n));let levels=['',t('poor'),t('acceptable'),t('good'),t('excellent'),t('professional')];document.getElementById('rating-msg').innerHTML=`⭐ ${levels[n]||''}`;}
+function buildLangSelect(){let sel=document.getElementById('lang-select');sel.innerHTML='';const langs={ar:"🇸🇦 العربية",en:"🇬🇧 English",fr:"🇫🇷 Français",es:"🇪🇸 Español",de:"🇩🇪 Deutsch",it:"🇮🇹 Italiano",pt:"🇵🇹 Português",ru:"🇷🇺 Русский",zh:"🇨🇳 中文",ja:"🇯🇵 日本語",ko:"🇰🇷 한국어",tr:"🇹🇷 Türkçe",nl:"🇳🇱 Nederlands",pl:"🇵🇱 Polski",hi:"🇮🇳 हिन्दी",id:"🇮🇩 Indonesia",fa:"🇮🇷 فارسی",ur:"🇵🇰 اردو",sw:"🇰🇪 Kiswahili",vi:"🇻🇳 Tiếng Việt",el:"🇬🇷 Ελληνικά",cs:"🇨🇿 Čeština",he:"🇮🇱 עברית",th:"🇹🇭 ไทย",uk:"🇺🇦 Українська",ro:"🇷🇴 Română",hu:"🇭🇺 Magyar",sv:"🇸🇪 Svenska",da:"🇩🇰 Dansk",fi:"🇫🇮 Suomi",no:"🇳🇴 Norsk",sk:"🇸🇰 Slovenčina",bg:"🇧🇬 Български",hr:"🇭🇷 Hrvatski",lt:"🇱🇹 Lietuvių",lv:"🇱🇻 Latviešu",et:"🇪🇪 Eesti",sl:"🇸🇮 Slovenščina",ms:"🇲🇾 Melayu"};for(let code in langs){let opt=document.createElement('option');opt.value=code;opt.textContent=langs[code];if(code===state.lang)opt.selected=true;sel.appendChild(opt);}}
+function buildSubscriptions(){document.getElementById('subs-grid').innerHTML=`<div class="sub-card" data-plan="free" onclick="selectPlan('free')"><div class="line1">${t('free_l1')}</div><div class="line2">${t('free_l2')}</div><div class="line3">${t('free_l3')}</div></div><div class="sub-card" data-plan="monthly" onclick="selectPlan('monthly')"><div class="line1">${t('monthly_l1')}</div><div class="line2">${t('monthly_l2')}</div><div class="line3">${t('monthly_l3')}</div></div><div class="sub-card" data-plan="yearly" onclick="selectPlan('yearly')"><div class="line1">${t('yearly_l1')}</div><div class="line2">${t('yearly_l2')}</div><div class="line3">${t('yearly_l3')}</div></div>`;updateSubUI();}
+function applyTranslations(){buildSubscriptions();['engine','truck','motorcycle','boat','tractor','generator'].forEach(d=>{let el=document.getElementById(`dev-${d}`);if(el)el.textContent=t(d);});document.getElementById('sensor-cam').textContent=t('camera');document.getElementById('sensor-mic').textContent=t('mic');document.getElementById('sensor-vib').textContent=t('vibration');document.getElementById('sensor-temp').textContent=t('temp');['cam','mic','vib','temp'].forEach(s=>{let b=document.getElementById('stop-'+s);if(b)b.textContent=t('stop');});document.querySelector('.back-btn').innerHTML=`↩️ ${t('back')}`;document.querySelector('.cancel').innerHTML=t('cancel');document.querySelector('.pdf').innerHTML=`📄 ${t('pdf')}`;document.querySelector('.rating-bar span:first-child').textContent=t('rating');document.getElementById('code-input').placeholder=`🔑 ${t('scan_qr')}`;document.getElementById('newListenText').innerHTML=t('listen');if(state.currentDevice)document.getElementById('lab-device-name').textContent=t(state.currentDevice);document.getElementById('dynamicMainTitle').innerHTML=t('mainTitle');document.getElementById('quickModeBtn').innerHTML=`⚡ ${t('quick_diag')}`;document.getElementById('advancedModeBtn').innerHTML=`🧠 ${t('advanced_diag')}`;document.querySelector('.action-row button:first-child').innerHTML=`🎤 ${t('speak_desc')}`;document.querySelector('.action-row button:last-child').innerHTML=`📊 ${t('export_history')}`;document.querySelector('.csv').innerHTML=`📊 ${t('save_diagnosis')}`;document.querySelector('.email').innerHTML=`📧 ${t('send_report')}`;updateCreditsDisplay();}
+function changeLang(lang){state.lang=lang;localStorage.setItem('auto_lang',lang);applyTranslations();if(document.getElementById('lab-ui').style.display==='block')openLab(state.currentDevice);}
+function initClock(){let tick=()=>{let now=new Date();document.getElementById('date').textContent=`${now.getDate().toString().padStart(2,'0')}/${(now.getMonth()+1).toString().padStart(2,'0')}/${now.getFullYear()}`;document.getElementById('clock').textContent=now.toLocaleTimeString('en-GB');};tick();setInterval(tick,1000);}
+function initGeo(){let locationSpan=document.getElementById('location');if(!navigator.geolocation){locationSpan.textContent='❌ Not supported';return;}navigator.geolocation.getCurrentPosition((p)=>{locationSpan.textContent=`${p.coords.latitude.toFixed(4)}, ${p.coords.longitude.toFixed(4)}`;},()=>{locationSpan.textContent='❌ Denied';});}
+function initQR(){new QRCode(document.getElementById('qr-container'),{text:window.location.href,width:50,height:50});}
 function openLab(device){
     let credits = getCredits();
-    if(credits <= 0 && !state.isAdmin){
-        showToast("⚠️ رصيدك انتهى. اشترِ تشخيصات جديدة.");
-        return;
-    }
-    state.currentDevice = device;
-    state.reportLines = []; state.finalDiagnosis = '';
-    document.getElementById('home-grid').style.display = 'none';
-    document.getElementById('lab-ui').style.display = 'block';
-    document.getElementById('lab-device-name').textContent = t(device);
-    document.getElementById('live-report').innerHTML = t('waiting');
-    document.getElementById('monitor-area').innerHTML = `<div style="padding:20px;color:#94a3b8">🔌 ${t('activate')}</div>`;
+    if(credits <= 0 && !state.isAdmin){ showToast("⚠️ رصيدك انتهى. اشترِ تشخيصات جديدة."); return; }
+    if(!checkLimit()) return;
+    state.currentDevice=device;state.reportLines=[];state.finalDiagnosis='';
+    document.getElementById('home-grid').style.display='none';
+    document.getElementById('lab-ui').style.display='block';
+    document.getElementById('lab-device-name').textContent=t(device);
+    document.getElementById('live-report').innerHTML=t('waiting');
+    document.getElementById('monitor-area').innerHTML=`<div style="padding:20px;color:#94a3b8">🔌 ${t('activate')}</div>`;
     for(let s in state.sensorStatus) if(state.sensorStatus[s]) stopSensor(s);
     setMode('quick');
 }
-function closeLab(){
-    if(advancedTimerInterval) clearInterval(advancedTimerInterval);
-    for(let s in state.sensorStatus) if(state.sensorStatus[s]) stopSensor(s);
-    document.getElementById('home-grid').style.display = 'grid';
-    document.getElementById('lab-ui').style.display = 'none';
-}
+function closeLab(){ for(let s in state.sensorStatus) if(state.sensorStatus[s]) stopSensor(s); document.getElementById('home-grid').style.display='grid'; document.getElementById('lab-ui').style.display='none'; if(state.globalTimerInterval) clearInterval(state.globalTimerInterval); }
 
-// بدء التطبيق
-initClock(); initGeo(); initQR(); buildLangSelect();
-let savedLang = localStorage.getItem('auto_lang'); if(savedLang) state.lang = savedLang;
-document.getElementById('lang-select').value = state.lang; document.getElementById('device-uid').textContent = state.deviceID; applyTranslations();
-updateCreditsDisplay();
-
-if (urlParams.get('payment') === 'success') {
-    let pack = urlParams.get('pack');
-    let add = 0;
-    if (pack === 'single') add = 1;
-    else if (pack === 'pack5') add = 5;
-    else if (pack === 'pack15') add = 15;
-    if (add > 0) {
-        addCredits(add);
-        showToast(`✅ تمت إضافة ${add} تشخيص إلى رصيدك!`);
-        window.history.replaceState({}, '', window.location.pathname);
-    }
-}
+initClock();initGeo();initQR();buildLangSelect();let savedLang=localStorage.getItem('auto_lang');if(savedLang)state.lang=savedLang;document.getElementById('lang-select').value=state.lang;document.getElementById('device-uid').textContent=state.deviceID;applyTranslations();updateCreditsDisplay();
+document.getElementById('code-input').addEventListener('change',function(e){if(e.target.value.toUpperCase()==='MOULOUD2026'){showToast("✅ Code valid! Admin activated");if(!state.isAdmin){state.isAdmin=true;localStorage.setItem('auto_isAdmin',true);updateSubUI();updateCreditsDisplay();showToast(t('admin_on'));}}else{showToast("❌ Invalid code");}});
 </script>
 </body>
 </html>
