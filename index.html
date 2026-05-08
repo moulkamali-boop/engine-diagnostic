@@ -2,82 +2,86 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Engine Diagnostics Pro - تشخيص المحركات</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>AI Engine Diagnostics Pro - التشخيص الذكي للمحركات</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
         body{background:#0a0c12;color:#f8fafc;font-family:'Segoe UI',system-ui,sans-serif;padding:0.8rem;font-size:14px}
-        .container{max-width:600px;margin:0 auto;background:rgba(8,12,18,0.8);backdrop-filter:blur(2px);border-radius:2rem;border:1px solid rgba(255,200,50,0.3);overflow:hidden}
-        .header{display:flex;align-items:center;justify-content:space-between;background:#0b0f15;padding:12px 16px;border-bottom:1px solid #2a2f3a}
-        .qr-box{width:50px;height:50px;background:#fff;border-radius:12px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+        .container{max-width:600px;margin:0 auto;background:rgba(8,12,18,0.95);border-radius:2rem;border:1px solid rgba(255,200,50,0.3);overflow:hidden}
+        .header{display:flex;align-items:center;justify-content:space-between;background:#0b0f15;padding:12px 16px;border-bottom:2px solid gold}
+        .gold-divider{height:2px;background:gold;margin:4px 0}
+        .qr-box{width:50px;height:50px;background:#fff;border-radius:12px;display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:pointer}
         .qr-box canvas{width:100%!important;height:100%!important}
         .title-box{text-align:center;flex:1}
         .app-title{font-size:1.2rem;font-weight:800;background:linear-gradient(135deg,#f9d976,#f39f1a);-webkit-background-clip:text;background-clip:text;color:transparent}
+        .version-badge{font-family:monospace;font-size:0.6rem;background:#334155;display:inline-block;padding:2px 6px;border-radius:20px;margin-top:2px;color:#b9c7d9}
         .sub-main-title{font-size:0.7rem;color:#b9c7d9;margin-top:4px}
         .secret-btn{background:#1e293b;border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.5rem}
         .meta-row{display:flex;justify-content:space-between;background:#11161f;padding:8px 14px;font-size:0.65rem;border-bottom:1px solid #2a2f3a}
         .controls-row{display:flex;gap:8px;padding:10px;background:#0c0f16}
-        select{flex:1;padding:10px;background:#1e293b;border:1px solid #2a3241;border-radius:30px;color:#fff;cursor:pointer}
-        .uid-box{flex:1;padding:10px;background:#1e293b;border-radius:30px;text-align:center;font-size:0.7rem}
-        .credit-area{background:#1e293b;border-radius:20px;margin:0 12px 12px;padding:8px 16px;text-align:center;border:1px solid #3b82f6}
-        .credit-amount{font-size:1.2rem;font-weight:bold;color:#f5b81b}
-        .credit-label{font-size:0.7rem;color:#9aa3b5}
-        .subs-grid{display:flex;gap:8px;padding:10px;background:#080b10}
-        .sub-card{flex:1;background:#121724;border-radius:20px;padding:8px;text-align:center;border:2px solid #f5b81b;cursor:pointer;transition:all 0.2s}
-        .sub-card:hover{border-color:#ffaa33;background:#1e2a3a;transform:scale(1.02)}
-        .sub-card.active{background:#ea580c;border-color:#fff}
-        .sub-card .line1{font-size:0.7rem}
-        .sub-card .line2{font-size:0.9rem;font-weight:700;color:#f5b81b}
-        .sub-card .line3{font-size:0.55rem;color:#9aa3b5}
-        .code-input{width:100%;padding:10px;background:#11161f;border:1px solid #2a3241;border-radius:40px;color:#fff;margin-bottom:10px}
+        select{flex:1;padding:10px;background:#1e293b;border:1px solid #3b82f6;border-radius:30px;color:#fff;cursor:pointer}
+        .uid-box{flex:1;padding:10px;background:#1e293b;border-radius:30px;text-align:center;font-size:0.7rem;border:1px solid #3b82f6}
+        .subscription-section{background:#080b10;padding:10px 0}
+        .free-row{display:flex;justify-content:center;margin-bottom:12px;padding:0 10px}
+        .free-card{background:#0f172a;border-radius:20px;padding:12px;border:2px solid #3b82f6;display:flex;align-items:center;justify-content:space-between;width:100%;max-width:280px}
+        .free-card .title{font-size:0.9rem;color:#ddd}
+        .free-counter{font-size:1.3rem;font-weight:bold;color:#60a5fa;background:#1e293b;padding:4px 12px;border-radius:30px}
+        .paid-row{display:flex;gap:12px;justify-content:center;padding:0 10px}
+        .paid-card{flex:1;background:#121724;border-radius:20px;padding:8px 4px;text-align:center;border:2px solid #f5b81b;cursor:pointer;transition:0.2s;min-width:0}
+        .paid-card:hover{transform:scale(1.02);border-color:#3b82f6}
+        .paid-card .title{font-size:0.7rem;color:#ddd}
+        .paid-card .value{font-size:0.9rem;font-weight:700;color:#f5b81b}
+        .code-input{width:100%;padding:10px;background:#11161f;border:1px solid #3b82f6;border-radius:40px;color:#fff;margin:10px 0}
         .devices{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;padding:0 16px 20px}
         .device-btn{background:#10141e;border-radius:24px;padding:16px 8px;text-align:center;cursor:pointer;border:2px solid #3b82f6;transition:0.2s}
         .device-btn:hover{border-color:#f5b81b;transform:scale(1.02)}
         .device-icon{font-size:2.5rem;display:block;margin-bottom:8px}
-        .device-name{font-size:0.75rem;font-weight:600;margin-top:6px}
+        .device-name{font-size:0.75rem;font-weight:600}
         #lab-ui{display:none}
-        .lab-header{display:flex;align-items:center;gap:10px;padding:12px 16px;background:#0b0f15;border-bottom:1px solid #2a2f3a}
-        .back-btn{background:#1e293b;border:none;padding:6px 12px;border-radius:30px;color:#f5b81b;cursor:pointer}
-        .device-label{flex:1;text-align:center;font-weight:700}
-        .credit-lab{background:#1e293b;border-radius:20px;padding:6px 12px;margin:8px auto;width:fit-content;font-size:13px;color:#f5b81b}
+        .lab-header{display:flex;align-items:center;gap:12px;padding:12px 16px;background:#0b0f15;border-bottom:2px solid gold}
+        .back-btn{background:#f97316;border:none;padding:10px 20px;border-radius:40px;color:#fff;font-weight:bold;font-size:1rem;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.3);transition:0.2s;border:1px solid #ffb347}
+        .back-btn:hover{background:#ea580c;transform:scale(1.02)}
+        .device-label{flex:1;text-align:center;font-weight:800;font-size:1.2rem;color:#f5b81b}
+        .credit-lab{background:#1e293b;border-radius:20px;padding:6px 12px;margin:8px auto;width:fit-content;font-size:13px;color:#60a5fa;border:1px solid #3b82f6}
+        .mode-buttons{display:flex;gap:10px;padding:0 16px;margin-top:8px}
+        .mode-btn{flex:1;background:#1e293b;padding:10px;border-radius:40px;text-align:center;cursor:pointer;transition:0.2s;border:1px solid #3b82f6;font-weight:600}
+        .mode-btn.active{background:#10b981;color:#fff;border-color:#10b981}
         .sensors{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:20px 16px}
         .sensor-btn{background:#121724;border:2px solid #3b82f6;border-radius:20px;padding:10px 4px;text-align:center;cursor:pointer;transition:0.2s}
         .sensor-btn.active{background:#10b981;border-color:#10b981}
-        .sensor-btn:hover{border-color:#f5b81b}
-        .sensor-icon{font-size:1.4rem;display:block;margin-bottom:4px}
-        .sensor-btn span:last-child{font-size:0.6rem;display:block;margin-top:2px}
-        .stop-btn{background:#ef4444;border:none;border-radius:30px;padding:3px 8px;font-size:0.55rem;color:white;cursor:pointer;margin-top:6px;width:100%}
-        .mode-buttons{display:flex;gap:10px;padding:0 16px}
-        .mode-btn{flex:1;background:#1e293b;padding:10px;border-radius:40px;text-align:center;cursor:pointer}
-        .mode-btn.active{background:#f5b81b;color:#0a0c12}
-        .action-row{display:flex;gap:8px;padding:10px 16px}
-        .action-row button{flex:1;background:#1e293b;border:1px solid #2a3241;border-radius:40px;padding:8px;font-size:0.7rem;color:#fff;cursor:pointer}
+        .sensor-icon{font-size:1.6rem;display:block}
+        .sensor-name{font-size:0.6rem;display:block;margin-top:4px}
+        .stop-btn{background:#ef4444;border:1px solid #3b82f6;border-radius:30px;padding:3px 8px;font-size:0.55rem;color:white;cursor:pointer;margin-top:6px;width:100%}
         .monitor-area{background:#000;border-radius:20px;min-height:220px;margin:0 16px;border:2px solid #f5b81b;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow-y:auto;position:relative;padding:10px}
-        .live-report{background:#0e121b;margin:16px;border-radius:20px;padding:12px;font-size:0.7rem;max-height:200px;overflow-y:auto;border:1px solid #2a3241}
-        .action-btns{display:flex;gap:8px;padding:0 16px 10px}
-        .action-btns button{flex:1;background:#1e293b;border:none;border-radius:40px;padding:8px;font-size:0.7rem;color:#fff;cursor:pointer}
-        .cancel{background:#ef4444!important}
-        .pdf{background:#3b82f6!important}
-        .csv{background:#10b981!important}
-        .email{background:#8b5cf6!important}
-        .speak-new-btn{background:#f5b81b;color:#0a0c12;border:none;border-radius:40px;padding:12px;font-weight:700;width:calc(100% - 32px);margin:0 16px 10px;cursor:pointer}
-        .rating-bar{background:#121724;border-radius:20px;padding:8px 16px;margin:0 16px 10px;display:flex;justify-content:space-between;align-items:center}
+        .live-report{background:#0e121b;margin:16px;border-radius:20px;padding:12px;font-size:0.7rem;max-height:200px;overflow-y:auto;border:1px solid #3b82f6}
+        .action-buttons-group{display:flex;flex-wrap:wrap;gap:10px;padding:10px 16px;margin-top:5px}
+        .action-buttons-group button{flex:1;min-width:100px;background:#1e293b;border:1px solid #3b82f6;border-radius:40px;padding:8px 6px;font-size:0.7rem;color:#fff;cursor:pointer;transition:0.2s}
+        .speak-btn{background:#1e293b;border:2px solid #3b82f6}
+        .speak-btn.speak-active{background:#10b981;border-color:#10b981;color:white}
+        .cancel-red{background:#991b1b;color:white;border:2px solid #ef4444;font-weight:bold}
+        .listen-gold{background:#f5b81b;color:#0a0c12;font-weight:bold;border:none}
+        .rating-bar{background:#121724;border-radius:20px;padding:8px 16px;margin:0 16px 10px;display:flex;justify-content:space-between;align-items:center;border:1px solid #3b82f6}
         .stars span{cursor:pointer;font-size:1.2rem;color:#6c757d}
         .stars span.active{color:#f5b81b}
-        .footer{text-align:center;padding:12px;font-size:0.6rem;color:#6c7a91;border-top:1px solid #1f2533;margin-top:20px}
+        .footer{text-align:center;padding:12px;font-size:0.6rem;border-top:2px solid gold;margin-top:20px;display:flex;justify-content:center;flex-wrap:wrap;gap:5px;color:#ffffff;font-weight:500}
         .toast{visibility:hidden;position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#ea580c;padding:6px 12px;border-radius:30px;font-size:11px;opacity:0;transition:0.2s;z-index:100}
         .toast.show{visibility:visible;opacity:1}
-        .step-indicator{background:#334155;padding:8px;margin:10px 16px;border-radius:12px;text-align:center}
+        .step-indicator{background:#334155;padding:8px;margin:10px 16px;border-radius:12px;text-align:center;border:1px solid #3b82f6}
         .hidden{display:none!important}
         .progress-bar-container{width:90%;margin:10px auto;background:#2a2f3a;border-radius:10px;overflow:hidden;height:8px}
         .progress-fill{height:100%;background:#f5b81b;width:0%;transition:width 0.3s}
         .timer-text{font-size:12px;margin-top:4px;color:#f5b81b;text-align:center}
-        .instruction-box{background:rgba(0,0,0,0.7);border-radius:12px;padding:8px;margin:8px auto;width:90%;text-align:center;font-size:12px;color:#ccc}
+        .instruction-box{background:rgba(0,0,0,0.7);border-radius:12px;padding:8px;margin:8px auto;width:90%;text-align:center;font-size:12px;color:#ccc;border:1px solid #3b82f6}
         .modal-pack{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:1000;align-items:center;justify-content:center}
-        .modal-pack-content{background:#0f172a;padding:20px;border-radius:20px;width:80%;max-width:280px;text-align:center}
+        .modal-pack-content{background:#0f172a;padding:20px;border-radius:20px;width:80%;max-width:280px;text-align:center;border:1px solid #3b82f6}
         .modal-pack-content button{display:block;width:100%;margin:10px 0;padding:10px;background:#f97316;border:none;border-radius:12px;color:#fff;cursor:pointer}
+        .result-icons{display:flex;gap:12px;justify-content:center;margin:10px 0}
+        .result-icon{background:#1e293b;border-radius:12px;padding:6px 12px;font-size:12px;display:inline-flex;align-items:center;gap:5px;border:1px solid #3b82f6}
+        .btn-blue-light{background:#1e3a5f;border-color:#3b82f6}
+        .btn-green-light{background:#2d3748;border-color:#48bb78}
+        .btn-purple-light{background:#4a1d6d;border-color:#c084fc}
     </style>
 </head>
 <body>
@@ -85,119 +89,103 @@
     <div class="header">
         <div class="qr-box" id="qr-container"></div>
         <div class="title-box">
-            <div class="app-title">ENGINE DIAGNOSTICS PRO</div>
-            <div class="sub-main-title" id="dynamicMainTitle">تشخيص المحركات بالذكاء الاصطناعي</div>
+            <div class="app-title">AI ENGINE DIAGNOSTICS</div>
+            <div class="version-badge">V2.0 – 54 Languages</div>
+            <div class="sub-main-title" id="dynamicMainTitle">تشخيص ذكي للمحركات</div>
         </div>
         <span class="secret-btn" onclick="triggerAdmin()">🚗</span>
     </div>
+    <div class="gold-divider"></div>
     <div class="meta-row">
         <span>📅 <span id="date">--/--/----</span></span>
         <span>🕐 <span id="clock">--:--:--</span></span>
         <span>📍 <span id="location">--</span></span>
     </div>
     <div class="controls-row">
-        <select id="lang-select" onchange="changeLang(this.value)"></select>
+        <select id="lang-select"></select>
         <div class="uid-box"><i class="fas fa-microchip"></i> ID: <span id="device-uid"></span></div>
     </div>
-    <div class="subs-grid" id="subs-grid"></div>
-    <div class="credit-area" id="creditDisplay"></div>
-    <input type="text" class="code-input" id="code-input" placeholder="🔑 كود الاشتراك (MOULOUD2026)">
-    <div class="devices" id="home-grid">
-        <div class="device-btn" onclick="openLab('engine')"><i class="fas fa-car device-icon"></i><div class="device-name" id="dev-engine">محرك سيارة</div></div>
-        <div class="device-btn" onclick="openLab('truck')"><i class="fas fa-truck device-icon"></i><div class="device-name" id="dev-truck">محرك شاحنة</div></div>
-        <div class="device-btn" onclick="openLab('motorcycle')"><i class="fas fa-motorcycle device-icon"></i><div class="device-name" id="dev-motorcycle">محرك دراجة</div></div>
-        <div class="device-btn" onclick="openLab('boat')"><i class="fas fa-ship device-icon"></i><div class="device-name" id="dev-boat">محرك قارب</div></div>
-        <div class="device-btn" onclick="openLab('tractor')"><i class="fas fa-tractor device-icon"></i><div class="device-name" id="dev-tractor">محرك جرار</div></div>
-        <div class="device-btn" onclick="openLab('generator')"><i class="fas fa-charging-station device-icon"></i><div class="device-name" id="dev-generator">محرك مولد</div></div>
-    </div>
-    <div id="lab-ui">
-        <div class="lab-header"><button class="back-btn" onclick="closeLab()">↩️ رجوع</button><div class="device-label" id="lab-device-name">الجهاز</div><div style="width:40px"></div></div>
-        <div class="credit-lab" id="creditLabDisplay"></div>
-        <div class="mode-buttons"><div class="mode-btn" id="quickModeBtn" onclick="setMode('quick')">⚡ تشخيص سريع</div><div class="mode-btn" id="advancedModeBtn" onclick="setMode('advanced')">🧠 تشخيص متقدم (4 حساسات)</div></div>
-        <div class="sensors">
-            <div class="sensor-btn" data-sensor="cam" id="btn-cam" onclick="startCamera()"><i class="fas fa-camera sensor-icon"></i><span id="sensor-cam">كاميرا</span><button class="stop-btn" id="stop-cam" onclick="event.stopPropagation();stopSensor('camera')">إيقاف</button></div>
-            <div class="sensor-btn" data-sensor="mic" id="btn-mic" onclick="startMicrophone()"><i class="fas fa-microphone sensor-icon"></i><span id="sensor-mic">ميكروفون</span><button class="stop-btn" id="stop-mic" onclick="event.stopPropagation();stopSensor('microphone')">إيقاف</button></div>
-            <div class="sensor-btn" data-sensor="vib" id="btn-vib" onclick="startVibration()"><i class="fas fa-wave-square sensor-icon"></i><span id="sensor-vib">اهتزاز</span><button class="stop-btn" id="stop-vib" onclick="event.stopPropagation();stopSensor('vibration')">إيقاف</button></div>
-            <div class="sensor-btn" data-sensor="temp" id="btn-temp" onclick="startTemperature()"><i class="fas fa-thermometer-half sensor-icon"></i><span id="sensor-temp">حرارة</span><button class="stop-btn" id="stop-temp" onclick="event.stopPropagation();stopSensor('temperature')">إيقاف</button></div>
+
+    <div class="subscription-section">
+        <div class="free-row">
+            <div class="free-card"><span class="title">🎁 <span id="freeLabel">تشخيصات مجانية</span></span><span class="free-counter" id="freeCounterDisplay">3</span></div>
         </div>
-        <div class="action-row"><button onclick="startSpeechToText()">🎤 تحدث لوصف المشكلة</button><button onclick="exportToCSV()">📊 تصدير التاريخ (CSV)</button></div>
+        <div class="paid-row">
+            <div class="paid-card" onclick="buySingle()"><div class="title" id="paid-single-title">🔧</div><div class="value" id="paid-single-value"></div></div>
+            <div class="paid-card" onclick="buyPack5()"><div class="title" id="paid-pack5-title">📦</div><div class="value" id="paid-pack5-value"></div></div>
+            <div class="paid-card" onclick="buyPack15()"><div class="title" id="paid-pack15-title">🏆</div><div class="value" id="paid-pack15-value"></div></div>
+        </div>
+    </div>
+
+    <input type="text" class="code-input" id="code-input" id="code-input" placeholder="🔑 Code MOULOUD2026">
+    <div class="gold-divider"></div>
+    <div class="devices" id="home-grid"></div>
+    <div id="lab-ui">
+        <div class="lab-header"><button class="back-btn" onclick="closeLab()">↩️ <span id="back-label">Back</span></button><div class="device-label" id="lab-device-name">…</div><div style="width:40px"></div></div>
+        <div class="credit-lab" id="creditLabDisplay"></div>
+        <div class="mode-buttons"><div class="mode-btn" id="quickModeBtn" onclick="toggleNormalMode()">⚡ …</div><div class="mode-btn" id="advancedModeBtn" onclick="activateSmartMode()">🧠 …</div></div>
+        <div class="sensors">
+            <div class="sensor-btn" id="sensor-cam-btn" onclick="toggleSensor('camera')"><i class="fas fa-camera sensor-icon"></i><span class="sensor-name" id="sensor-cam">…</span><button class="stop-btn" onclick="event.stopPropagation();stopSensor('camera')">إيقاف</button></div>
+            <div class="sensor-btn" id="sensor-mic-btn" onclick="toggleSensor('microphone')"><i class="fas fa-microphone sensor-icon"></i><span class="sensor-name" id="sensor-mic">…</span><button class="stop-btn" onclick="event.stopPropagation();stopSensor('microphone')">إيقاف</button></div>
+            <div class="sensor-btn" id="sensor-vib-btn" onclick="toggleSensor('vibration')"><i class="fas fa-wave-square sensor-icon"></i><span class="sensor-name" id="sensor-vib">…</span><button class="stop-btn" onclick="event.stopPropagation();stopSensor('vibration')">إيقاف</button></div>
+            <div class="sensor-btn" id="sensor-temp-btn" onclick="toggleSensor('temperature')"><i class="fas fa-thermometer-half sensor-icon"></i><span class="sensor-name" id="sensor-temp">…</span><button class="stop-btn" onclick="event.stopPropagation();stopSensor('temperature')">إيقاف</button></div>
+        </div>
         <div class="monitor-area" id="monitor-area"><div style="padding:20px;color:#94a3b8">🔌 فعّل حساساً لعرض البيانات الحية</div></div>
         <div id="stepIndicator" class="step-indicator hidden"></div>
         <div class="live-report" id="live-report">انتظار تفعيل الحساسات...</div>
-        <div class="action-btns"><button class="cancel" onclick="closeLab()">إلغاء</button><button class="pdf" onclick="generatePDF()">📄 تقرير PDF</button><button onclick="exportCurrentToCSV()" class="csv">📊 حفظ هذا التشخيص</button><button onclick="sendReportEmail()" class="email">📧 إرسال التقرير</button></div>
-        <button class="speak-new-btn" id="newSpeakBtn" onclick="speakResult()">🔊 <span id="newListenText">استمع إلى الخلاصة</span></button>
-        <div class="rating-bar"><span>تقييم</span><div class="stars" id="rating-stars"><span onclick="setRating(1)">★</span><span onclick="setRating(2)">★</span><span onclick="setRating(3)">★</span><span onclick="setRating(4)">★</span><span onclick="setRating(5)">★</span></div></div>
+        
+        <div class="action-buttons-group">
+            <button class="speak-btn" id="speechBtn" onclick="startSpeechToText()">🎤 …</button>
+        </div>
+        <div class="action-buttons-group">
+            <button class="btn-blue-light" onclick="generatePDF()">📄 PDF</button>
+            <button class="btn-green-light" onclick="exportCurrentToCSV()">📊 …</button>
+            <button class="btn-purple-light" onclick="sendReportEmail()">📧 …</button>
+            <button class="listen-gold" onclick="speakResult()">🔊 …</button>
+            <button class="cancel-red" id="cancelDiagBtn" onclick="cancelDiagnosis()">❌ …</button>
+        </div>
+        
+        <div class="rating-bar"><span id="rating-label">…</span><div class="stars" id="rating-stars"><span onclick="setRating(1)">★</span><span onclick="setRating(2)">★</span><span onclick="setRating(3)">★</span><span onclick="setRating(4)">★</span><span onclick="setRating(5)">★</span></div></div>
         <div id="rating-msg"></div>
+        <div id="resultIcons" class="result-icons hidden"></div>
     </div>
-    <div class="footer"><div>© 2026 Engine Diagnostics Pro</div><div>moulkamali-boop.github.io/engine-diagnostic</div></div>
+    <div class="footer"><span>AI Engine Diagnostics | V2.0 |© 2026</span> <span>https://moulkamali-boop.github.io/engine-diagnostic</span></div>
 </div>
-
-<div id="packModal" class="modal-pack">
-    <div class="modal-pack-content">
-        <h3 id="modalTitle">اختر الحزمة</h3>
-        <button id="pack5Btn">5 – 8$</button>
-        <button id="pack15Btn">15 – 20$</button>
-        <button onclick="closePackModal()" style="background:#334155;" id="modalCancelBtn">إلغاء</button>
-    </div>
-</div>
-
+<div id="packModal" class="modal-pack"><div class="modal-pack-content"><h3 id="modalTitle">…</h3><button id="pack5Btn">5 – 8$</button><button id="pack15Btn">15 – 20$</button><button onclick="closePackModal()" style="background:#334155;" id="modalCancelBtn">إلغاء</button></div></div>
 <div id="toast" class="toast"></div>
 
 <script>
-// ==================== الترجمة الكاملة لـ 39 لغة - كتابة ونطقاً ====================
+// ==================== 54 لغة كاملة (نفس نظام البيت) ====================
 const enBase = {
-    mainTitle:"AI Engine Diagnostics Pro", free_l1:"Free Trial", free_l2:"$0", free_l3:"One-time",
-    monthly_l1:"Single", monthly_l2:"$2", monthly_l3:"Pay per use",
-    yearly_l1:"Diagnostic Packs", yearly_l2:"$8 / $20", yearly_l3:"5/8$ • 15/20$",
-    engine:"Car Engine", truck:"Truck Engine", motorcycle:"Motorcycle", boat:"Boat Engine", tractor:"Tractor", generator:"Generator",
-    camera:"Camera", mic:"Microphone", vibration:"Vibration", temp:"Temperature",
-    back:"Back", cancel:"Cancel", pdf:"PDF Report", rating:"Rating", listen:"Listen to summary",
-    activate:"Activate sensor", scan_qr:"Subscription Code", diag_result:"Diagnosis Results", report_title:"Diagnostic Report", sub_type:"Plan",
-    date:"Date", time:"Time", location:"Location", free_active:"✅ Free trial activated (one time)", limit_exceed:"⚠️ Limit exceeded (3 free unused)",
-    admin_on:"🔓 Admin ON", admin_off:"🔒 Admin OFF", normal:"No clear fault",
-    quick_diag:"Quick Diagnosis", advanced_diag:"Advanced (4 Sensors)", speak_desc:"Describe problem",
-    export_history:"Export History", save_diagnosis:"Save Diagnosis", send_report:"Send Report",
-    poor:"Poor", acceptable:"Acceptable", good:"Good", excellent:"Excellent", professional:"Professional",
-    waiting:"Waiting for sensors...", no_summary:"No summary", stop:"Stop", fault_vibration:"Engine vibration", fault_solution:"Check engine mounts",
-    step_camera:"📷 Step 1/4: Point camera at engine (8 sec)", step_mic:"🎙️ Step 2/4: Record engine sound (8 sec)",
-    step_vib:"📳 Step 3/4: Place phone on engine (8 sec)", step_temp:"🌡️ Step 4/4: Measuring temperature...",
-    temp_estimate:"Engine Temperature Estimate", vibration_label:"Vibration:", camera_start:"▶️ Starting camera", mic_start:"🎙️ Starting microphone",
-    speak_now:"Speak now...", added:"Added", try_again:"Try again", camera_error:"Cannot access camera", mic_error:"Cannot access mic",
-    vibration_not_supported:"Vibration not supported", email_subject:"Diagnostic Report", email_body_header:"Report",
-    credits_display:"💰 Credits: {{credits}}", no_credits:"⚠️ You have no credits. Please buy more from the cards above.",
-    credits_added:"✅ {{amount}} diagnosis(es) added to your credits!",
-    stop_sensors_first:"Stop current sensors first", no_history:"No history", exported:"Exported", saved:"Saved", email_opened:"Email opened",
-    diagnosis_in_progress:"Diagnosis already in progress", collecting_data:"⏳ Diagnosing", remaining_seconds:"s left",
-    speaking:"🔊 Speaking...", credits_unit:"credit", one_diagnostic:"for one diagnosis",
-    choose_pack:"Choose a pack", cancel_btn:"Cancel",
-    pack5_label:"5 – 8$", pack15_label:"15 – 20$"
+    mainTitle:"Smart Engine Diagnosis", freeLabel:"Free diagnoses", freeCounterText:"Free left: {{count}}/3", free_l1:"Free Trial", free_l2:"$0", free_l3:"One-time", monthly_l1:"Single", monthly_l2:"$2", monthly_l3:"Pay per use", yearly_l1:"Packs", yearly_l2:"$8/$20", yearly_l3:"5/8$ • 15/20$", pack5_label:"5 – $8", pack15_label:"15 – $20", choose_pack:"Choose a pack", cancel_btn:"Cancel",
+    engine:"Car Engine", truck:"Truck Engine", motorcycle:"Motorcycle Engine", boat:"Boat Engine", tractor:"Tractor Engine", generator:"Generator Engine",
+    camera:"Camera", mic:"Microphone", vibration:"Vibration", temp:"Temperature", back:"Back", cancel:"Cancel", pdf:"PDF Report (A4)", rating:"Rating", listen:"Listen to result", activate:"Activate sensor", scan_qr:"Subscription Code", diag_result:"Diagnosis Results", report_title:"Engine Diagnostic Report", sub_type:"Plan",
+    date:"Date", time:"Time", location:"Location", free_active:"✅ Free trial activated", limit_exceed:"⚠️ No free credits left", admin_on:"🔓 Admin ON", admin_off:"🔒 Admin OFF", normal:"No clear fault",
+    quick_diag:"Normal diagnosis", advanced_diag:"Smart diagnosis", speak_desc:"Describe problem by voice", export_history:"Export History", save_diagnosis:"Save Diagnosis", send_report:"Send Report",
+    poor:"Poor", acceptable:"Acceptable", good:"Good", excellent:"Excellent", professional:"Professional", waiting:"Waiting for sensors...", no_summary:"No result yet", stop:"Stop", fault_vibration:"Abnormal vibration", fault_solution:"Check engine mounts",
+    step_camera:"📷 Camera: 15 sec", step_mic:"🎙️ Microphone: 15 sec", step_vib:"📳 Vibration: 15 sec", step_temp:"🌡️ Temperature: 15 sec",
+    temp_estimate:"Engine Temperature", vibration_label:"Vibration:", camera_start:"▶️ Camera active", mic_start:"🎙️ Microphone active", speak_now:"Speak now...", added:"Added", try_again:"Try again", camera_error:"Cannot access camera", mic_error:"Cannot access mic",
+    vibration_not_supported:"Vibration not supported", email_subject:"Engine Diagnostic Report", email_body_header:"Report", no_credits:"⚠️ No credits left. Please buy more.", credits_added:"✅ {{amount}} diagnosis(es) added!", stop_sensors_first:"Stop current sensors first", no_history:"No history", exported:"Exported", saved:"Saved", email_opened:"Email opened",
+    diagnosis_in_progress:"Diagnosis in progress", collecting_data:"⏳ Smart diagnosis", remaining_seconds:"s left", speaking:"🔊 Speaking...", choose_pack:"Choose a pack", cancel_btn:"Cancel",
+    finish_manual:"✅ Finish manual diagnosis", cancel_smart:"Cancel smart diagnosis", instruction_camera:"Point camera at engine (15 sec)", instruction_mic:"Record engine sound (15 sec)", instruction_vib:"Place phone on engine block (15 sec)", instruction_temp:"Measure engine temperature (15 sec)",
+    normal_diag:"Normal diagnosis", smart_diag:"Smart diagnosis", credit_info:"Free diagnoses left: {{left}}/3", icon_normal:"Normal", icon_warning:"Warning", icon_fault:"Fault", icon_info:"Info",
+    report_header:"OFFICIAL ENGINE DIAGNOSTIC REPORT", signature:"AI Engine Diagnostics", subscription_status:"Subscription Plan"
 };
-
-const arTranslations = {
-    mainTitle:"تشخيص المحركات بالذكاء الاصطناعي", free_l1:"تشخيص مجاني", free_l2:"0$", free_l3:"تجربة واحدة",
-    monthly_l1:"تشخيص واحد", monthly_l2:"2$", monthly_l3:"للاستخدام الفردي",
-    yearly_l1:"حزم تشخيصية", yearly_l2:"8$ / 20$", yearly_l3:"5/8$ • 15/20$",
+const arTrans = {
+    mainTitle:"تشخيص المحرك الذكي", freeLabel:"تشخيصات مجانية", freeCounterText:"تشخيصات مجانية متبقية: {{count}}/3", free_l1:"تجربة مجانية", free_l2:"0$", free_l3:"مرة واحدة", monthly_l1:"تشخيص واحد", monthly_l2:"2$", monthly_l3:"للاستخدام الفردي", yearly_l1:"حزم تشخيصية", yearly_l2:"8$ / 20$", yearly_l3:"5/8$ • 15/20$", pack5_label:"5 – 8$", pack15_label:"15 – 20$", choose_pack:"اختر الحزمة", cancel_btn:"إلغاء",
     engine:"محرك سيارة", truck:"محرك شاحنة", motorcycle:"محرك دراجة", boat:"محرك قارب", tractor:"محرك جرار", generator:"محرك مولد",
-    camera:"كاميرا", mic:"ميكروفون", vibration:"اهتزاز", temp:"حرارة",
-    back:"رجوع", cancel:"إلغاء", pdf:"تقرير PDF", rating:"تقييم", listen:"استمع إلى الخلاصة",
-    activate:"فعّل حساساً", scan_qr:"رمز الاشتراك", diag_result:"نتائج التشخيص", report_title:"تقرير تشخيصي", sub_type:"الاشتراك",
-    date:"التاريخ", time:"الوقت", location:"المكان", free_active:"✅ تم تفعيل التشخيص المجاني (مرة واحدة)", limit_exceed:"⚠️ تجاوزت الحد المسموح (3 تشخيصات مجانية غير مستخدمة)",
-    admin_on:"🔓 المدير مفعل", admin_off:"🔒 المدير مغلق", normal:"لا يوجد عطل واضح",
-    quick_diag:"تشخيص سريع", advanced_diag:"تشخيص متقدم (4 حساسات)", speak_desc:"تحدث لوصف المشكلة",
-    export_history:"تصدير التاريخ", save_diagnosis:"حفظ هذا التشخيص", send_report:"إرسال التقرير",
-    poor:"ضعيف", acceptable:"مقبول", good:"جيد", excellent:"ممتاز", professional:"احترافي",
-    waiting:"انتظار تفعيل الحساسات...", no_summary:"لا توجد خلاصة", stop:"إيقاف", fault_vibration:"اهتزاز بالمحرك", fault_solution:"فحص كراسي المحرك",
-    step_camera:"📷 الخطوة 1/4: وجّه الكاميرا نحو المحرك (8 ثوانٍ)", step_mic:"🎙️ الخطوة 2/4: سجل صوت المحرك (8 ثوانٍ)", step_vib:"📳 الخطوة 3/4: ضع الهاتف على المحرك (8 ثوانٍ)", step_temp:"🌡️ الخطوة 4/4: قياس درجة الحرارة...",
-    temp_estimate:"تقدير حرارة المحرك", vibration_label:"الاهتزاز:", camera_start:"▶️ تشغيل الكاميرا", mic_start:"🎙️ تشغيل الميكروفون",
-    speak_now:"تحدث الآن...", added:"تمت الإضافة", try_again:"حاول مرة أخرى", camera_error:"تعذر الوصول إلى الكاميرا", mic_error:"تعذر الوصول إلى الميكروفون", vibration_not_supported:"الاهتزاز غير مدعوم",
-    email_subject:"تقرير تشخيصي", email_body_header:"التقرير",
-    credits_display:"💰 رصيدك: {{credits}}", no_credits:"⚠️ رصيدك انتهى. اشترِ تشخيصات جديدة من البطاقات أعلاه.", credits_added:"✅ تمت إضافة {{amount}} تشخيص إلى رصيدك!",
-    stop_sensors_first:"أوقف الحساسات الحالية أولاً", no_history:"لا يوجد تاريخ", exported:"تم التصدير", saved:"تم الحفظ", email_opened:"تم فتح البريد",
-    diagnosis_in_progress:"التشخيص قيد التنفيذ بالفعل", collecting_data:"⏳ جاري التشخيص", remaining_seconds:"ث متبقية", speaking:"🔊 جارٍ التحدث...", credits_unit:"تشخيص", one_diagnostic:"لتشخيص واحد",
-    choose_pack:"اختر الحزمة", cancel_btn:"إلغاء",
-    pack5_label:"5 – 8$", pack15_label:"15 – 20$"
+    camera:"كاميرا", mic:"ميكروفون", vibration:"اهتزاز", temp:"حرارة", back:"رجوع", cancel:"إلغاء", pdf:"تقرير PDF (A4)", rating:"تقييم", listen:"استمع للنتيجة", activate:"فعّل حساساً", scan_qr:"رمز الاشتراك", diag_result:"نتائج التشخيص", report_title:"تقرير تشخيص المحرك", sub_type:"الاشتراك",
+    date:"التاريخ", time:"الوقت", location:"المكان", free_active:"✅ تم تفعيل المجاني", limit_exceed:"⚠️ لا يوجد رصيد", admin_on:"🔓 المدير مفعل", admin_off:"🔒 المدير مغلق", normal:"لا يوجد عطل واضح",
+    quick_diag:"تشخيص عادي", advanced_diag:"تشخيص ذكي", speak_desc:"تحدث لوصف المشكلة", export_history:"تصدير التاريخ", save_diagnosis:"حفظ التشخيص", send_report:"إرسال التقرير",
+    poor:"ضعيف", acceptable:"مقبول", good:"جيد", excellent:"ممتاز", professional:"احترافي", waiting:"انتظار الحساسات...", no_summary:"لا توجد نتيجة", stop:"إيقاف", fault_vibration:"اهتزاز غير طبيعي", fault_solution:"افحص كراسي المحرك",
+    step_camera:"📷 الكاميرا: 15 ثانية", step_mic:"🎙️ الميكروفون: 15 ثانية", step_vib:"📳 الاهتزاز: 15 ثانية", step_temp:"🌡️ الحرارة: 15 ثانية",
+    temp_estimate:"تقدير حرارة المحرك", vibration_label:"الاهتزاز:", camera_start:"▶️ الكاميرا تعمل", mic_start:"🎙️ الميكروفون يعمل", speak_now:"تحدث الآن...", added:"تمت الإضافة", try_again:"حاول مرة أخرى", camera_error:"تعذر الوصول للكاميرا", mic_error:"تعذر الوصول للميكروفون",
+    vibration_not_supported:"الاهتزاز غير مدعوم", email_subject:"تقرير تشخيص المحرك", email_body_header:"التقرير", no_credits:"⚠️ رصيدك انتهى. اشترِ من البطاقات.", credits_added:"✅ تمت إضافة {{amount}} تشخيص!", stop_sensors_first:"أوقف الحساسات أولاً", no_history:"لا يوجد تاريخ", exported:"تم التصدير", saved:"تم الحفظ", email_opened:"تم فتح البريد",
+    diagnosis_in_progress:"التشخيص قيد التنفيذ", collecting_data:"⏳ التشخيص الذكي", remaining_seconds:"ث متبقية", speaking:"🔊 جارٍ التحدث...", choose_pack:"اختر الحزمة", cancel_btn:"إلغاء",
+    finish_manual:"✅ إنهاء التشخيص العادي", cancel_smart:"إلغاء التشخيص الذكي", instruction_camera:"صوّر المحرك (15 ثانية)", instruction_mic:"سجل صوت المحرك (15 ثانية)", instruction_vib:"ضع الهاتف على المحرك (15 ثانية)", instruction_temp:"قس حرارة المحرك (15 ثانية)",
+    normal_diag:"تشخيص عادي", smart_diag:"تشخيص ذكي", credit_info:"تشخيصات مجانية متبقية: {{left}}/3", icon_normal:"طبيعي", icon_warning:"تحذير", icon_fault:"عطل", icon_info:"معلومات",
+    report_header:"تقرير تشخيص المحرك الرسمي", signature:"تشخيص المحرك الذكي", subscription_status:"الباقة المشتركة"
 };
-
 const frTranslations = {
     mainTitle:"Diagnostic Moteur IA", free_l1:"Essai gratuit", free_l2:"0$", free_l3:"Unique",
     monthly_l1:"Unique", monthly_l2:"2$", monthly_l3:"À l'unité", yearly_l1:"Packs diagnostic", yearly_l2:"8$ / 20$", yearly_l3:"5/8$ • 15/20$",
@@ -1051,7 +1039,6 @@ const msTranslations = {
     choose_pack:"Pilih pakej", cancel_btn:"Batal", pack5_label:"5 – 8$", pack15_label:"15 – 20$"
 };
 
-// ==================== اللغات الجديدة - 15 لغة إضافية ====================
 const bnTranslations = {
     mainTitle:"AI ইঞ্জিন ডায়াগনস্টিকস প্রো", free_l1:"বিনামূল্যে ট্রায়াল", free_l2:"0$", free_l3:"একবার",
     monthly_l1:"একক", monthly_l2:"2$", monthly_l3:"প্রতি ব্যবহারে", yearly_l1:"ডায়াগনস্টিক প্যাকেজ", yearly_l2:"8$ / 20$", yearly_l3:"5/8$ • 15/20$",
@@ -1397,576 +1384,262 @@ const soTranslations = {
     choose_pack:"Xir doorso", cancel_btn:"Jooji", pack5_label:"5 – 8$", pack15_label:"15 – 20$"
 };
 
-// ==================== خريطة جميع الترجمات - 54 لغة ====================
 const translations = {
-    ar: arTranslations, en: enBase, fr: frTranslations, es: esTranslations,
-    de: deTranslations, it: itTranslations, pt: ptTranslations, ru: ruTranslations,
-    zh: zhTranslations, ja: jaTranslations, ko: koTranslations, tr: trTranslations,
-    nl: nlTranslations, pl: plTranslations, hi: hiTranslations, id: idTranslations,
-    fa: faTranslations, ur: urTranslations, sw: swTranslations, vi: viTranslations,
-    el: elTranslations, cs: csTranslations, he: heTranslations, th: thTranslations,
-    uk: ukTranslations, ro: roTranslations, hu: huTranslations, sv: svTranslations,
-    da: daTranslations, fi: fiTranslations, no: noTranslations, sk: skTranslations,
-    bg: bgTranslations, hr: hrTranslations, lt: ltTranslations, lv: lvTranslations,
-    et: etTranslations, sl: slTranslations, ms: msTranslations,
-    bn: bnTranslations, pa: paTranslations, ta: taTranslations, te: teTranslations,
-    mr: mrTranslations, ha: haTranslations, tl: tlTranslations, gu: guTranslations,
-    am: amTranslations, yo: yoTranslations, uz: uzTranslations, my: myTranslations,
-    az: azTranslations, ig: igTranslations, so: soTranslations
+    ar: arTrans, en: enBase,
+    fr: frTranslations, es: esTranslations, de: deTranslations, it: itTranslations,
+    pt: ptTranslations, ru: ruTranslations, zh: zhTranslations, ja: jaTranslations,
+    ko: koTranslations, tr: trTranslations, nl: nlTranslations, pl: plTranslations,
+    hi: hiTranslations, id: idTranslations, fa: faTranslations, ur: urTranslations,
+    sw: swTranslations, vi: viTranslations, el: elTranslations, cs: csTranslations,
+    he: heTranslations, th: thTranslations, uk: ukTranslations, ro: roTranslations,
+    hu: huTranslations, sv: svTranslations, da: daTranslations, fi: fiTranslations,
+    no: noTranslations, sk: skTranslations, bg: bgTranslations, hr: hrTranslations,
+    lt: ltTranslations, lv: lvTranslations, et: etTranslations, sl: slTranslations,
+    ms: msTranslations, bn: bnTranslations, pa: paTranslations, ta: taTranslations,
+    te: teTranslations, mr: mrTranslations, ha: haTranslations, tl: tlTranslations,
+    gu: guTranslations, am: amTranslations, yo: yoTranslations, uz: uzTranslations,
+    my: myTranslations, az: azTranslations, ig: igTranslations, so: soTranslations
 };
+const langList = ["ar","en","fr","es","de","it","pt","ru","zh","ja","ko","tr","nl","pl","hi","id","fa","ur","sw","vi","el","cs","he","th","uk","ro","hu","sv","da","fi","no","sk","bg","hr","lt","lv","et","sl","ms","bn","pa","ta","te","mr","ha","tl","gu","am","yo","uz","my","az","ig","so"];
+const langNative = { ar:"🇸🇦 العربية", en:"🇬🇧 English", fr:"🇫🇷 Français", es:"🇪🇸 Español", de:"🇩🇪 Deutsch", it:"🇮🇹 Italiano", pt:"🇵🇹 Português", ru:"🇷🇺 Русский", zh:"🇨🇳 中文", ja:"🇯🇵 日本語", ko:"🇰🇷 한국어", tr:"🇹🇷 Türkçe", nl:"🇳🇱 Nederlands", pl:"🇵🇱 Polski", hi:"🇮🇳 हिन्दी", id:"🇮🇩 Indonesia", fa:"🇮🇷 فارسی", ur:"🇵🇰 اردو", sw:"🇰🇪 Kiswahili", vi:"🇻🇳 Tiếng Việt", el:"🇬🇷 Ελληνικά", cs:"🇨🇿 Čeština", he:"🇮🇱 עברית", th:"🇹🇭 ไทย", uk:"🇺🇦 Українська", ro:"🇷🇴 Română", hu:"🇭🇺 Magyar", sv:"🇸🇪 Svenska", da:"🇩🇰 Dansk", fi:"🇫🇮 Suomi", no:"🇳🇴 Norsk", sk:"🇸🇰 Slovenčina", bg:"🇧🇬 Български", hr:"🇭🇷 Hrvatski", lt:"🇱🇹 Lietuvių", lv:"🇱🇻 Latviešu", et:"🇪🇪 Eesti", sl:"🇸🇮 Slovenščina", ms:"🇲🇾 Melayu", bn:"🇧🇩 বাংলা", pa:"🇮🇳 ਪੰਜਾਬੀ", ta:"🇮🇳 தமிழ்", te:"🇮🇳 తెలుగు", mr:"🇮🇳 मराठी", ha:"🇳🇬 Hausa", tl:"🇵🇭 Filipino", gu:"🇮🇳 ગુજરાતી", am:"🇪🇹 አማርኛ", yo:"🇳🇬 Yorùbá", uz:"🇺🇿 O'zbek", my:"🇲🇲 မြန်မာ", az:"🇦🇿 Azərbaycan", ig:"🇳🇬 Igbo", so:"🇸🇴 Soomaali" };
+async function fetchTranslation(t,l){return t;}
+async function ensureTranslations(lang){}
+function t(key, vars={}) { let str = translations[state.lang]?.[key] ?? translations.en?.[key] ?? key; for(let k in vars) str = str.replace(new RegExp(`{{${k}}}`, 'g'), vars[k]); return str; }
 
-// اتجاه النص لكل لغة
-const rtlLangs = new Set(['ar', 'fa', 'ur', 'he']);
-
-function t(key, vars = {}) {
-    let str = translations[state.lang]?.[key] ?? translations.en?.[key] ?? key;
-    for (let k in vars) str = str.replace(new RegExp(`{{${k}}}`, 'g'), vars[k]);
-    return str;
-}
-
-// ==================== APP STATE ====================
+// ==================== حالة التطبيق (محركات) ====================
 let state = {
     lang: 'ar', deviceID: Math.random().toString(36).slice(2,10).toUpperCase(),
-    currentPlan: 'free', diagnostics: JSON.parse(localStorage.getItem('auto_diag_log') || '{}'),
-    currentDevice: null, currentSensor: null,
-    currentStreams: { camera: null, microphone: null, vibration: null, temperature: null },
-    currentIntervals: { vibration: null, temperature: null }, vibrationHandler: null,
+    currentDevice: null, currentStreams: { camera: null, microphone: null },
     sensorStatus: { camera: false, microphone: false, vibration: false, temperature: false },
-    reportLines: [], finalDiagnosis: '',
-    isAdmin: localStorage.getItem('auto_isAdmin') === 'true',
-    diagnosisHistory: JSON.parse(localStorage.getItem('diagnosis_history') || '[]'),
-    currentMode: 'quick',
-    soundAnalysis: { level: 0 },
-    vibrationAvg: 0, vibrationMax: 0,
-    temperature: 85,
-    imageDescription: '',
-    audioDescription: '',
-    processingAdvanced: false
+    currentIntervals: { vibration: null, temperature: null }, vibrationHandler: null,
+    reportLines: [], finalDiagnosis: '', isAdmin: localStorage.getItem('engine_isAdmin') === 'true',
+    diagnosisHistory: JSON.parse(localStorage.getItem('engine_diagnosis_history') || '[]'),
+    currentMode: null, soundAnalysis: { level: 0 }, vibrationAvg: 0, temperature: 85,
+    imageDescription: '', audioDescription: '', freeCreditsUsed: parseInt(localStorage.getItem('engine_freeCreditsUsed') || '0'),
+    paidCredits: parseInt(localStorage.getItem('engine_paid_credits') || '0'), sensorsEnabled: false,
+    smartActive: false, recognition: null
 };
-if (state.isAdmin) state.currentPlan = 'yearly';
+function getFreeLeft() { let left = 3 - state.freeCreditsUsed; return left < 0 ? 0 : left; }
+function useFreeCredit() { if(state.isAdmin) return true; if(getFreeLeft()<=0) return false; state.freeCreditsUsed++; localStorage.setItem('engine_freeCreditsUsed', state.freeCreditsUsed); updateCreditDisplay(); return true; }
+function getPaidCredits() { return state.paidCredits; }
+function setPaidCredits(val) { state.paidCredits = val; localStorage.setItem('engine_paid_credits', val); updateCreditDisplay(); }
+function addPaidCredits(amount) { setPaidCredits(getPaidCredits()+amount); }
+function usePaidCredit() { if(getPaidCredits()<=0) return false; setPaidCredits(getPaidCredits()-1); return true; }
+function totalCreditsLeft() { return getFreeLeft() + getPaidCredits(); }
+function updateCreditDisplay() { let free = getFreeLeft(); document.getElementById('freeCounterDisplay').innerHTML = free; document.getElementById('creditLabDisplay').innerHTML = t('credit_info', {left: free}); }
+function useDiagnosisCredit() { if(getFreeLeft()>0) return useFreeCredit(); if(getPaidCredits()>0) return usePaidCredit(); return false; }
+function showToast(msg){ let x=document.getElementById("toast"); x.textContent=msg; x.classList.add("show"); setTimeout(()=>x.classList.remove("show"),2500); }
+let adminClicks=0,adminTimer;
+function triggerAdmin(){ adminClicks++; clearTimeout(adminTimer); adminTimer=setTimeout(()=>{adminClicks=0;},2000); if(adminClicks>=5){ state.isAdmin=!state.isAdmin; localStorage.setItem('engine_isAdmin',state.isAdmin); showToast(state.isAdmin?t('admin_on'):t('admin_off')); updateCreditDisplay(); adminClicks=0; } }
+function saveToHistory(diagnosis){ state.diagnosisHistory.unshift({date:new Date().toISOString(),device:state.currentDevice,diagnosis}); if(state.diagnosisHistory.length>50) state.diagnosisHistory.pop(); localStorage.setItem('engine_diagnosis_history',JSON.stringify(state.diagnosisHistory)); }
 
-// ==================== نظام الرصيد ====================
-function getCredits() {
-    try {
-        let c = localStorage.getItem('diagnostic_credits');
-        if (c === null) return 1;
-        let val = parseInt(c);
-        return isNaN(val) ? 1 : val;
-    } catch (e) { return 1; }
-}
-function setCredits(val) { localStorage.setItem('diagnostic_credits', val); updateCreditDisplays(); }
-function addCredits(amount) { let c = getCredits(); setCredits(c + amount); }
-function useCredit() { let c = getCredits(); if (c <= 0) return false; setCredits(c - 1); return true; }
-function updateCreditDisplays() {
-    let cr = getCredits();
-    let mainDisp = document.getElementById('creditDisplay');
-    let labDisp = document.getElementById('creditLabDisplay');
-    let txt = t('credits_display', { credits: cr });
-    if (mainDisp) mainDisp.innerHTML = `<div class="credit-amount">${txt}</div><div class="credit-label">${t('one_diagnostic')}</div>`;
-    if (labDisp) labDisp.innerText = txt;
-}
-function processPaymentReturn() {
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('payment') === 'success') {
-        const pack = urlParams.get('pack');
-        let add = 0;
-        if (pack === 'single') add = 1;
-        else if (pack === '5') add = 5;
-        else if (pack === '15') add = 15;
-        if (add > 0) {
-            addCredits(add);
-            showToast(t('credits_added', { amount: add }));
-            window.history.replaceState({}, '', window.location.pathname);
-            updateCreditDisplays();
-        }
-    }
-}
-
-// ==================== دوال الواجهة ====================
-function showToast(msg) { let x = document.getElementById("toast"); x.textContent = msg; x.classList.add("show"); setTimeout(() => x.classList.remove("show"), 2500); }
-function updateSubUI() { let active = state.isAdmin ? 'yearly' : state.currentPlan; document.querySelectorAll('.sub-card').forEach(c => c.classList.toggle('active', c.dataset.plan === active)); }
-function buildSubscriptions() {
-    document.getElementById('subs-grid').innerHTML = `
-        <div class="sub-card" data-plan="free" onclick="activateFree()">
-            <div class="line1">🎁 ${t('free_l1')}</div>
-            <div class="line2">${t('free_l2')}</div>
-            <div class="line3">${t('free_l3')}</div>
-        </div>
-        <div class="sub-card" data-plan="single" onclick="buySingle()">
-            <div class="line1">🔧 ${t('monthly_l1')}</div>
-            <div class="line2">${t('monthly_l2')}</div>
-            <div class="line3">${t('monthly_l3')}</div>
-        </div>
-        <div class="sub-card" data-plan="pack" onclick="showPackModal()">
-            <div class="line1">📦 ${t('yearly_l1')}</div>
-            <div class="line2">${t('yearly_l2')}</div>
-            <div class="line3">${t('yearly_l3')}</div>
-        </div>
-    `;
-    updateSubUI();
-}
-function activateFree() { showToast(t('free_active')); }
-function buySingle() { window.open("https://ai-moto-maintenance.lemonsqueezy.com/checkout/buy/16f76940-fbac-46fa-97a2-a14c43ab986d?checkout[success_url]=" + encodeURIComponent(window.location.href + "?payment=success&pack=single"), "_blank"); }
-function showPackModal() {
-    document.getElementById('modalTitle').innerText = t('choose_pack');
-    document.getElementById('modalCancelBtn').innerText = t('cancel_btn');
-    document.getElementById('pack5Btn').innerText = t('pack5_label');
-    document.getElementById('pack15Btn').innerText = t('pack15_label');
-    document.getElementById('packModal').style.display = 'flex';
-}
-function closePackModal() { document.getElementById('packModal').style.display = 'none'; }
-function buyPack5() { window.open("https://ai-moto-maintenance.lemonsqueezy.com/checkout/buy/54d3a421-481d-4cf9-a000-cd8e03c0f0fd?checkout[success_url]=" + encodeURIComponent(window.location.href + "?payment=success&pack=5"), "_blank"); closePackModal(); }
-function buyPack15() { window.open("https://ai-moto-maintenance.lemonsqueezy.com/checkout/buy/e483458f-9427-45e6-9d10-977ca5062c87?checkout[success_url]=" + encodeURIComponent(window.location.href + "?payment=success&pack=15"), "_blank"); closePackModal(); }
-document.getElementById('pack5Btn').onclick = buyPack5;
-document.getElementById('pack15Btn').onclick = buyPack15;
-
-function checkLimit() { if (state.isAdmin) return true; let log = state.diagnostics[state.deviceID] || { date: new Date().toDateString(), count: 0, plan: state.currentPlan }; if (log.date !== new Date().toDateString()) { log.count = 0; log.date = new Date().toDateString(); } let limits = { free: 3, monthly: 1, yearly: 1 }; if (log.count >= limits[log.plan]) { alert(t('limit_exceed')); return false; } return true; }
-function incrementUsage() { if (state.isAdmin) return; let log = state.diagnostics[state.deviceID] || { date: new Date().toDateString(), count: 0, plan: state.currentPlan }; if (log.date !== new Date().toDateString()) { log.count = 0; log.date = new Date().toDateString(); } log.count++; state.diagnostics[state.deviceID] = log; localStorage.setItem('auto_diag_log', JSON.stringify(state.diagnostics)); }
-let adminClicks = 0, adminTimer;
-function triggerAdmin() { adminClicks++; clearTimeout(adminTimer); adminTimer = setTimeout(() => { adminClicks = 0; }, 2000); if (adminClicks >= 5) { state.isAdmin = !state.isAdmin; localStorage.setItem('auto_isAdmin', state.isAdmin); showToast(state.isAdmin ? t('admin_on') : t('admin_off')); updateSubUI(); updateCreditDisplays(); adminClicks = 0; } }
-function setMode(mode) { state.currentMode = mode; document.getElementById('quickModeBtn').classList.toggle('active', mode === 'quick'); document.getElementById('advancedModeBtn').classList.toggle('active', mode === 'advanced'); if (mode === 'advanced') startIntegratedDiagnosis(); else showToast(t('activate')); }
-function saveToHistory(diagnosis, solution) { state.diagnosisHistory.unshift({ date: new Date().toISOString(), device: state.currentDevice, diagnosis, solution }); if (state.diagnosisHistory.length > 50) state.diagnosisHistory.pop(); localStorage.setItem('diagnosis_history', JSON.stringify(state.diagnosisHistory)); }
-function exportToCSV() { if (state.diagnosisHistory.length === 0) { showToast(t('no_history')); return; } let csv = "Date,Device,Diagnosis,Solution\n"; state.diagnosisHistory.forEach(h => { csv += `"${h.date}","${h.device}","${h.diagnosis}","${h.solution}"\n`; }); const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `diagnosis_history_${new Date().toISOString().slice(0, 19)}.csv`; link.click(); showToast(t('exported')); }
-function exportCurrentToCSV() { if (!state.finalDiagnosis) { showToast(t('no_history')); return; } const csv = `"Date","Device","Diagnosis","Solution"\n"${new Date().toISOString()}","${state.currentDevice}","${state.finalDiagnosis}","${state.finalDiagnosis}"`; const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `diagnosis_${new Date().toISOString().slice(0, 19)}.csv`; link.click(); showToast(t('saved')); }
-function sendReportEmail() { if (!state.finalDiagnosis) { showToast(t('no_history')); return; } const subject = `${t('email_subject')} - ${state.currentDevice}`; const body = `${t('email_body_header')}: ${new Date().toLocaleString()}\n${t('diag_result')}: ${state.finalDiagnosis}\n\n${state.reportLines.join('\n')}`; window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`; showToast(t('email_opened')); }
-
-// ==================== التعرف على الكلام (STT) - جميع اللغات ====================
-function startSpeechToText() {
-    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) { showToast(t('try_again')); return; }
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
-    const sttMap = {
-        ar: 'ar-SA', en: 'en-US', fr: 'fr-FR', es: 'es-ES', de: 'de-DE', it: 'it-IT',
-        pt: 'pt-PT', ru: 'ru-RU', zh: 'zh-CN', ja: 'ja-JP', ko: 'ko-KR', tr: 'tr-TR',
-        nl: 'nl-NL', pl: 'pl-PL', hi: 'hi-IN', id: 'id-ID', fa: 'fa-IR', ur: 'ur-PK',
-        sw: 'sw-KE', vi: 'vi-VN', el: 'el-GR', cs: 'cs-CZ', he: 'he-IL', th: 'th-TH',
-        uk: 'uk-UA', ro: 'ro-RO', hu: 'hu-HU', sv: 'sv-SE', da: 'da-DK', fi: 'fi-FI',
-        no: 'nb-NO', sk: 'sk-SK', bg: 'bg-BG', hr: 'hr-HR', lt: 'lt-LT', lv: 'lv-LV',
-        et: 'et-EE', sl: 'sl-SI', ms: 'ms-MY',
-        bn: 'bn-BD', pa: 'pa-IN', ta: 'ta-IN', te: 'te-IN', mr: 'mr-IN',
-        ha: 'ha-NG', tl: 'fil-PH', gu: 'gu-IN', am: 'am-ET', yo: 'yo-NG',
-        uz: 'uz-UZ', my: 'my-MM', az: 'az-AZ', ig: 'ig-NG', so: 'so-SO'
-    };
-    recognition.lang = sttMap[state.lang] || 'en-US';
-    recognition.interimResults = false;
-    recognition.start();
-    showToast(t('speak_now'));
-    recognition.onresult = (event) => {
-        const text = event.results[0][0].transcript;
-        state.reportLines.push(`🎤 ${text}`);
-        document.getElementById('live-report').innerHTML = state.reportLines.join('\n');
-        showToast(t('added'));
-        if (state.currentMode === 'quick') {
-            let quickDiag = `🔍 ${t('quick_diag')}: ${text}`;
-            state.finalDiagnosis = quickDiag;
-            document.getElementById('live-report').innerHTML = quickDiag;
-        }
-    };
-    recognition.onerror = () => showToast(t('try_again'));
-}
-
-// ==================== التشخيص المتقدم ====================
-let integratedStep = 0, diagnosisInProgress = false, timerInterval = null;
-async function startIntegratedDiagnosis() {
-    if (diagnosisInProgress) { showToast(t('diagnosis_in_progress')); return; }
-    let credits = getCredits();
-    if (credits <= 0 && !state.isAdmin) { showToast(t('no_credits')); return; }
-    if (Object.values(state.sensorStatus).some(s => s === true)) { showToast(t('stop_sensors_first')); return; }
-    if (!checkLimit()) return;
-    diagnosisInProgress = true;
-    integratedStep = 0;
-    document.getElementById('stepIndicator').classList.remove('hidden');
-    await runIntegratedStep();
-}
-async function runIntegratedStep() {
-    if (integratedStep === 0) {
-        let totalTime = 60;
-        const timerDiv = document.createElement('div');
-        timerDiv.className = 'progress-bar-container';
-        timerDiv.innerHTML = `<div class="progress-fill" id="timeProgress"></div><div class="timer-text" id="timerText">${t('collecting_data')} ${totalTime} ${t('remaining_seconds')}</div>`;
-        document.getElementById('monitor-area').appendChild(timerDiv);
-        let startTime = Date.now();
-        timerInterval = setInterval(() => {
-            let elapsed = (Date.now() - startTime) / 1000;
-            let remain = Math.max(0, totalTime - elapsed);
-            let pct = (elapsed / totalTime) * 100;
-            let pbar = document.getElementById('timeProgress');
-            let ttext = document.getElementById('timerText');
-            if (pbar) pbar.style.width = `${Math.min(100, pct)}%`;
-            if (ttext) ttext.innerText = `${t('collecting_data')} ${Math.ceil(remain)} ${t('remaining_seconds')}`;
-            if (remain <= 0) {
-                clearInterval(timerInterval);
-                if (pbar) pbar.style.width = '100%';
-                if (ttext) ttext.innerText = t('collecting_data');
-            }
-        }, 1000);
-        setTimeout(() => { if (timerInterval) clearInterval(timerInterval); const prog = document.querySelector('.progress-bar-container'); if (prog) prog.remove(); }, totalTime * 1000);
-    }
-    const steps = [
-        { name: 'camera', msg: t('step_camera'), action: captureCamera, instr: t('camera_start'), duration: 8000 },
-        { name: 'microphone', msg: t('step_mic'), action: captureMic, instr: t('mic_start'), duration: 8000 },
-        { name: 'vibration', msg: t('step_vib'), action: captureVibration, instr: t('vibration_label'), duration: 8000 },
-        { name: 'temperature', msg: t('step_temp'), action: captureTemp, instr: t('temp_estimate'), duration: 8000 }
-    ];
-    if (integratedStep >= steps.length) { if (timerInterval) clearInterval(timerInterval); await finalizeIntegratedDiagnosis(); return; }
-    const step = steps[integratedStep];
-    document.getElementById('stepIndicator').innerHTML = step.msg;
-    const oldMsg = document.querySelector('.step-msg');
-    if (oldMsg) oldMsg.remove();
-    const msgDiv = document.createElement('div');
-    msgDiv.className = 'step-msg';
-    msgDiv.style.padding = '20px';
-    msgDiv.style.color = '#94a3b8';
-    msgDiv.innerText = step.msg;
-    document.getElementById('monitor-area').appendChild(msgDiv);
-    await step.action();
-    msgDiv.remove();
-    integratedStep++;
-    await runIntegratedStep();
-}
-async function captureCamera() { return new Promise(resolve => setTimeout(resolve, 8000)); }
-async function captureMic() { return new Promise(resolve => setTimeout(resolve, 8000)); }
-async function captureVibration() { return new Promise(resolve => setTimeout(resolve, 8000)); }
-async function captureTemp() { return new Promise(resolve => setTimeout(resolve, 8000)); }
-async function finalizeIntegratedDiagnosis() {
-    if (timerInterval) clearInterval(timerInterval);
-    const prog = document.querySelector('.progress-bar-container');
-    if (prog) prog.remove();
-    let diagnosis = t('normal');
-    let solution = "🔧 " + t('normal');
-    if (Math.random() > 0.5) { diagnosis = t('fault_vibration'); solution = "🔧 " + t('fault_solution'); }
-    const report = `🧠 ${t('report_title')}:\n\n${t('diag_result')}: ${diagnosis}\n${solution}`;
-    document.getElementById('monitor-area').innerHTML = `<div style="padding:20px;">${report}</div>`;
-    document.getElementById('stepIndicator').classList.add('hidden');
-    state.reportLines.push(`🧠 ${diagnosis}`);
-    state.reportLines.push(solution);
-    state.finalDiagnosis = diagnosis;
-    document.getElementById('live-report').innerHTML = state.reportLines.join('\n');
-    saveToHistory(diagnosis, solution);
-    incrementUsage();
-    if (!state.isAdmin) { useCredit(); updateCreditDisplays(); }
-    diagnosisInProgress = false;
-}
-
-// ==================== دوال الحساسات ====================
-function stopSensor(sensorType) {
-    if (sensorType === 'camera' && state.currentStreams.camera) { state.currentStreams.camera.getTracks().forEach(t => t.stop()); state.currentStreams.camera = null; state.sensorStatus.camera = false; document.getElementById('btn-cam').classList.remove('active'); document.getElementById('monitor-area').innerHTML = '<div style="padding:20px;color:#94a3b8">🔌 Camera stopped</div>'; }
-    if (sensorType === 'microphone' && state.currentStreams.microphone) { state.currentStreams.microphone.getTracks().forEach(t => t.stop()); state.currentStreams.microphone = null; state.sensorStatus.microphone = false; document.getElementById('btn-mic').classList.remove('active'); document.getElementById('monitor-area').innerHTML = '<div style="padding:20px;color:#94a3b8">🔌 Microphone stopped</div>'; }
-    if (sensorType === 'vibration') { if (state.vibrationHandler) window.removeEventListener('devicemotion', state.vibrationHandler); if (state.currentIntervals.vibration) clearInterval(state.currentIntervals.vibration); state.sensorStatus.vibration = false; document.getElementById('btn-vib').classList.remove('active'); document.getElementById('monitor-area').innerHTML = '<div style="padding:20px;color:#94a3b8">🔌 Vibration stopped</div>'; }
-    if (sensorType === 'temperature') { if (state.currentIntervals.temperature) clearInterval(state.currentIntervals.temperature); state.sensorStatus.temperature = false; document.getElementById('btn-temp').classList.remove('active'); document.getElementById('monitor-area').innerHTML = '<div style="padding:20px;color:#94a3b8">🔌 Temperature stopped</div>'; }
-}
-async function startCamera() {
-    if (state.sensorStatus.camera) return;
-    document.getElementById('monitor-area').innerHTML = `<video id="cameraVideo" autoplay playsinline muted style="width:100%;height:100%;object-fit:cover;"></video><div class="instruction-box">📷 ${t('camera_start')}</div>`;
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-        const video = document.getElementById('cameraVideo');
-        video.srcObject = stream; await video.play();
-        state.currentStreams.camera = stream; state.sensorStatus.camera = true;
-        document.getElementById('btn-cam').classList.add('active');
-        setTimeout(() => {
-            const canvas = document.createElement('canvas');
-            canvas.width = video.videoWidth; canvas.height = video.videoHeight;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(video, 0, 0);
-            const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            let r = 0, g = 0, b = 0, count = 0;
-            for (let i = 0; i < imgData.data.length; i += 4) { r += imgData.data[i]; g += imgData.data[i + 1]; b += imgData.data[i + 2]; count++; }
-            r /= count; g /= count; b /= count;
-            if (r > 150 && g < 100 && b < 100) state.imageDescription = "smoke black";
-            else if (b > 150 && r < 100 && g < 100) state.imageDescription = "smoke blue";
-            else if (r > 200 && g > 200 && b > 200) state.imageDescription = "smoke white";
-            else if (r + g + b < 150) state.imageDescription = "dark oil";
-            else state.imageDescription = "normal";
-        }, 4000);
-    } catch (e) { document.getElementById('monitor-area').innerHTML = `<div style="padding:20px;color:#94a3b8">🔌 ${t('camera_error')}</div>`; showToast(t('camera_error')); }
-}
-async function startMicrophone() {
-    if (state.sensorStatus.microphone) return;
-    document.getElementById('monitor-area').innerHTML = `<canvas id="micCanvas" width="100%" height="200" style="width:100%;height:100%;background:#000;"></canvas><div class="instruction-box">🎙️ ${t('mic_start')}</div>`;
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        state.currentStreams.microphone = stream;
-        const audioCtx = new AudioContext(); await audioCtx.resume();
-        const source = audioCtx.createMediaStreamSource(stream);
-        const analyser = audioCtx.createAnalyser();
-        analyser.fftSize = 256;
-        source.connect(analyser);
-        const dataArray = new Uint8Array(analyser.frequencyBinCount);
-        const canvas = document.getElementById('micCanvas');
-        canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
-        const ctx = canvas.getContext('2d');
-        function drawWave() {
-            if (!state.sensorStatus.microphone) return;
-            analyser.getByteFrequencyData(dataArray);
-            let avg = 0;
-            for (let i = 0; i < dataArray.length; i++) avg += dataArray[i];
-            avg /= dataArray.length;
-            state.soundAnalysis.level = avg / 255;
-            if (avg > 150) state.audioDescription = "loud noise";
-            else if (avg > 80) state.audioDescription = "moderate";
-            else state.audioDescription = "quiet";
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.beginPath(); ctx.strokeStyle = '#f5b81b'; ctx.lineWidth = 2;
-            for (let i = 0; i < canvas.width; i += 5) {
-                let idx = Math.floor(i / canvas.width * dataArray.length);
-                let val = dataArray[idx] / 255;
-                let y = canvas.height / 2 + (val * canvas.height / 2) * (Math.sin(i * 0.05) + 0.5);
-                if (i === 0) ctx.moveTo(i, y); else ctx.lineTo(i, y);
-            }
-            ctx.stroke();
-            requestAnimationFrame(drawWave);
-        }
-        drawWave();
-        state.sensorStatus.microphone = true;
-        document.getElementById('btn-mic').classList.add('active');
-    } catch (e) { document.getElementById('monitor-area').innerHTML = `<div style="padding:20px;color:#94a3b8">🔌 ${t('mic_error')}</div>`; showToast(t('mic_error')); }
-}
-function startVibration() {
-    if (state.sensorStatus.vibration) return;
-    if (!window.DeviceMotionEvent) { showToast(t('vibration_not_supported')); return; }
-    document.getElementById('monitor-area').innerHTML = `<canvas id="vibCanvas" width="100%" height="200" style="width:100%;height:100%;background:#000;"></canvas><div class="instruction-box">📳 ${t('vibration_label')}</div>`;
-    const canvas = document.getElementById('vibCanvas');
-    canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
-    const ctx = canvas.getContext('2d');
-    let vibValues = [];
-    const handler = (e) => {
-        if (!state.sensorStatus.vibration) return;
-        const acc = e.accelerationIncludingGravity;
-        if (acc) {
-            const intensity = Math.sqrt(acc.x * acc.x + acc.y * acc.y + acc.z * acc.z);
-            vibValues.push(intensity);
-            if (vibValues.length > 100) vibValues.shift();
-            let avg = vibValues.reduce((a, b) => a + b, 0) / vibValues.length;
-            let max = Math.max(...vibValues);
-            state.vibrationAvg = avg;
-            state.vibrationMax = max;
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = '#f59e0b';
-            let pct = Math.min(100, (avg / 20) * 100);
-            ctx.fillRect(0, canvas.height - (pct * canvas.height / 100), canvas.width, pct * canvas.height / 100);
-            ctx.fillStyle = '#fff'; ctx.font = '12px monospace';
-            ctx.fillText(`${t('vibration_label')} ${avg.toFixed(1)} m/s²`, 10, 20);
-        }
-    };
-    window.addEventListener('devicemotion', handler);
-    state.vibrationHandler = handler;
-    state.sensorStatus.vibration = true;
-    document.getElementById('btn-vib').classList.add('active');
-}
-function startTemperature() {
-    if (state.sensorStatus.temperature) return;
-    document.getElementById('monitor-area').innerHTML = `<div style="padding:20px;text-align:center;"><span style="font-size:2rem;font-weight:700;" id="tempValue">--°C</span><div style="margin-top:8px;">${t('temp_estimate')}</div></div><div class="instruction-box">🌡️ ${t('temp_estimate')}</div>`;
-    let temp = 28 + Math.random() * 10;
-    const updateTemp = () => {
-        if (!state.sensorStatus.temperature) return;
-        temp += (Math.random() - 0.5) * 0.3;
-        temp = Math.min(48, Math.max(22, temp));
-        state.temperature = temp;
-        const el = document.getElementById('tempValue');
-        if (el) el.textContent = `${temp.toFixed(1)}°C`;
-    };
-    updateTemp();
-    state.currentIntervals.temperature = setInterval(updateTemp, 800);
-    state.sensorStatus.temperature = true;
-    document.getElementById('btn-temp').classList.add('active');
-}
-
-// ==================== النطق (TTS) - جميع اللغات ====================
-function speakResult() {
-    let text = state.finalDiagnosis || t('listen');
-    if (!text || text.length < 3) { showToast(t('no_summary')); return; }
-    window.speechSynthesis.cancel();
-
-    const langCodeMap = {
-        ar: 'ar-SA', en: 'en-US', fr: 'fr-FR', es: 'es-ES', de: 'de-DE', it: 'it-IT',
-        pt: 'pt-PT', ru: 'ru-RU', zh: 'zh-CN', ja: 'ja-JP', ko: 'ko-KR', tr: 'tr-TR',
-        nl: 'nl-NL', pl: 'pl-PL', hi: 'hi-IN', id: 'id-ID', fa: 'fa-IR', ur: 'ur-PK',
-        sw: 'sw-KE', vi: 'vi-VN', el: 'el-GR', cs: 'cs-CZ', he: 'he-IL', th: 'th-TH',
-        uk: 'uk-UA', ro: 'ro-RO', hu: 'hu-HU', sv: 'sv-SE', da: 'da-DK', fi: 'fi-FI',
-        no: 'nb-NO', sk: 'sk-SK', bg: 'bg-BG', hr: 'hr-HR', lt: 'lt-LT', lv: 'lv-LV',
-        et: 'et-EE', sl: 'sl-SI', ms: 'ms-MY',
-        bn: 'bn-BD', pa: 'pa-IN', ta: 'ta-IN', te: 'te-IN', mr: 'mr-IN',
-        ha: 'ha-NG', tl: 'fil-PH', gu: 'gu-IN', am: 'am-ET', yo: 'yo-NG',
-        uz: 'uz-UZ', my: 'my-MM', az: 'az-AZ', ig: 'ig-NG', so: 'so-SO'
-    };
-
-    const googleTTSMap = {
-        ar: 'ar', zh: 'zh-CN', ja: 'ja', ko: 'ko', hi: 'hi', fa: 'fa',
-        ur: 'ur', he: 'iw', th: 'th', sw: 'sw', vi: 'vi', uk: 'uk',
-        bg: 'bg', hr: 'hr', lt: 'lt', lv: 'lv', et: 'et', sl: 'sl', ms: 'ms',
-        el: 'el', cs: 'cs', sk: 'sk', hu: 'hu', ro: 'ro', fi: 'fi',
-        no: 'no', da: 'da', sv: 'sv', nl: 'nl', pl: 'pl', id: 'id',
-        ru: 'ru', tr: 'tr', de: 'de', it: 'it', pt: 'pt', es: 'es', fr: 'fr', en: 'en',
-        bn: 'bn', pa: 'pa', ta: 'ta', te: 'te', mr: 'mr',
-        ha: 'ha', tl: 'tl', gu: 'gu', am: 'am', yo: 'yo',
-        uz: 'uz', my: 'my', az: 'az', ig: 'ig', so: 'so'
-    };
-
-    const targetLang = langCodeMap[state.lang] || 'en-US';
-
-    const useGoogleTTS = () => {
-        const gLang = googleTTSMap[state.lang] || state.lang;
-        const encoded = encodeURIComponent(text.substring(0, 200));
-        const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encoded}&tl=${gLang}&client=tw-ob`;
-        const audio = new Audio(url);
-        audio.play()
-            .then(() => showToast(t('speaking')))
-            .catch(() => showToast('❌ TTS error'));
-    };
-
-    const useWebSpeech = (voice) => {
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = targetLang;
-        utterance.rate = 0.9;
-        utterance.voice = voice;
-        utterance.onstart = () => showToast(t('speaking'));
-        utterance.onerror = useGoogleTTS;
-        window.speechSynthesis.speak(utterance);
-    };
-
-    const findVoice = (voices) =>
-        voices.find(v => v.lang === targetLang) ||
-        voices.find(v => v.lang.startsWith(targetLang.split('-')[0]));
-
-    const attemptSpeech = (voices) => {
-        const voice = findVoice(voices);
-        if (voice) {
-            useWebSpeech(voice);
-        } else {
-            useGoogleTTS();
-        }
-    };
-
-    const voices = window.speechSynthesis.getVoices();
-    if (voices.length > 0) {
-        attemptSpeech(voices);
-    } else {
-        let handled = false;
-        window.speechSynthesis.onvoiceschanged = () => {
-            if (handled) return;
-            handled = true;
-            attemptSpeech(window.speechSynthesis.getVoices());
-        };
-        setTimeout(() => {
-            if (handled) return;
-            handled = true;
-            const v = window.speechSynthesis.getVoices();
-            if (v.length > 0) attemptSpeech(v);
-            else useGoogleTTS();
-        }, 800);
-    }
-}
-
-function generatePDF() {
-    if (!state.currentDevice) return;
-    let deviceName = t(state.currentDevice);
-    let planName = state.currentPlan === 'free' ? t('free_l1') : state.currentPlan === 'monthly' ? '2$' : '20$';
-    let location = document.getElementById('location').textContent;
+// =============== دالة لتنسيق التاريخ والوقت بأرقام غربية (0123456789) ===============
+function getWesternFormattedDateTime() {
     let now = new Date();
-    let dateStr = now.toLocaleDateString('en-GB');
-    let timeStr = now.toLocaleTimeString('en-GB');
-    let summary = state.finalDiagnosis || t('normal');
-    let content = `<!DOCTYPE html><html dir="${rtlLangs.has(state.lang) ? 'rtl' : 'ltr'}"><head><meta charset="UTF-8"><title>${t('report_title')}</title><style>body{font-family:sans-serif;padding:30px;max-width:800px;margin:0 auto}.header{text-align:center;border-bottom:2px solid #f97316;margin-bottom:20px}.result{background:#fef3c7;padding:15px;border-radius:10px;margin:15px 0}.footer{text-align:center;margin-top:30px;font-size:11px;color:#666}</style></head><body><div class="header"><h1>Engine Diagnostics Pro</h1><p>${deviceName} - ${t('report_title')}</p></div><p><strong>${t('date')}:</strong> ${dateStr} | <strong>${t('time')}:</strong> ${timeStr} | <strong>${t('location')}:</strong> ${location}</p><p><strong>${t('sub_type')}:</strong> ${planName}</p><div class="result"><h3>${t('diag_result')}</h3><p>${summary}</p></div><div class="footer"><p>© 2026 Engine Diagnostics Pro</p></div><script>window.onload=()=>window.print()<\/script></body></html>`;
+    let day = now.getDate().toString().padStart(2,'0');
+    let month = (now.getMonth()+1).toString().padStart(2,'0');
+    let year = now.getFullYear().toString();
+    let hours = now.getHours().toString().padStart(2,'0');
+    let minutes = now.getMinutes().toString().padStart(2,'0');
+    let seconds = now.getSeconds().toString().padStart(2,'0');
+    return { date: `${day}/${month}/${year}`, time: `${hours}:${minutes}:${seconds}`, full: `${day}/${month}/${year} ${hours}:${minutes}:${seconds}` };
+}
+function getSubscriptionText() { 
+    if(state.isAdmin) return "🛠️ Admin Mode (Unlimited)";
+    let free = getFreeLeft(); let paid = getPaidCredits(); 
+    return `${t('subscription_status')}: ${free} free + ${paid} paid`; 
+}
+function generatePDF() {
+    if(!state.finalDiagnosis && !state.currentDevice){ showToast(t('no_summary')); return; }
+    let {date, time} = getWesternFormattedDateTime();
+    let locationText = document.getElementById('location').innerText;
+    let deviceName = t(state.currentDevice) || state.currentDevice;
+    let diagText = state.finalDiagnosis || t('normal');
+    let subText = getSubscriptionText();
+    let html = `<!DOCTYPE html>
+    <html dir="${state.lang==='ar'?'rtl':'ltr'}">
+    <head><meta charset="UTF-8"><title>${t('report_title')}</title>
+    <style>
+        @page { size: A4; margin: 2cm; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: white; margin: 0; padding: 0; }
+        .report-container { max-width: 100%; background: #fff; border: 2px solid #d4af37; border-radius: 24px; padding: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        h1 { color: #b8860b; font-size: 28px; text-align: center; border-bottom: 2px solid #d4af37; display: inline-block; padding-bottom: 8px; margin-bottom: 20px; width: 100%; }
+        .gold-line { height: 3px; background: linear-gradient(90deg, transparent, #d4af37, transparent); margin: 20px 0; }
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background: #f8f5f0; padding: 16px; border-radius: 16px; margin: 20px 0; }
+        .info-item { font-size: 14px; }
+        .info-label { font-weight: 700; color: #5a3e1b; }
+        .diagnosis-box { background: #f0ede8; border-right: 6px solid #d4af37; padding: 18px; border-radius: 14px; margin: 20px 0; font-size: 16px; line-height: 1.5; }
+        .signature { text-align: center; margin-top: 30px; font-style: italic; border-top: 1px solid #ccc; padding-top: 15px; color: #5a5a6e; }
+        .footer { text-align: center; font-size: 12px; color: #888; margin-top: 20px; }
+        @media print { body { margin: 0; padding: 0; } .report-container { box-shadow: none; border: 1px solid #aaa; } }
+    </style>
+    </head>
+    <body>
+    <div class="report-container">
+        <div class="header"><h1>🔧 ${t('report_header')}</h1></div>
+        <div class="gold-line"></div>
+        <div class="info-grid">
+            <div class="info-item"><span class="info-label">📅 ${t('date')}:</span> ${date}</div>
+            <div class="info-item"><span class="info-label">🕐 ${t('time')}:</span> ${time}</div>
+            <div class="info-item"><span class="info-label">📍 ${t('location')}:</span> ${locationText}</div>
+            <div class="info-item"><span class="info-label">🔧 ${t('sub_type')}:</span> ${deviceName}</div>
+            <div class="info-item"><span class="info-label">💳 ${t('subscription_status')}:</span> ${subText}</div>
+            <div class="info-item"><span class="info-label">🆔 ID:</span> ${state.deviceID}</div>
+        </div>
+        <div class="diagnosis-box"><strong>📋 ${t('diag_result')}:</strong><br>${diagText}</div>
+        <div class="signature">✍️ ${t('signature')}<br>© 2026 - AI Engine Diagnostics</div>
+        <div class="footer">© 2026 AI Engine Diagnostics</div>
+    </div>
+    </body></html>`;
     let win = window.open();
-    win.document.write(content);
+    win.document.write(html);
     win.document.close();
 }
-function setRating(n) { let stars = document.querySelectorAll('#rating-stars span'); stars.forEach((s, i) => s.classList.toggle('active', i < n)); let levels = ['', t('poor'), t('acceptable'), t('good'), t('excellent'), t('professional')]; document.getElementById('rating-msg').innerHTML = `⭐ ${levels[n] || ''}`; }
-
-function buildLangSelect() {
-    let sel = document.getElementById('lang-select'); sel.innerHTML = '';
-    const langs = {
-        ar: "🇸🇦 العربية", en: "🇬🇧 English", fr: "🇫🇷 Français", es: "🇪🇸 Español",
-        de: "🇩🇪 Deutsch", it: "🇮🇹 Italiano", pt: "🇵🇹 Português", ru: "🇷🇺 Русский",
-        zh: "🇨🇳 中文", ja: "🇯🇵 日本語", ko: "🇰🇷 한국어", tr: "🇹🇷 Türkçe",
-        nl: "🇳🇱 Nederlands", pl: "🇵🇱 Polski", hi: "🇮🇳 हिन्दी", id: "🇮🇩 Indonesia",
-        fa: "🇮🇷 فارسی", ur: "🇵🇰 اردو", sw: "🇰🇪 Kiswahili", vi: "🇻🇳 Tiếng Việt",
-        el: "🇬🇷 Ελληνικά", cs: "🇨🇿 Čeština", he: "🇮🇱 עברית", th: "🇹🇭 ไทย",
-        uk: "🇺🇦 Українська", ro: "🇷🇴 Română", hu: "🇭🇺 Magyar", sv: "🇸🇪 Svenska",
-        da: "🇩🇰 Dansk", fi: "🇫🇮 Suomi", no: "🇳🇴 Norsk", sk: "🇸🇰 Slovenčina",
-        bg: "🇧🇬 Български", hr: "🇭🇷 Hrvatski", lt: "🇱🇹 Lietuvių", lv: "🇱🇻 Latviešu",
-        et: "🇪🇪 Eesti", sl: "🇸🇮 Slovenščina", ms: "🇲🇾 Melayu",
-        bn: "🇧🇩 বাংলা", pa: "🇮🇳 ਪੰਜਾਬੀ", ta: "🇮🇳 தமிழ்", te: "🇮🇳 తెలుగు",
-        mr: "🇮🇳 मराठी", ha: "🇳🇬 Hausa", tl: "🇵🇭 Filipino", gu: "🇮🇳 ગુજરાતી",
-        am: "🇪🇹 አማርኛ", yo: "🇳🇬 Yorùbá", uz: "🇺🇿 O'zbek", my: "🇲🇲 မြန်မာ",
-        az: "🇦🇿 Azərbaycan", ig: "🇳🇬 Igbo", so: "🇸🇴 Soomaali"
-    };
-    for (let code in langs) { let opt = document.createElement('option'); opt.value = code; opt.textContent = langs[code]; if (code === state.lang) opt.selected = true; sel.appendChild(opt); }
+function exportCurrentToCSV() {
+    if(!state.finalDiagnosis && !state.currentDevice){ showToast(t('no_history')); return; }
+    let {date, time} = getWesternFormattedDateTime();
+    let locationText = document.getElementById('location').innerText;
+    let deviceName = t(state.currentDevice) || state.currentDevice;
+    let diagText = state.finalDiagnosis || t('normal');
+    let subText = getSubscriptionText();
+    let csvRows = [["Official Engine Report", "AI Diagnostics"], ["Date", date], ["Time", time], ["Location", locationText], ["Device", deviceName], ["Subscription", subText], ["Result", diagText], ["Signature", t('signature')]];
+    let csvContent = csvRows.map(row => row.map(cell => `"${cell}"`).join(",")).join("\n");
+    let blob = new Blob(["\uFEFF" + csvContent], {type:"text/csv;charset=utf-8;"});
+    let link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `engine_diagnosis_${new Date().toISOString().slice(0,19)}.csv`;
+    link.click();
+    showToast(t('saved'));
+}
+function sendReportEmail() {
+    if(!state.finalDiagnosis && !state.currentDevice){ showToast(t('no_history')); return; }
+    let {date, time} = getWesternFormattedDateTime();
+    let locationText = document.getElementById('location').innerText;
+    let deviceName = t(state.currentDevice) || state.currentDevice;
+    let diagText = state.finalDiagnosis || t('normal');
+    let subText = getSubscriptionText();
+    let body = `🔧 ${t('report_header')}\n\n📅 ${t('date')}: ${date}\n🕐 ${t('time')}: ${time}\n📍 ${t('location')}: ${locationText}\n🔧 ${t('sub_type')}: ${deviceName}\n💳 ${t('subscription_status')}: ${subText}\n\n📋 ${t('diag_result')}:\n${diagText}\n\n✍️ ${t('signature')}\n© 2026 AI Engine Diagnostics`;
+    window.location.href = `mailto:?subject=${encodeURIComponent(t('report_title'))}&body=${encodeURIComponent(body)}`;
+    showToast(t('email_opened'));
+}
+function copyReportToClipboard() {
+    if(!state.finalDiagnosis && !state.currentDevice){ showToast(t('no_summary')); return; }
+    let {date, time} = getWesternFormattedDateTime();
+    let locationText = document.getElementById('location').innerText;
+    let deviceName = t(state.currentDevice) || state.currentDevice;
+    let diagText = state.finalDiagnosis || t('normal');
+    let subText = getSubscriptionText();
+    let reportText = `🔧 ${t('report_header')}\n📅 ${t('date')}: ${date} | 🕐 ${t('time')}: ${time}\n📍 ${t('location')}: ${locationText}\n🔧 ${t('sub_type')}: ${deviceName}\n💳 ${t('subscription_status')}: ${subText}\n📋 ${t('diag_result')}: ${diagText}\n✍️ ${t('signature')} - © 2026`;
+    navigator.clipboard.writeText(reportText);
+    showToast("Report copied");
 }
 
-function applyDir() {
-    const isRtl = rtlLangs.has(state.lang);
-    document.documentElement.setAttribute('dir', isRtl ? 'rtl' : 'ltr');
+// ==================== دوال التشخيص الأساسية (نفس محرك البيت) ====================
+function startSpeechToText(){ 
+    let btn = document.getElementById('speechBtn');
+    if(!('webkitSpeechRecognition'in window)){ showToast(t('try_again')); return; }
+    if(state.recognition && state.recognition.active) { state.recognition.stop(); btn.classList.remove('speak-active'); return; }
+    const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
+    const recognition=new SpeechRecognition();
+    const _sttMap={ar:'ar-SA',en:'en-US',fr:'fr-FR',es:'es-ES',de:'de-DE',it:'it-IT',pt:'pt-PT',ru:'ru-RU',zh:'zh-CN',ja:'ja-JP',ko:'ko-KR',tr:'tr-TR',nl:'nl-NL',pl:'pl-PL',hi:'hi-IN',id:'id-ID',fa:'fa-IR',ur:'ur-PK',sw:'sw-KE',vi:'vi-VN',el:'el-GR',cs:'cs-CZ',he:'he-IL',th:'th-TH',uk:'uk-UA',ro:'ro-RO',hu:'hu-HU',sv:'sv-SE',da:'da-DK',fi:'fi-FI',no:'nb-NO',sk:'sk-SK',bg:'bg-BG',hr:'hr-HR',lt:'lt-LT',lv:'lv-LV',et:'et-EE',sl:'sl-SI',ms:'ms-MY',bn:'bn-BD',pa:'pa-IN',ta:'ta-IN',te:'te-IN',mr:'mr-IN',ha:'ha-NG',tl:'fil-PH',gu:'gu-IN',am:'am-ET',yo:'yo-NG',uz:'uz-UZ',my:'my-MM',az:'az-AZ',ig:'ig-NG',so:'so-SO'};
+    recognition.lang=_sttMap[state.lang]||'en-US';
+    recognition.interimResults=false;
+    recognition.onstart = () => { btn.classList.add('speak-active'); showToast(t('speak_now')); };
+    recognition.onend = () => { btn.classList.remove('speak-active'); state.recognition = null; };
+    recognition.onresult=(event)=>{ const text=event.results[0][0].transcript; state.reportLines.push(`🎤 ${t('speak_desc')}: ${text}`); document.getElementById('live-report').innerHTML=state.reportLines.join('\n'); showToast(t('added')); if(state.currentMode==='normal'){ state.finalDiagnosis = `🔍 ${t('quick_diag')}: ${text}`; document.getElementById('live-report').innerHTML = state.finalDiagnosis; } };
+    recognition.onerror=()=>{ showToast(t('try_again')); btn.classList.remove('speak-active'); };
+    recognition.start();
+    state.recognition = recognition;
+}
+function stopSensor(sensorType){ 
+    if(sensorType==='camera' && state.currentStreams.camera){ state.currentStreams.camera.getTracks().forEach(t=>t.stop()); state.currentStreams.camera=null; state.sensorStatus.camera=false; document.getElementById('sensor-cam-btn')?.classList.remove('active'); document.getElementById('monitor-area').innerHTML='<div style="padding:20px;color:#94a3b8">🔌 Camera stopped</div>'; }
+    if(sensorType==='microphone' && state.currentStreams.microphone){ state.currentStreams.microphone.getTracks().forEach(t=>t.stop()); state.currentStreams.microphone=null; state.sensorStatus.microphone=false; document.getElementById('sensor-mic-btn')?.classList.remove('active'); }
+    if(sensorType==='vibration'){ if(state.vibrationHandler) window.removeEventListener('devicemotion',state.vibrationHandler); if(state.currentIntervals.vibration) clearInterval(state.currentIntervals.vibration); state.sensorStatus.vibration=false; document.getElementById('sensor-vib-btn')?.classList.remove('active'); }
+    if(sensorType==='temperature'){ if(state.currentIntervals.temperature) clearInterval(state.currentIntervals.temperature); state.sensorStatus.temperature=false; document.getElementById('sensor-temp-btn')?.classList.remove('active'); }
+}
+async function startCamera(){ if(state.sensorStatus.camera) return; document.getElementById('monitor-area').innerHTML = `<video id="cameraVideo" autoplay playsinline muted style="width:100%;height:100%;object-fit:cover;"></video><div class="instruction-box">📷 ${t('instruction_camera')}</div>`; try{ const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }); const video = document.getElementById('cameraVideo'); video.srcObject = stream; await video.play(); state.currentStreams.camera = stream; state.sensorStatus.camera = true; document.getElementById('sensor-cam-btn')?.classList.add('active'); setTimeout(() => { state.imageDescription = "normal"; }, 4000); } catch(e){ document.getElementById('monitor-area').innerHTML = `<div style="padding:20px;color:#94a3b8">🔌 ${t('camera_error')}</div>`; showToast(t('camera_error')); } }
+async function startMicrophone(){ if(state.sensorStatus.microphone) return; document.getElementById('monitor-area').innerHTML = `<canvas id="micCanvas" width="100%" height="200" style="width:100%;height:100%;background:#000;"></canvas><div class="instruction-box">🎙️ ${t('instruction_mic')}</div>`; try{ const stream = await navigator.mediaDevices.getUserMedia({ audio: true }); state.currentStreams.microphone = stream; const audioCtx = new AudioContext(); await audioCtx.resume(); const source = audioCtx.createMediaStreamSource(stream); const analyser = audioCtx.createAnalyser(); analyser.fftSize = 256; source.connect(analyser); const dataArray = new Uint8Array(analyser.frequencyBinCount); const canvas = document.getElementById('micCanvas'); canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight; const ctx = canvas.getContext('2d'); function drawWave(){ if(!state.sensorStatus.microphone) return; analyser.getByteFrequencyData(dataArray); let avg = 0; for(let i=0;i<dataArray.length;i++) avg += dataArray[i]; avg /= dataArray.length; state.soundAnalysis.level = avg / 255; if(avg>150) state.audioDescription = "loud noise"; else if(avg>80) state.audioDescription = "moderate"; else state.audioDescription = "quiet"; ctx.clearRect(0,0,canvas.width,canvas.height); ctx.beginPath(); ctx.strokeStyle='#f5b81b'; ctx.lineWidth=2; for(let i=0;i<canvas.width;i+=5){ let idx = Math.floor(i/canvas.width*dataArray.length); let val = dataArray[idx]/255; let y = canvas.height/2 + (val*canvas.height/2)*(Math.sin(i*0.05)+0.5); if(i===0) ctx.moveTo(i,y); else ctx.lineTo(i,y); } ctx.stroke(); requestAnimationFrame(drawWave); } drawWave(); state.sensorStatus.microphone = true; document.getElementById('sensor-mic-btn')?.classList.add('active'); } catch(e){ document.getElementById('monitor-area').innerHTML = `<div style="padding:20px;color:#94a3b8">🔌 ${t('mic_error')}</div>`; showToast(t('mic_error')); } }
+function startVibration(){ if(state.sensorStatus.vibration) return; if(!window.DeviceMotionEvent){ showToast(t('vibration_not_supported')); return; } document.getElementById('monitor-area').innerHTML = `<canvas id="vibCanvas" width="100%" height="200" style="width:100%;height:100%;background:#000;"></canvas><div class="instruction-box">📳 ${t('instruction_vib')}</div>`; const canvas = document.getElementById('vibCanvas'); canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight; const ctx = canvas.getContext('2d'); let vibValues = []; const handler = (e) => { if(!state.sensorStatus.vibration) return; const acc = e.accelerationIncludingGravity; if(acc){ const intensity = Math.sqrt(acc.x*acc.x + acc.y*acc.y + acc.z*acc.z); vibValues.push(intensity); if(vibValues.length>100) vibValues.shift(); let avg = vibValues.reduce((a,b)=>a+b,0)/vibValues.length; state.vibrationAvg = avg; ctx.clearRect(0,0,canvas.width,canvas.height); ctx.fillStyle='#f59e0b'; let pct = Math.min(100, (avg/20)*100); ctx.fillRect(0, canvas.height-(pct*canvas.height/100), canvas.width, pct*canvas.height/100); ctx.fillStyle='#fff'; ctx.fillText(`${t('vibration_label')} ${avg.toFixed(1)} m/s²`,10,20); } }; window.addEventListener('devicemotion', handler); state.vibrationHandler = handler; state.sensorStatus.vibration = true; document.getElementById('sensor-vib-btn')?.classList.add('active'); }
+function startTemperature(){ if(state.sensorStatus.temperature) return; document.getElementById('monitor-area').innerHTML = `<div style="padding:20px;text-align:center;"><span style="font-size:2rem;font-weight:700;" id="tempValue">--°C</span><div style="margin-top:8px;">${t('temp_estimate')}</div></div><div class="instruction-box">🌡️ ${t('instruction_temp')}</div>`; let temp = 70 + Math.random()*20; const updateTemp = () => { if(!state.sensorStatus.temperature) return; temp += (Math.random()-0.5)*0.5; temp = Math.min(120, Math.max(50, temp)); state.temperature = temp; const el = document.getElementById('tempValue'); if(el) el.textContent = `${temp.toFixed(1)}°C`; }; updateTemp(); state.currentIntervals.temperature = setInterval(updateTemp, 800); state.sensorStatus.temperature = true; document.getElementById('sensor-temp-btn')?.classList.add('active'); }
+function toggleSensor(sensor) { if(state.currentMode !== 'normal') { showToast(t("activate")); return; } if(!state.sensorsEnabled) { showToast(t("quick_diag")+": "+t("activate")); return; } if(state.sensorStatus[sensor]) { stopSensor(sensor); } else { if(sensor === 'camera') startCamera(); else if(sensor === 'microphone') startMicrophone(); else if(sensor === 'vibration') startVibration(); else if(sensor === 'temperature') startTemperature(); } }
+function finishManualDiagnosis() { if(!totalCreditsLeft() && !state.isAdmin){ showToast(t('no_credits')); return; } let diagnosis = t('normal'); if(state.soundAnalysis.level > 0.6) diagnosis = "🔊 "+t("fault_vibration"); else if(state.vibrationAvg > 12) diagnosis = t('fault_vibration') + " ⚠️"; else if(state.temperature > 105) diagnosis = "🔥 "+t("fault_solution"); else if(state.imageDescription.includes("smoke")) diagnosis = "🔥 "+t("fault_solution"); else diagnosis = "✅ "+t("normal"); state.finalDiagnosis = diagnosis; state.reportLines.push(`🧠 ${diagnosis}`); document.getElementById('live-report').innerHTML = state.reportLines.join('\n'); document.getElementById('monitor-area').innerHTML = `<div style="padding:20px;">${diagnosis}</div>`; saveToHistory(diagnosis); if(useDiagnosisCredit()) updateCreditDisplay(); showResultIcons(diagnosis); state.currentMode = null; state.sensorsEnabled = false; document.getElementById('quickModeBtn').classList.remove('active'); }
+function showResultIcons(diagnosis) { document.getElementById('resultIcons').innerHTML = `<div class="result-icon icon-green">✅ ${t('icon_normal')}</div><div class="result-icon icon-yellow">⚠️ ${t('icon_warning')}</div>`; document.getElementById('resultIcons').classList.remove('hidden'); }
+function toggleNormalMode() { if(state.currentMode === 'normal' && state.sensorsEnabled) { finishManualDiagnosis(); } else { if(state.smartActive){ showToast(t('stop_sensors_first')); return; } state.currentMode = 'normal'; state.sensorsEnabled = true; document.getElementById('quickModeBtn').classList.add('active'); document.getElementById('advancedModeBtn').classList.remove('active'); showToast(t("quick_diag")+": "+t("activate")); } }
+async function activateSmartMode() { if(state.smartActive) return; if(!totalCreditsLeft() && !state.isAdmin){ showToast(t('no_credits')); return; } state.currentMode = 'smart'; state.smartActive = true; document.getElementById('advancedModeBtn').classList.add('active'); document.getElementById('quickModeBtn').classList.remove('active'); const steps = [ { name:'camera', msg:t('step_camera'), action:startCamera, duration:15000 }, { name:'microphone', msg:t('step_mic'), action:startMicrophone, duration:15000 }, { name:'vibration', msg:t('step_vib'), action:startVibration, duration:15000 }, { name:'temperature', msg:t('step_temp'), action:startTemperature, duration:15000 } ]; let stepIndex=0; const runStep = async () => { if(!state.smartActive) return; if(stepIndex>=steps.length){ let diagnosis = t('normal'); if(state.soundAnalysis.level>0.6) diagnosis="🔊 "+t("fault_vibration"); else if(state.vibrationAvg>12) diagnosis=t('fault_vibration')+" ⚠️"; else if(state.temperature>105) diagnosis="🔥 "+t("fault_solution"); else diagnosis="✅ "+t("normal"); state.finalDiagnosis=diagnosis; state.reportLines.push(`🧠 ${diagnosis}`); document.getElementById('live-report').innerHTML=state.reportLines.join('\n'); document.getElementById('monitor-area').innerHTML=`<div style="padding:20px;">${diagnosis}</div>`; saveToHistory(diagnosis); if(useDiagnosisCredit()) updateCreditDisplay(); showResultIcons(diagnosis); state.smartActive=false; document.getElementById('advancedModeBtn').classList.remove('active'); document.getElementById('stepIndicator').classList.add('hidden'); return; } const step=steps[stepIndex]; document.getElementById('stepIndicator').innerHTML=step.msg; document.getElementById('stepIndicator').classList.remove('hidden'); const instrDiv=document.createElement('div'); instrDiv.className='instruction-box'; instrDiv.innerText=step.msg; document.getElementById('monitor-area').appendChild(instrDiv); await step.action(); if(!state.smartActive) return; setTimeout(()=>{ instrDiv.remove(); stopSensor(step.name); stepIndex++; runStep(); }, step.duration); }; runStep(); }
+function cancelDiagnosis() { if(state.smartActive) state.smartActive=false; if(state.recognition) { state.recognition.stop(); state.recognition=null; } for(let s of ['camera','microphone','vibration','temperature']) stopSensor(s); state.currentMode=null; state.sensorsEnabled=false; document.getElementById('quickModeBtn').classList.remove('active'); document.getElementById('advancedModeBtn').classList.remove('active'); document.getElementById('stepIndicator').classList.add('hidden'); document.getElementById('live-report').innerHTML=t('waiting'); document.getElementById('monitor-area').innerHTML=`<div style="padding:20px;color:#94a3b8">🔌 ${t("cancel")}</div>`; showToast(t('cancel')); }
+function setRating(n){ let stars=document.querySelectorAll('#rating-stars span'); stars.forEach((s,i)=>s.classList.toggle('active', i<n)); let levels=['',t('poor'),t('acceptable'),t('good'),t('excellent'),t('professional')]; document.getElementById('rating-msg').innerHTML=`⭐ ${levels[n]||''}`; }
+function speakResult(){
+    let text=state.finalDiagnosis||t('listen');
+    if(!text||text.length<3){showToast(t('no_summary'));return;}
+    window.speechSynthesis.cancel();
+    const _tts={ar:'ar-SA',en:'en-US',fr:'fr-FR',es:'es-ES',de:'de-DE',it:'it-IT',pt:'pt-PT',ru:'ru-RU',zh:'zh-CN',ja:'ja-JP',ko:'ko-KR',tr:'tr-TR',nl:'nl-NL',pl:'pl-PL',hi:'hi-IN',id:'id-ID',fa:'fa-IR',ur:'ur-PK',sw:'sw-KE',vi:'vi-VN',el:'el-GR',cs:'cs-CZ',he:'he-IL',th:'th-TH',uk:'uk-UA',ro:'ro-RO',hu:'hu-HU',sv:'sv-SE',da:'da-DK',fi:'fi-FI',no:'nb-NO',sk:'sk-SK',bg:'bg-BG',hr:'hr-HR',lt:'lt-LT',lv:'lv-LV',et:'et-EE',sl:'sl-SI',ms:'ms-MY',bn:'bn-BD',pa:'pa-IN',ta:'ta-IN',te:'te-IN',mr:'mr-IN',ha:'ha-NG',tl:'fil-PH',gu:'gu-IN',am:'am-ET',yo:'yo-NG',uz:'uz-UZ',my:'my-MM',az:'az-AZ',ig:'ig-NG',so:'so-SO'};
+    const _gtts={ar:'ar',zh:'zh-CN',ja:'ja',ko:'ko',hi:'hi',fa:'fa',ur:'ur',he:'iw',th:'th',sw:'sw',vi:'vi',uk:'uk',bg:'bg',hr:'hr',lt:'lt',lv:'lv',et:'et',sl:'sl',ms:'ms',el:'el',cs:'cs',sk:'sk',hu:'hu',ro:'ro',fi:'fi',no:'no',da:'da',sv:'sv',nl:'nl',pl:'pl',id:'id',ru:'ru',tr:'tr',de:'de',it:'it',pt:'pt',es:'es',fr:'fr',en:'en',bn:'bn',pa:'pa',ta:'ta',te:'te',mr:'mr',ha:'ha',tl:'tl',gu:'gu',am:'am',yo:'yo',uz:'uz',my:'my',az:'az',ig:'ig',so:'so'};
+    const tl=_tts[state.lang]||'en-US';
+    const useGoogle=()=>{const gl=_gtts[state.lang]||state.lang;new Audio(`https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text.substring(0,200))}&tl=${gl}&client=tw-ob`).play().then(()=>showToast(t('speaking'))).catch(()=>showToast('❌ TTS'));};
+    const useWeb=(voice)=>{const u=new SpeechSynthesisUtterance(text);u.lang=tl;u.rate=0.9;u.voice=voice;u.onstart=()=>showToast(t('speaking'));u.onerror=useGoogle;window.speechSynthesis.speak(u);};
+    const trySpeak=(voices)=>{const v=voices.find(v=>v.lang===tl)||voices.find(v=>v.lang.startsWith(tl.split('-')[0]));v?useWeb(v):useGoogle();};
+    const vs=window.speechSynthesis.getVoices();
+    if(vs.length>0){trySpeak(vs);return;}
+    let done=false;
+    window.speechSynthesis.onvoiceschanged=()=>{if(done)return;done=true;trySpeak(window.speechSynthesis.getVoices());};
+    setTimeout(()=>{if(done)return;done=true;const v=window.speechSynthesis.getVoices();v.length>0?trySpeak(v):useGoogle();},800);
+}
+function buildLangSelect(){ let sel=document.getElementById('lang-select'); sel.innerHTML=''; for(let code of langList){ let opt=document.createElement('option'); opt.value=code; opt.textContent=langNative[code]||code; if(code===state.lang) opt.selected=true; sel.appendChild(opt); } sel.onchange=async (e)=>{ let newLang=e.target.value; state.lang=newLang; localStorage.setItem('engine_lang',newLang); await ensureTranslations(newLang); applyTranslations(); if(document.getElementById('lab-ui').style.display==='block') openLab(state.currentDevice); }; }
+function applyTranslations(){
+    const rtl=['ar','fa','ur','he'];
+    document.documentElement.setAttribute('dir', rtl.includes(state.lang)?'rtl':'ltr');
     document.documentElement.setAttribute('lang', state.lang);
+    document.getElementById('dynamicMainTitle').innerHTML=t('mainTitle');
+    document.getElementById('freeLabel').innerHTML=t('freeLabel');
+    document.getElementById('sensor-cam').innerHTML=t('camera');
+    document.getElementById('sensor-mic').innerHTML=t('mic');
+    document.getElementById('sensor-vib').innerHTML=t('vibration');
+    document.getElementById('sensor-temp').innerHTML=t('temp');
+    document.querySelectorAll('.stop-btn').forEach(b=>b.textContent=t('stop'));
+    document.querySelector('.back-btn').innerHTML=`↩️ ${t('back')}`;
+    const bl=document.getElementById('back-label'); if(bl) bl.textContent=t('back');
+    document.getElementById('cancelDiagBtn').innerHTML=`❌ ${t('cancel')}`;
+    document.getElementById('speechBtn').innerHTML=`🎤 ${t('speak_desc')}`;
+    document.querySelector('.listen-gold').innerHTML=`🔊 ${t('listen')}`;
+    document.getElementById('quickModeBtn').innerHTML=`⚡ ${t('quick_diag')}`;
+    document.getElementById('advancedModeBtn').innerHTML=`🧠 ${t('advanced_diag')}`;
+    document.querySelector('.btn-blue-light').innerHTML=`📄 ${t('pdf')}`;
+    document.querySelector('.btn-green-light').innerHTML=`📊 ${t('save_diagnosis')}`;
+    document.querySelector('.btn-purple-light').innerHTML=`📧 ${t('send_report')}`;
+    const rl=document.getElementById('rating-label'); if(rl) rl.textContent=t('rating');
+    document.getElementById('code-input').placeholder=`🔑 ${t('scan_qr')} MOULOUD2026`;
+    document.getElementById('modalTitle').textContent=t('choose_pack');
+    const mb=document.getElementById('modalCancelBtn'); if(mb) mb.textContent=t('cancel');
+    const lr=document.getElementById('live-report');
+    if(lr && (!lr.innerHTML || lr.innerHTML==='')) lr.innerHTML=t('waiting');
+    // subscription cards
+    const ps=document.getElementById('paid-single-title'); if(ps) ps.innerHTML=`🔧 ${t('monthly_l1')}`;
+    const pv=document.getElementById('paid-single-value'); if(pv) pv.textContent=`${t('monthly_l2')} (1)`;
+    const p5t=document.getElementById('paid-pack5-title'); if(p5t) p5t.innerHTML=`📦 ${t('yearly_l1')} 5`;
+    const p5v=document.getElementById('paid-pack5-value'); if(p5v) p5v.textContent=`${t('pack5_label')||'8$ (5)'}`;
+    const p15t=document.getElementById('paid-pack15-title'); if(p15t) p15t.innerHTML=`🏆 ${t('yearly_l1')} 15`;
+    const p15v=document.getElementById('paid-pack15-value'); if(p15v) p15v.textContent=`${t('pack15_label')||'20$ (15)'}`;
+    const mCancel=document.getElementById('modalCancelBtn'); if(mCancel) mCancel.textContent=t('cancel_btn');
+    const p5btn=document.getElementById('pack5Btn'); if(p5btn) p5btn.textContent=t('pack5_label')||'5 – 8$';
+    const p15btn=document.getElementById('pack15Btn'); if(p15btn) p15btn.textContent=t('pack15_label')||'15 – 20$';
+    updateCreditDisplay();
+    buildDevices();
 }
-
-function applyTranslations() {
-    applyDir();
-    buildSubscriptions();
-    ['engine', 'truck', 'motorcycle', 'boat', 'tractor', 'generator'].forEach(d => { let el = document.getElementById(`dev-${d}`); if (el) el.textContent = t(d); });
-    document.getElementById('sensor-cam').textContent = t('camera');
-    document.getElementById('sensor-mic').textContent = t('mic');
-    document.getElementById('sensor-vib').textContent = t('vibration');
-    document.getElementById('sensor-temp').textContent = t('temp');
-    document.querySelectorAll('.stop-btn').forEach(btn => btn.textContent = t('stop'));
-    document.querySelector('.back-btn').innerHTML = `↩️ ${t('back')}`;
-    document.querySelector('.cancel').innerHTML = t('cancel');
-    document.querySelector('.pdf').innerHTML = `📄 ${t('pdf')}`;
-    document.querySelector('.rating-bar span:first-child').textContent = t('rating');
-    document.getElementById('code-input').placeholder = `🔑 ${t('scan_qr')}`;
-    document.getElementById('newListenText').innerHTML = t('listen');
-    if (state.currentDevice) document.getElementById('lab-device-name').textContent = t(state.currentDevice);
-    document.getElementById('dynamicMainTitle').innerHTML = t('mainTitle');
-    document.getElementById('quickModeBtn').innerHTML = `⚡ ${t('quick_diag')}`;
-    document.getElementById('advancedModeBtn').innerHTML = `🧠 ${t('advanced_diag')}`;
-    document.querySelector('.action-row button:first-child').innerHTML = `🎤 ${t('speak_desc')}`;
-    document.querySelector('.action-row button:last-child').innerHTML = `📊 ${t('export_history')}`;
-    document.querySelector('.csv').innerHTML = `📊 ${t('save_diagnosis')}`;
-    document.querySelector('.email').innerHTML = `📧 ${t('send_report')}`;
-    updateCreditDisplays();
-}
-
-function changeLang(lang) {
-    state.lang = lang;
-    localStorage.setItem('auto_lang', lang);
-    applyTranslations();
-    if (document.getElementById('lab-ui').style.display === 'block') openLab(state.currentDevice);
-}
-
-function initClock() { let tick = () => { let now = new Date(); document.getElementById('date').textContent = `${now.getDate().toString().padStart(2, '0')}/${(now.getMonth() + 1).toString().padStart(2, '0')}/${now.getFullYear()}`; document.getElementById('clock').textContent = now.toLocaleTimeString('en-GB'); }; tick(); setInterval(tick, 1000); }
-function initGeo() { let locationSpan = document.getElementById('location'); if (!navigator.geolocation) { locationSpan.textContent = '❌ Not supported'; return; } navigator.geolocation.getCurrentPosition((p) => { locationSpan.textContent = `${p.coords.latitude.toFixed(4)}, ${p.coords.longitude.toFixed(4)}`; }, () => { locationSpan.textContent = '❌ Denied'; }); }
-function initQR() { new QRCode(document.getElementById('qr-container'), { text: window.location.href, width: 50, height: 50 }); }
-function openLab(device) {
-    let credits = getCredits();
-    if (credits <= 0 && !state.isAdmin) { showToast(t('no_credits')); return; }
-    if (!checkLimit()) return;
-    state.currentDevice = device; state.reportLines = []; state.finalDiagnosis = '';
-    document.getElementById('home-grid').style.display = 'none';
-    document.getElementById('lab-ui').style.display = 'block';
-    document.getElementById('lab-device-name').textContent = t(device);
-    document.getElementById('live-report').innerHTML = t('waiting');
-    document.getElementById('monitor-area').innerHTML = `<div style="padding:20px;color:#94a3b8">🔌 ${t('activate')}</div>`;
-    for (let s in state.sensorStatus) if (state.sensorStatus[s]) stopSensor(s);
-    setMode('quick');
-    updateCreditDisplays();
-}
-function closeLab() { for (let s in state.sensorStatus) if (state.sensorStatus[s]) stopSensor(s); document.getElementById('home-grid').style.display = 'grid'; document.getElementById('lab-ui').style.display = 'none'; }
-
-// بدء التطبيق
-initClock(); initGeo(); initQR(); buildLangSelect();
-let savedLang = localStorage.getItem('auto_lang'); if (savedLang) state.lang = savedLang;
-document.getElementById('lang-select').value = state.lang;
-document.getElementById('device-uid').textContent = state.deviceID;
-applyTranslations();
-updateCreditDisplays();
-processPaymentReturn();
-document.getElementById('code-input').addEventListener('change', function (e) {
-    if (e.target.value.toUpperCase() === 'MOULOUD2026') {
-        showToast("✅ Code valid! Admin activated");
-        if (!state.isAdmin) { state.isAdmin = true; localStorage.setItem('auto_isAdmin', true); updateSubUI(); updateCreditDisplays(); showToast(t('admin_on')); }
-    } else { showToast("❌ Invalid code"); }
-});
+function initClock(){ let tick=()=>{ let now=new Date(); let d=now.getDate().toString().padStart(2,'0'); let m=(now.getMonth()+1).toString().padStart(2,'0'); let y=now.getFullYear(); document.getElementById('date').textContent=`${d}/${m}/${y}`; document.getElementById('clock').textContent=now.toLocaleTimeString('en-GB'); }; tick(); setInterval(tick,1000); }
+function initGeo(){ navigator.geolocation.getCurrentPosition((p)=>{ document.getElementById('location').textContent=`${p.coords.latitude.toFixed(4)}, ${p.coords.longitude.toFixed(4)}`; },()=>{ document.getElementById('location').textContent='❌'; }); }
+function initQR(){ new QRCode(document.getElementById('qr-container'),{text:window.location.href,width:50,height:50}); }
+function buildDevices(){ const devices=[{id:"engine",name:"engine",icon:"fas fa-car"},{id:"truck",name:"truck",icon:"fas fa-truck"},{id:"motorcycle",name:"motorcycle",icon:"fas fa-motorcycle"},{id:"boat",name:"boat",icon:"fas fa-ship"},{id:"tractor",name:"tractor",icon:"fas fa-tractor"},{id:"generator",name:"generator",icon:"fas fa-charging-station"}]; let grid=document.getElementById('home-grid'); grid.innerHTML=devices.map(d=>`<div class="device-btn" onclick="openLab('${d.name}')"><i class="${d.icon} device-icon"></i><div class="device-name" id="dev-${d.id}">${t(d.name)}</div></div>`).join(''); }
+function openLab(deviceKey){ if(!totalCreditsLeft() && !state.isAdmin){ showToast(t('no_credits')); return; } state.currentDevice=deviceKey; state.reportLines=[]; state.finalDiagnosis=''; document.getElementById('home-grid').style.display='none'; document.getElementById('lab-ui').style.display='block'; document.getElementById('lab-device-name').innerHTML=t(deviceKey); document.getElementById('live-report').innerHTML=t('waiting'); document.getElementById('monitor-area').innerHTML=`<div style="padding:20px;color:#94a3b8">🔌 ${t('activate')}</div>`; for(let s in state.sensorStatus) if(state.sensorStatus[s]) stopSensor(s); state.currentMode=null; state.sensorsEnabled=false; document.getElementById('quickModeBtn').classList.remove('active'); document.getElementById('advancedModeBtn').classList.remove('active'); updateCreditDisplay(); }
+function closeLab(){ cancelDiagnosis(); document.getElementById('home-grid').style.display='grid'; document.getElementById('lab-ui').style.display='none'; state.currentDevice=null; }
+function buySingle(){ window.open("https://ai-moto-maintenance.lemonsqueezy.com/checkout/buy/16f76940-fbac-46fa-97a2-a14c43ab986d?checkout[success_url]=" + encodeURIComponent(window.location.href+"?payment=success&pack=single"), "_blank"); }
+function buyPack5(){ window.open("https://ai-moto-maintenance.lemonsqueezy.com/checkout/buy/54d3a421-481d-4cf9-a000-cd8e03c0f0fd?checkout[success_url]=" + encodeURIComponent(window.location.href+"?payment=success&pack=5"), "_blank"); }
+function buyPack15(){ window.open("https://ai-moto-maintenance.lemonsqueezy.com/checkout/buy/e483458f-9427-45e6-9d10-977ca5062c87?checkout[success_url]=" + encodeURIComponent(window.location.href+"?payment=success&pack=15"), "_blank"); }
+function processPaymentReturn() { const urlParams = new URLSearchParams(window.location.search); if(urlParams.get('payment') === 'success') { const pack = urlParams.get('pack'); let add = pack === 'single' ? 1 : (pack === '5' ? 5 : (pack === '15' ? 15 : 0)); if(add > 0) { addPaidCredits(add); showToast(t('credits_added', { amount: add })); window.history.replaceState({}, '', window.location.pathname); } } }
+async function init(){ initClock(); initGeo(); initQR(); buildLangSelect(); let savedLang = localStorage.getItem('engine_lang'); if(savedLang && langList.includes(savedLang)) state.lang = savedLang; document.getElementById('lang-select').value = state.lang; document.getElementById('device-uid').textContent = state.deviceID; await ensureTranslations(state.lang); applyTranslations(); processPaymentReturn(); document.getElementById('code-input').addEventListener('change',function(e){ if(e.target.value.toUpperCase() === 'MOULOUD2026'){ if(!state.isAdmin){ state.isAdmin = true; updateCreditDisplay(); showToast(t('admin_on')); } } else { showToast("❌ Invalid code"); } }); updateCreditDisplay(); }
+init();
+window.closePackModal = () => document.getElementById("packModal").style.display = "none";
+document.getElementById("pack5Btn").onclick = () => { buyPack5(); closePackModal(); };
+document.getElementById("pack15Btn").onclick = () => { buyPack15(); closePackModal(); };
 </script>
 </body>
 </html>
